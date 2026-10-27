@@ -23,9 +23,8 @@ Future<void> _pump(
       formFactor: formFactor,
       child: WidgetsApp(
         color: const Color(0xFFFFFFFF),
-        builder: (context, _) => Overlay(
-          initialEntries: [OverlayEntry(builder: (_) => child)],
-        ),
+        builder: (context, _) =>
+            Overlay(initialEntries: [OverlayEntry(builder: (_) => child)]),
       ),
     ),
   );
@@ -162,9 +161,7 @@ void main() {
       expect(taps, 1);
     });
 
-    testWidgets('leaves out empty secondary and snippet lines', (
-      tester,
-    ) async {
+    testWidgets('leaves out empty secondary and snippet lines', (tester) async {
       await _pump(
         tester,
         SizedBox(
@@ -316,10 +313,7 @@ void main() {
         ),
       );
       expect(find.byKey(const ValueKey('search-type-all')), findsOneWidget);
-      expect(
-        find.byKey(const ValueKey('search-type-value-x')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('search-type-value-x')), findsOneWidget);
       // Only the removable chip ends with a close mark.
       expect(find.byType(Icon20), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('search-type-value-x')));
@@ -332,12 +326,7 @@ void main() {
         tester,
         SearchTypeChips(
           chips: [
-            SearchTypeChip(
-              id: 'on',
-              label: 'On',
-              selected: true,
-              onTap: () {},
-            ),
+            SearchTypeChip(id: 'on', label: 'On', selected: true, onTap: () {}),
             SearchTypeChip(
               id: 'off',
               label: 'Off',
@@ -389,19 +378,13 @@ void main() {
       ),
     );
 
-    testWidgets('arrows move the selection and Enter picks it', (
-      tester,
-    ) async {
+    testWidgets('arrows move the selection and Enter picks it', (tester) async {
       final controller = TextEditingController();
       addTearDown(controller.dispose);
       final picked = <String>[];
       await _pump(
         tester,
-        panel(
-          controller: controller,
-          sections: _sections(),
-          picked: picked,
-        ),
+        panel(controller: controller, sections: _sections(), picked: picked),
       );
       await tester.pump();
       await _key(tester, LogicalKeyboardKey.enter);
@@ -483,10 +466,7 @@ void main() {
         tester,
         panel(controller: controller, sections: _sections(), picked: []),
       );
-      expect(
-        find.byKey(const ValueKey('search-narrowed-hint')),
-        findsNothing,
-      );
+      expect(find.byKey(const ValueKey('search-narrowed-hint')), findsNothing);
       expect(
         find.byKey(const ValueKey('search-correction-hint')),
         findsNothing,
@@ -520,11 +500,7 @@ void main() {
       final picked = <String>[];
       await _pump(
         tester,
-        panel(
-          controller: controller,
-          sections: _sections(),
-          picked: picked,
-        ),
+        panel(controller: controller, sections: _sections(), picked: picked),
       );
       await tester.tap(find.byKey(const ValueKey('row-a2')));
       expect(picked, ['a2']);
