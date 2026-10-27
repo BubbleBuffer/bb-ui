@@ -1,29 +1,26 @@
-# Gallery
+# UI primitives gallery
 
-With no live settings, the gallery runs its existing scripted scenes. The
-scripted mode also runs in a browser.
-
-To use a local BubblePaw host, supply all three Dart defines to a desktop build:
+A small, standalone Flutter app for `bb_ui`: buttons (including a disabled
+example), a live text field, checkbox selection, reference chips, a foldable
+stack and semantic colour swatches. It has no agent, host process or network
+dependency. Switch between light and dark at the top; the layout reflows at
+compact widths and scrolls in short windows.
 
 ```sh
-flutter run -d linux \
-  --dart-define=BP_BIN=/path/to/bubblepaw \
-  --dart-define=BP_WORKSPACE=/path/to/workspace \
-  --dart-define=BP_DATA=/path/to/host-data
+# From the repository root:
+flutter pub get
+cd apps/gallery
+flutter run -d chrome
+flutter test --exclude-tags golden
 ```
 
-If the desktop runner has not been generated, first run
-`flutter create --platforms=linux --project-name agent_kit_gallery .` in this
-directory. Select the corresponding platform and device for another desktop OS.
+The checked-in web runner is ready for `flutter build web`. To add a local
+desktop runner, run `flutter create --platforms=linux --project-name bb_ui_gallery .`
+here (or choose the target OS), then `flutter run -d linux`.
 
-Live mode uses the host configuration associated with the selected workspace and
-data directory. The gallery owns its child host and requests shutdown when the
-window exits. Partial settings show a configuration error; a web build with live
-settings explains that a desktop app is required. Startup failures use generic
-copy so local paths and host diagnostics do not appear in the UI.
-
-The adapter workflow builds web and Linux variants. Its separate opt-in local
-transport test uses the checksum-verified public BubblePaw v0.2.2 release and
-the offline demo provider. The gap test drops a real host notification and
-injects a synthetic `events.gap` to exercise recovery; it does not reproduce a
-host buffer overflow.
+Golden tests render four new `primitives_*.png` specimens at 1000 and 390 logical
+pixels, light and dark, with bundled fonts and device pixel ratio 1. The tall
+test windows capture the complete specimen sheet. These are new baselines;
+the old agent-scene references belong to agent-kit. Missing baselines fail the
+normal comparison job. Generate candidates on GitHub's pinned Linux runner
+and review them using [the verification guide](../../docs/verification.md).

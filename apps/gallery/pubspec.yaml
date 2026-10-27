@@ -1,6 +1,6 @@
-name: agent_kit_gallery
-description: Gallery of the agent kit's widgets, running on the scripted fake backend.
-version: 0.1.0
+name: bb_ui_gallery
+description: Interactive UI primitive specimens without a backend.
+version: 0.4.0
 publish_to: none
 resolution: workspace
 
@@ -10,12 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  agent_kit:
-    path: ../../packages/agent_kit
-  agent_kit_core:
-    path: ../../packages/agent_kit_core
-  agent_kit_bubblepaw:
-    path: ../../packages/agent_kit_bubblepaw
   bb_ui:
     path: ../../packages/bb_ui
 

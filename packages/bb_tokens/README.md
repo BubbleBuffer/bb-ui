@@ -1,54 +1,50 @@
 # bb_tokens
 
-BubbleBuffer design tokens for Flutter: colours, type scale, layout, radii and
-motion. Scratch's look is the default.
+BubbleBuffer design tokens for Flutter: colours, type scale, spacing, layout,
+radii and motion. Version 0.4.0 preserves the API extracted from agent-kit.
 
-## Where the colours come from
+Import `package:bb_tokens/bb_tokens.dart` or the compatibility `tokens.dart`
+entry point. `AppTheme`, `AppColors`, `TypeScale`, `Radii`, `Motion` and the
+layout/spacing helpers are shared with `bb_ui`. Hosts supply the font assets;
+the gallery includes a complete font registration example and OFL licences.
 
-Every colour is generated. The canonical source is the `agent-kit` profile of
-the BubbleBuffer design repository (`BubbleBuffer/BubbleBufferDesign`,
-`product-profiles.json`). Three files carry it into this package:
+## Colour provenance
 
-| File | What it is | Edit it? |
-|---|---|---|
-| `tokens/agent-kit.json` | The profile's resolved light and dark palette, vendored. A `vendored` header names the source repository, the commit and the command. | No, re-vendor it. |
-| `tool/generate_colors.dart` | Plain Dart (SDK only). Reads the JSON and writes `lib/src/colors.g.dart`. | Yes. |
-| `lib/src/colors.g.dart` | `ProfileColors.light` and `ProfileColors.dark`: every role as a `Color`, shadows as `BoxShadow` lists. | No. |
+Colours come from the original `agent-kit` profile of
+`BubbleBuffer/BubbleBufferDesign`. The profile name records provenance and
+remains unchanged in this extraction.
 
-`lib/tokens.dart` keeps the non-colour tokens (type, spacing, radii, motion,
-layout) and the public API. `AppColors` (Scratch's field names) and
-`KitInks` are backed by the generated palette; the roles that have no
-`AppColors` field (status, diff, context, control colours) are on
-`AppColors.palette`. `kTransparent` and `kMaskOpaque` are the only hand-written
-colour constants. Widgets read `BbTheme` roles, never raw colours: CI runs
-`scripts/check-raw-colours.sh` over `packages/agent_kit`, `packages/bb_ui` and
-`apps/`.
+| File | Role | Edit policy |
+| --- | --- | --- |
+| `tokens/agent-kit.json` | Resolved light and dark palette, with source repository, commit and command | Re-vendor from the design repository |
+| `tool/generate_colors.dart` | SDK-only generator | Edit as needed |
+| `lib/src/colors.g.dart` | Generated `ProfileColors` values and shadows | Regenerate |
 
-## Changing a colour
+`lib/tokens.dart` contains the non-colour tokens and public API. `AppColors`
+and `KitInks` read the generated palette. `kTransparent` and `kMaskOpaque` are
+the only hand-written colour constants. `AppColors.palette` exposes the full
+resolved profile. CI checks raw colours in `packages/bb_ui` and `apps`.
 
-Cross-repo sync is a command you run, not automation: the design repository
-may be private, and this repository's CI cannot reach it.
+## Change a colour
 
-1. In a checkout of the design repository, change the `agent-kit` profile in
+Cross-repository sync is explicit; public CI uses only the vendored JSON.
+
+1. Change the profile in the design repository's
    `plugins/bubblebuffer-design/assets/design-system/product-profiles.json`,
-   run `npm run design:generate`, and merge that change.
-2. From that checkout, vendor the palette into this repository:
+   run `npm run design:generate`, and merge the source change.
+2. From that checkout, re-vendor the resolved palette:
 
-   ```
+   ```sh
    node plugins/bubblebuffer-design/skills/bubblebuffer-design-system/scripts/generate-design-css.mjs \
-     --profile agent-kit --json <path to this repo>/packages/bb_tokens/tokens/agent-kit.json
+     --profile agent-kit --json <bb-ui-checkout>/packages/bb_tokens/tokens/agent-kit.json
    ```
 
-3. In `packages/bb_tokens`, regenerate the Dart colours:
+3. In `packages/bb_tokens`, run `dart tool/generate_colors.dart`.
+4. Review and commit the JSON and generated Dart together. CI regenerates the
+   Dart and fails on drift. If screenshots change, follow the explicit
+   [golden candidate review](../../docs/verification.md) workflow.
 
-   ```
-   dart tool/generate_colors.dart
-   ```
+The generator locates files relative to its own script, so it also runs as
+`dart packages/bb_tokens/tool/generate_colors.dart` from the root.
 
-4. Commit `tokens/agent-kit.json` and `lib/src/colors.g.dart` together. CI
-   regenerates `colors.g.dart` and fails on any difference. Goldens may move;
-   re-render them with the manual `workflow_dispatch` run (see
-   `docs/agent-kit.md`).
-
-The Scratch-skin mockup's `theme.css` is generated from the same profile; its
-`--css <path>` option writes it in the same step as the JSON.
+AGPL-3.0; see the repository [LICENSE](../../LICENSE).

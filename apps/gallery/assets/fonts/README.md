@@ -1,6 +1,6 @@
 # Fonts
 
-Atkinson Hyperlegible Next, Fragment Mono and Bricolage Grotesque, all under the
-SIL Open Font License 1.1 (see `licenses/`). The gallery bundles them, and the
-`agent_kit` tests load them from here (`package:agent_kit/testing.dart`), so
-golden screenshots draw real text.
+Atkinson Hyperlegible Next, Fragment Mono and Bricolage Grotesque are bundled
+under the SIL Open Font License 1.1; retain the notices in `licenses/`.
+The gallery registers these families in its pubspec and loads the same files
+in `test/flutter_test_config.dart`, so golden screenshots draw real text.

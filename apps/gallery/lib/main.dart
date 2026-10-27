@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import 'src/live_gallery.dart';
+import 'gallery.dart';
 
-void main() => runApp(const GalleryLaunch());
+void main() => runApp(const GalleryApp());

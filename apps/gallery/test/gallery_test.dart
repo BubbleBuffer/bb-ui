@@ -1,51 +1,51 @@
-// The gallery runs on the scripted backend and its toolbar drives the scene,
-// the theme and the width.
-
-import 'package:agent_kit_core/agent_kit_core.dart' show ChatStatus;
-import 'package:agent_kit_gallery/gallery.dart';
+import 'package:bb_ui/bb_ui.dart';
+import 'package:bb_ui_gallery/gallery.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('the scripted chat ends waiting for the user', (tester) async {
-    final controller = GalleryController();
-    addTearDown(controller.dispose);
-    await tester.runAsync(controller.start);
-    final snapshot = controller.snapshot!;
-    expect(snapshot.title, 'Quota bar flickers on reconnect');
-    expect(snapshot.status, ChatStatus.needsYou);
-    expect(snapshot.approvals, isNotEmpty);
-  });
-
-  testWidgets('the toolbar switches scene, theme and width', (tester) async {
-    tester.view.physicalSize = const Size(1600, 900);
+  testWidgets('controls update samples, draft, selection and stack', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    final controller = GalleryController();
-    addTearDown(controller.dispose);
-    await tester.runAsync(controller.start);
-    await tester.pumpWidget(GalleryApp(controller: controller));
-
-    for (var i = 0; i < 6; i++) {
-      await tester.pump();
-    }
-    expect(controller.scene, GalleryScene.workbench);
-    expect(controller.width, 1440);
-    expect(find.text('Quota bar flickers on reconnect'), findsWidgets);
-
-    await tester.tap(find.text('C · Phone'));
+    await tester.pumpWidget(const GalleryApp());
+    await tester.tap(find.text('Add sample'));
+    await tester.pumpAndSettle();
+    expect(find.text('Samples added: 1'), findsOneWidget);
+    await tester.tap(find.text('Reset'));
+    await tester.pumpAndSettle();
+    expect(find.text('Samples added: 0'), findsOneWidget);
+    await tester.enterText(find.byType(EditableText), 'A new collection');
     await tester.pump();
-    expect(controller.scene, GalleryScene.phone);
-    expect(controller.width, 390);
+    expect(find.text('Preview: A new collection'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('selection-checkbox')));
+    await tester.pumpAndSettle();
+    expect(find.text('Sample not selected'), findsOneWidget);
+    expect(find.text('A stack keeps related items together.'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('stack-toggle')));
+    await tester.pumpAndSettle();
+    expect(find.text('A stack keeps related items together.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
-    await tester.tap(find.text('Dark'));
-    await tester.pump();
-    expect(controller.brightness, Brightness.dark);
-
-    controller.width = 5000;
-    expect(controller.width, maxGalleryWidth);
-    controller.width = 10;
-    expect(controller.width, minGalleryWidth);
+  testWidgets('compact gallery switches theme and remains scrollable', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const GalleryApp());
+    await tester.tap(find.byKey(const ValueKey('theme-toggle')));
+    await tester.pumpAndSettle();
+    expect(find.text('Use light theme'), findsOneWidget);
+    final theme = AppTheme.of(tester.element(find.byType(PrimitiveGallery)));
+    expect(theme.colors.dark, isTrue);
+    await tester.ensureVisible(find.text('Semantic colours'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }

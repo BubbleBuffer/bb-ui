@@ -1,0 +1,17 @@
+.dart_tool/
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+pubspec.lock
+**/test/failures/
+format.patch
+shots/
+
+# Keep personal editor and agent state outside the public repository.
+.claude/
+.codex/
+.cursor/
+.vscode/
+.idea/
+.agents/

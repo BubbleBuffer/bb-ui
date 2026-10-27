@@ -20,7 +20,7 @@ permissions:
 jobs:
   check:
     name: private strings
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
       - name: Check tracked files
         env:
           PRIVATE_STRINGS: ${{ secrets.PRIVATE_STRINGS }}
-          FROM_FORK: ${{ github.event.pull_request.head.repo.fork == true }}
+          FROM_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: |
           if [ "$FROM_FORK" = true ]; then
             bash scripts/check-private-strings.sh

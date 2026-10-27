@@ -1,7 +1,3 @@
-# Format, analyze and test every package (Flutter packages with flutter
-# test, pure Dart ones with dart test); on pushes, also check that a
-# consumer can depend on the packages through git, the way Scratch pins them.
-# Public repository: GitHub-hosted runners only.
 name: ci
 
 on:
@@ -15,7 +11,7 @@ permissions:
 jobs:
   format:
     name: dart format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -28,21 +24,19 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
-      # When the check fails, hand over the formatted result as a patch
-      # (git apply format.patch), since formatting is not run on the PC.
       - name: Save a format patch
         if: failure()
         run: dart format . && git diff > format.patch
-      - name: Upload the format patch
+      - uses: actions/upload-artifact@v4
         if: failure()
-        uses: actions/upload-artifact@v4
         with:
           name: format-patch
           path: format.patch
+          if-no-files-found: ignore
 
   analyze:
     name: flutter analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -54,15 +48,11 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - run: flutter analyze
+      - run: flutter analyze --fatal-infos
 
-  # One colour source: the palette is vendored from the BubbleBuffer design
-  # repository (packages/bb_tokens/tokens/agent-kit.json) and the Dart colours
-  # are generated from it. Fails when the committed file differs from a fresh
-  # generation, or when kit code writes a raw colour.
   colours:
-    name: colour source
-    runs-on: ubuntu-latest
+    name: colour drift and raw colours
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -74,31 +64,23 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - name: Regenerate the colours
+      - name: Regenerate colours
         working-directory: packages/bb_tokens
         run: dart tool/generate_colors.dart
-      - name: Fail on drift
-        run: |
-          git diff --exit-code -- packages/bb_tokens/lib/src/colors.g.dart || {
-            echo "colors.g.dart is stale: run dart tool/generate_colors.dart in packages/bb_tokens." >&2
-            exit 1
-          }
-      - name: Save the regenerated file
-        if: failure()
-        run: cp packages/bb_tokens/lib/src/colors.g.dart colors.g.dart
-      - name: Upload the regenerated file
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: colors-g-dart
-          path: colors.g.dart
-      - name: No raw colours in kit code
+      - name: Fail on generated colour drift
+        run: git diff --exit-code -- packages/bb_tokens/lib/src/colors.g.dart
+      - name: Check raw colours
         if: ${{ !cancelled() }}
-        run: scripts/check-raw-colours.sh
+        run: bash scripts/check-raw-colours.sh
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: regenerated-colours
+          path: packages/bb_tokens/lib/src/colors.g.dart
 
   test:
-    name: flutter test (${{ matrix.package }})
-    runs-on: ubuntu-latest
+    name: tests (${{ matrix.package }})
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -106,7 +88,6 @@ jobs:
         include:
           - {package: bb_tokens, dir: packages/bb_tokens}
           - {package: bb_ui, dir: packages/bb_ui}
-          - {package: agent_kit, dir: packages/agent_kit}
           - {package: gallery, dir: apps/gallery}
     steps:
       - uses: actions/checkout@v4
@@ -118,23 +99,14 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - name: flutter test
+      - name: Run non-golden tests
         working-directory: ${{ matrix.dir }}
-        # Goldens run in the goldens job.
         run: flutter test --exclude-tags golden
 
-  # Golden screenshots of the StatusMark specimens and of every gallery scene
-  # (1440, 1000 and 390 px, light and dark), rendered with the bundled fonts.
-  # Pushes and pull requests compare with the committed PNGs. A manual run
-  # (workflow_dispatch) re-renders them without comparing; download the
-  # artifact (`gh run download <id> -n gallery-shots`) to look at them next to
-  # the mockup shots, or to commit them. Either way the PNGs are uploaded as
-  # the `gallery-shots` artifact: components/ from packages/agent_kit and
-  # scenes/ from apps/gallery.
   goldens:
-    name: goldens
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    name: primitive goldens
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -145,48 +117,41 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - name: Compare with the committed goldens
+      - name: Compare committed baselines (missing PNGs fail)
         if: github.event_name != 'workflow_dispatch'
+        working-directory: apps/gallery
+        run: flutter test --tags golden
+      - name: Test gallery and render golden candidates
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: apps/gallery
         run: |
-          set -euo pipefail
-          (cd packages/agent_kit && flutter test --tags golden)
-          (cd apps/gallery && flutter test --tags golden)
-      - name: Re-render the goldens (no comparison)
+          flutter test --exclude-tags golden
+          flutter test --tags golden --update-goldens
+      - name: Collect candidates and rendering environment
         if: github.event_name == 'workflow_dispatch'
         run: |
-          set -euo pipefail
-          (cd packages/agent_kit && flutter test --tags golden --update-goldens)
-          (cd apps/gallery && flutter test --tags golden --update-goldens)
-      - name: Collect the shots
-        if: ${{ !cancelled() }}
-        run: |
-          mkdir -p shots/components shots/scenes
-          cp packages/agent_kit/test/goldens/*.png shots/components/ || true
-          cp apps/gallery/test/goldens/*.png shots/scenes/ || true
+          mkdir -p shots/test/goldens
+          cp apps/gallery/test/goldens/primitives_*.png shots/test/goldens/
+          git rev-parse HEAD > shots/commit.txt
+          flutter --version > shots/flutter-version.txt
+          cat /etc/os-release > shots/os-release.txt
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: github.event_name == 'workflow_dispatch'
         with:
-          name: gallery-shots
+          name: primitive-golden-candidates
           path: shots
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: golden-failures
-          path: |
-            packages/agent_kit/test/failures
-            apps/gallery/test/failures
+          path: apps/gallery/test/failures
           if-no-files-found: ignore
 
-  # Pure Dart packages: strict analysis (infos fail) and dart test.
-  dart-test:
-    name: dart test (${{ matrix.package }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        package: [agent_kit_core]
+  gallery-web:
+    name: build gallery web
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -197,17 +162,17 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - name: dart analyze
-        working-directory: packages/${{ matrix.package }}
-        run: dart analyze --fatal-infos
-      - name: dart test
-        working-directory: packages/${{ matrix.package }}
-        run: dart test
+      - working-directory: apps/gallery
+        run: flutter build web --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: primitives-gallery-web
+          path: apps/gallery/build/web
 
   git-consumer:
     name: git dependency resolves
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: subosito/flutter-action@v2
@@ -215,12 +180,10 @@ jobs:
           channel: stable
           flutter-version: 3.47.5
           cache: true
-      # A consumer pins bb_ui by ref name (branch or tag), as Scratch does,
-      # and gets bb_tokens through bb_ui's path dependency.
-      - name: Resolve and analyze a consumer
+      - name: Resolve and analyze a consumer at this commit
         env:
           URL: https://github.com/${{ github.repository }}.git
-          REF: ${{ github.ref_name }}
+          REF: ${{ github.sha }}
         run: |
           set -euo pipefail
           dir="$RUNNER_TEMP/consumer"
@@ -241,8 +204,6 @@ jobs:
           YAML
           printf "import 'package:bb_ui/bb_ui.dart';\n\nfinal colors = AppColors.light;\nconst hint = AppTooltip.hoverDelay;\n" > "$dir/lib/ui_use.dart"
           printf "import 'package:bb_ui/tokens.dart';\n\nconst radius = Radii.md;\n" > "$dir/lib/tokens_use.dart"
-          cat "$dir/pubspec.yaml"
           cd "$dir"
           flutter pub get
-          flutter analyze
-          grep -A8 '^  bb_' pubspec.lock
+          flutter analyze --fatal-infos
