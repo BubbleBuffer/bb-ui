@@ -47,4 +47,4 @@ Cross-repository sync is explicit; public CI uses only the vendored JSON.
 The generator locates files relative to its own script, so it also runs as
 `dart packages/bb_tokens/tool/generate_colors.dart` from the root.
 
-AGPL-3.0; see the repository [LICENSE](../../LICENSE).
+AGPL-3.0-or-later; see the repository [LICENSE](../../LICENSE).

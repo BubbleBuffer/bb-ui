@@ -24,8 +24,8 @@ repository.
 dependencies:
   bb_ui:
     git:
-      url: https://github.com/BubbleBuffer/bb-ui.git
-      ref: <reviewed-commit-or-tag>
+      url: https://github.com/BubbleBuffer/bb-ui
+      ref: v0.4.0
       path: packages/bb_ui
 ```
 
@@ -55,6 +55,6 @@ baseline generation, candidate review and private-string configuration.
 
 ## Licence
 
-AGPL-3.0, as inherited from agent-kit; see [LICENSE](LICENSE). Bundled fonts
+AGPL-3.0-or-later, as inherited from agent-kit; see [LICENSE](LICENSE). Bundled fonts
 retain their SIL Open Font License notices in
 [`apps/gallery/assets/fonts/licenses`](apps/gallery/assets/fonts/licenses).

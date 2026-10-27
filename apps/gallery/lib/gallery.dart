@@ -24,20 +24,22 @@ class _GalleryAppState extends State<GalleryApp> {
       settings: settings,
       pageBuilder: (context, animation, secondary) => builder(context),
     ),
-    home: LayoutBuilder(
+    // The theme wraps the Navigator and its Overlay, including text handles.
+    builder: (context, child) => LayoutBuilder(
       builder: (context, constraints) => AppTheme(
         colors: _brightness == Brightness.dark
             ? AppColors.darkTheme
             : AppColors.light,
         formFactor: FormFactor.forWidth(constraints.maxWidth),
-        child: PrimitiveGallery(
-          onThemeChanged: () => setState(() {
-            _brightness = _brightness == Brightness.light
-                ? Brightness.dark
-                : Brightness.light;
-          }),
-        ),
+        child: child!,
       ),
+    ),
+    home: PrimitiveGallery(
+      onThemeChanged: () => setState(() {
+        _brightness = _brightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+      }),
     ),
   );
 }
@@ -161,12 +163,15 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                           key: const ValueKey('selection-checkbox'),
                           checked: _checked,
                           size: 32,
-                          onChanged: (value) => setState(() => _checked = value),
+                          onChanged: (value) =>
+                              setState(() => _checked = value),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            _checked ? 'Sample selected' : 'Sample not selected',
+                            _checked
+                                ? 'Sample selected'
+                                : 'Sample not selected',
                             style: ts(context.type.ui, c.textPrimary),
                           ),
                         ),
@@ -226,7 +231,10 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                                 const SizedBox(height: 6),
                                 Text(
                                   label,
-                                  style: ts(context.type.uiSmall, c.textSecondary),
+                                  style: ts(
+                                    context.type.uiSmall,
+                                    c.textSecondary,
+                                  ),
                                 ),
                               ],
                             ),

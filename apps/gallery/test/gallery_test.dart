@@ -20,6 +20,8 @@ void main() {
     expect(find.text('Samples added: 0'), findsOneWidget);
     await tester.enterText(find.byType(EditableText), 'A new collection');
     await tester.pump();
+    // Text-selection handles render in the Navigator overlay and need a theme.
+    expect(tester.takeException(), isNull);
     expect(find.text('Preview: A new collection'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('selection-checkbox')));
     await tester.pumpAndSettle();

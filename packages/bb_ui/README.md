@@ -32,4 +32,4 @@ it is not a complete state or accessibility audit of every export.
 
 Widgets read theme roles; raw colour literals belong only in the token source.
 Run `flutter test` in this package for the inherited tooltip interaction tests.
-AGPL-3.0; see the repository [LICENSE](../../LICENSE).
+AGPL-3.0-or-later; see the repository [LICENSE](../../LICENSE).
