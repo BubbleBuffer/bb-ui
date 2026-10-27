@@ -10,6 +10,7 @@ export 'lucide.dart';
 export 'marked_list.dart';
 export 'menu.dart';
 export 'modal.dart';
+export 'palette.dart';
 export 'picker_sheet.dart';
 export 'reference_chip.dart';
 export 'routes.dart';
