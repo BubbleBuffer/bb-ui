@@ -1,0 +1,3 @@
+tags:
+  golden:
+    description: Compares the neutral primitive gallery with committed PNGs.

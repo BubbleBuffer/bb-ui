@@ -1,0 +1,14 @@
+name: bb_ui_workspace
+description: BubbleBuffer Flutter UI packages and their primitives gallery.
+publish_to: none
+
+environment:
+  sdk: ^3.13.4
+
+workspace:
+  - packages/bb_tokens
+  - packages/bb_ui
+  - apps/gallery
+
+dev_dependencies:
+  flutter_lints: ^6.0.0

@@ -1,30 +1,42 @@
-// Approved Stacks tokens from wiki/product/design.md and the direction
-// prototype, plus the app-wide type scale and bundled fonts.
+// Approved Stacks tokens plus the app-wide type scale and bundled fonts.
+// Every colour comes from `src/colors.g.dart`, generated from the agent-kit
+// profile of the BubbleBuffer design repository (packages/bb_tokens/README.md).
 // No Material anywhere: this is the only theme the widgets read.
 
 import 'package:flutter/widgets.dart';
+
+import 'src/colors.g.dart';
+
+export 'src/colors.g.dart';
 
 /// Bundled fonts used identically on every platform and in golden tests.
 String sansFamily = 'Atkinson Hyperlegible Next';
 String monoFamily = 'Fragment Mono';
 String displayFamily = 'Bricolage Grotesque';
 const monoFallback = ['monospace'];
-Color _rgba(int r, int g, int b, double a) => Color.fromRGBO(r, g, b, a);
+
+/// Fully transparent. `Colors.transparent` is Material, which the kit avoids.
+const kTransparent = Color(0x00000000);
+
+/// An opaque colour for alpha masks, where only the alpha channel matters.
+const kMaskOpaque = Color(0xFF000000);
 
 /// Quiet space colours shared by the tree, agenda and checklist progress.
 const spaceColorNames = ['apricot', 'paw', 'moss', 'duvet', 'sun', 'sky'];
-Color? spaceColor(String? name, Brightness brightness) => switch (name) {
-  'apricot' => const Color(0xFFDE945F),
-  'paw' => const Color(0xFFDDA39D),
-  'moss' => const Color(0xFF697A6B),
-  'duvet' =>
-    brightness == Brightness.dark
-        ? const Color(0xFF999DA6)
-        : const Color(0xFF2F3138),
-  'sun' => const Color(0xFFF0D29C),
-  'sky' => const Color(0xFFCBD5DF),
-  _ => null,
-};
+Color? spaceColor(String? name, Brightness brightness) {
+  final p = brightness == Brightness.dark
+      ? ProfileColors.dark
+      : ProfileColors.light;
+  return switch (name) {
+    'apricot' => p.spaceApricot,
+    'paw' => p.spacePaw,
+    'moss' => p.spaceMoss,
+    'duvet' => p.spaceDuvet,
+    'sun' => p.spaceSun,
+    'sky' => p.spaceSky,
+    _ => null,
+  };
+}
 
 /// Opaque edge/tile colours; the quiet dot/pill palette above stays separate.
 class SpacePatch {
@@ -34,7 +46,8 @@ class SpacePatch {
   Color get hover => Color.alphaBlend(ink.withValues(alpha: .12), fill);
 
   /// Moss keeps its original backing behind title/glyphs on hover.
-  Color get hoverTextBacking => fill == const Color(0xFF5F7062) ? fill : hover;
+  Color get hoverTextBacking =>
+      fill == ProfileColors.light.spacePatchMossFill ? fill : hover;
 }
 
 SpacePatch? spacePatch(
@@ -43,28 +56,40 @@ SpacePatch? spacePatch(
   bool rail = false,
 }) {
   final dark = brightness == Brightness.dark || (rail && name == 'duvet');
-  final values = switch (name) {
-    'apricot' =>
-      dark ? [0xDB8C56, 0xB0673A, 0x1E2024] : [0xDE945F, 0xBF6F3C, 0x282A2F],
-    'paw' =>
-      dark ? [0xD29891, 0xAC736D, 0x1E2024] : [0xDDA39D, 0xBC7C75, 0x282A2F],
-    'moss' =>
-      dark ? [0x5F7062, 0x4A5A4D, 0xFFFAF1] : [0x5F7062, 0x495A4C, 0xFFFAF1],
-    'duvet' =>
-      dark ? [0xDCD4C8, 0xB5AA9C, 0x282A2F] : [0x2F3138, 0x4C505A, 0xF3EFE7],
-    'sun' =>
-      dark ? [0xE3C48B, 0xBC9A58, 0x1E2024] : [0xF0D29C, 0xCDA663, 0x282A2F],
-    'sky' =>
-      dark ? [0xB9C6D3, 0x93A5B8, 0x1E2024] : [0xCBD5DF, 0xA3B3C4, 0x282A2F],
+  final p = dark ? ProfileColors.dark : ProfileColors.light;
+  return switch (name) {
+    'apricot' => SpacePatch(
+      p.spacePatchApricotFill,
+      p.spacePatchApricotDeep,
+      p.spacePatchApricotInk,
+    ),
+    'paw' => SpacePatch(
+      p.spacePatchPawFill,
+      p.spacePatchPawDeep,
+      p.spacePatchPawInk,
+    ),
+    'moss' => SpacePatch(
+      p.spacePatchMossFill,
+      p.spacePatchMossDeep,
+      p.spacePatchMossInk,
+    ),
+    'duvet' => SpacePatch(
+      p.spacePatchDuvetFill,
+      p.spacePatchDuvetDeep,
+      p.spacePatchDuvetInk,
+    ),
+    'sun' => SpacePatch(
+      p.spacePatchSunFill,
+      p.spacePatchSunDeep,
+      p.spacePatchSunInk,
+    ),
+    'sky' => SpacePatch(
+      p.spacePatchSkyFill,
+      p.spacePatchSkyDeep,
+      p.spacePatchSkyInk,
+    ),
     _ => null,
   };
-  return values == null
-      ? null
-      : SpacePatch(
-          Color(0xFF000000 | values[0]),
-          Color(0xFF000000 | values[1]),
-          Color(0xFF000000 | values[2]),
-        );
 }
 
 class AppColors {
@@ -114,7 +139,12 @@ class AppColors {
     required this.seam,
     required this.seamHover,
     required this.stack,
-  });
+    ProfileColors? palette,
+  }) : palette = palette ?? (dark ? ProfileColors.dark : ProfileColors.light);
+
+  /// Every role of the agent-kit profile, including the ones below that
+  /// have no field of their own (status, diff, context and control colours).
+  final ProfileColors palette;
   final bool dark;
   final Color bgPrimary;
   final Color bgSecondary;
@@ -162,126 +192,60 @@ class AppColors {
   List<BoxShadow> get shadowMenu => seamHover;
   List<BoxShadow> get shadowSmall => seam;
 
-  static final light = AppColors(
-    dark: false,
-    bgPrimary: const Color(0xFFFFFAF1),
-    bgSecondary: const Color(0xFFF3EFE7),
-    bgTertiary: const Color(0xFFECE6DB),
-    bgElevated: const Color(0xFFFFFAF1),
-    bgHover: _rgba(40, 42, 47, 0.05),
-    bgPressed: _rgba(40, 42, 47, 0.08),
-    bgSelectedBlock: _rgba(222, 148, 95, 0.14),
-    textSelection: _rgba(222, 148, 95, 0.30),
-    textPrimary: const Color(0xFF282A2F),
-    textSecondary: const Color(0xFF625C55),
-    textTertiary: const Color(0xFF6C645D),
-    textDisabled: const Color(0xFFB8ADA1),
-    iconPrimary: const Color(0xFF282A2F),
-    iconSecondary: const Color(0xFF625C55),
-    iconTertiary: const Color(0xFF6C645D),
-    border: const Color(0xFFE4DCCF),
-    borderSubtle: const Color(0xFFEDE6DA),
-    borderStrong: const Color(0xFFB8ADA1),
-    borderTranslucent: const Color(0xFFE4DCCF),
-    divider: const Color(0xFFE4DCCF),
-    accent: const Color(0xFFDE945F),
-    accentHover: const Color(0xFFC97F4A),
-    inlineCodeBg: const Color(0xFFF3EFE7),
-    inlineCodeText: const Color(0xFF874016),
-    overlay: _rgba(40, 42, 47, 0.45),
-    desk: const Color(0xFFECE6DB),
-    accentText: const Color(0xFF874016),
-    onAccent: const Color(0xFF282A2F),
-    focus: const Color(0xFF7AB7FF),
-    thread: const Color(0xFFB8ADA1),
-    threadStrong: const Color(0xFF6C645D),
-    okBg: const Color(0xFFCAD8CD),
-    infoBg: const Color(0xFFCBD5DF),
-    attnBg: const Color(0xFFF0D29C),
-    dangerBg: const Color(0xFFE5B1AA),
-    pawBg: const Color(0xFFEFD3CF),
-    rail: const Color(0xFF2F3138),
-    rail2: const Color(0xFF3B3E45),
-    railInk: const Color(0xFFF3EFE7),
-    railMuted: const Color(0xFFC6BAAC),
-    railLine: const Color(0xFF41444C),
-    seam: const [
-      BoxShadow(color: Color(0x1A282A2F), offset: Offset(0, 4), blurRadius: 12),
-    ],
-    seamHover: const [
-      BoxShadow(color: Color(0x24282A2F), offset: Offset(0, 8), blurRadius: 20),
-    ],
-    stack: const [
-      BoxShadow(
-        color: Color(0x57282A2F),
-        offset: Offset(-14, 0),
-        blurRadius: 28,
-        spreadRadius: -14,
-      ),
-      BoxShadow(color: Color(0x0F282A2F), spreadRadius: 1),
-    ],
-  );
+  static final light = _appColors(ProfileColors.light, dark: false);
 
-  static final darkTheme = AppColors(
-    dark: true,
-    bgPrimary: const Color(0xFF30333A),
-    bgSecondary: const Color(0xFF2A2D33),
-    bgTertiary: const Color(0xFF222428),
-    bgElevated: const Color(0xFF30333A),
-    bgHover: _rgba(255, 255, 255, 0.06),
-    bgPressed: _rgba(255, 255, 255, 0.09),
-    bgSelectedBlock: _rgba(240, 160, 100, 0.18),
-    textSelection: _rgba(240, 160, 100, 0.34),
-    textPrimary: const Color(0xFFF3EFE7),
-    textSecondary: const Color(0xFFC6BAAC),
-    textTertiary: const Color(0xFF999DA6),
-    textDisabled: const Color(0xFF575B64),
-    iconPrimary: const Color(0xFFF3EFE7),
-    iconSecondary: const Color(0xFFC6BAAC),
-    iconTertiary: const Color(0xFF999DA6),
-    border: const Color(0xFF41444C),
-    borderSubtle: const Color(0xFF363940),
-    borderStrong: const Color(0xFF575B64),
-    borderTranslucent: const Color(0xFF41444C),
-    divider: const Color(0xFF41444C),
-    accent: const Color(0xFFF0A064),
-    accentHover: const Color(0xFFF5B47F),
-    inlineCodeBg: const Color(0xFF2A2D33),
-    inlineCodeText: const Color(0xFFF0A064),
-    overlay: _rgba(0, 0, 0, 0.60),
-    desk: const Color(0xFF222428),
-    accentText: const Color(0xFFF0A064),
-    onAccent: const Color(0xFF282A2F),
-    focus: const Color(0xFF7AB7FF),
-    thread: const Color(0xFF575B64),
-    threadStrong: const Color(0xFF999DA6),
-    okBg: _rgba(202, 216, 205, 0.22),
-    infoBg: _rgba(203, 213, 223, 0.20),
-    attnBg: _rgba(240, 210, 156, 0.20),
-    dangerBg: _rgba(229, 177, 170, 0.26),
-    pawBg: _rgba(221, 163, 157, 0.22),
-    rail: const Color(0xFF141618),
-    rail2: const Color(0xFF24262B),
-    railInk: const Color(0xFFF3EFE7),
-    railMuted: const Color(0xFFC6BAAC),
-    railLine: const Color(0xFF2B2E33),
-    seam: const [
-      BoxShadow(color: Color(0x52000000), offset: Offset(0, 4), blurRadius: 12),
-    ],
-    seamHover: const [
-      BoxShadow(color: Color(0x6B000000), offset: Offset(0, 8), blurRadius: 20),
-    ],
-    stack: const [
-      BoxShadow(
-        color: Color(0x99000000),
-        offset: Offset(-16, 0),
-        blurRadius: 30,
-        spreadRadius: -12,
-      ),
-      BoxShadow(color: Color(0x0DFFFFFF), spreadRadius: 1),
-    ],
-  );
+  static final darkTheme = _appColors(ProfileColors.dark, dark: true);
 }
+
+/// Scratch's field names over the generated palette.
+AppColors _appColors(ProfileColors p, {required bool dark}) => AppColors(
+  dark: dark,
+  palette: p,
+  bgPrimary: p.surface,
+  bgSecondary: p.surface2,
+  bgTertiary: p.desk,
+  bgElevated: p.raised,
+  bgHover: p.hover,
+  bgPressed: p.pressed,
+  bgSelectedBlock: p.selected,
+  textSelection: p.selection,
+  textPrimary: p.ink,
+  textSecondary: p.muted,
+  textTertiary: p.faint,
+  textDisabled: p.disabled,
+  iconPrimary: p.ink,
+  iconSecondary: p.icon,
+  iconTertiary: p.iconFaint,
+  border: p.seam,
+  borderSubtle: p.seamSubtle,
+  borderStrong: p.seamStrong,
+  borderTranslucent: p.seam,
+  divider: p.seam,
+  accent: p.accent,
+  accentHover: p.accentHover,
+  inlineCodeBg: p.codeBg,
+  inlineCodeText: p.codeInk,
+  overlay: p.scrim,
+  desk: p.desk,
+  accentText: p.accentInk,
+  onAccent: p.onAccent,
+  focus: p.focus,
+  thread: p.thread,
+  threadStrong: p.threadStrong,
+  okBg: p.constructive,
+  infoBg: p.information,
+  attnBg: p.attention,
+  dangerBg: p.danger,
+  pawBg: p.pawTint,
+  rail: p.scratchRail,
+  rail2: p.scratchRail2,
+  railInk: p.scratchRailInk,
+  railMuted: p.scratchRailMuted,
+  railLine: p.scratchRailLine,
+  seam: p.shadow,
+  seamHover: p.shadowHover,
+  stack: p.shadowStack,
+);
 
 /// One entry of the type scale: size / line height in logical px, weight.
 class TypeSpec {
@@ -462,4 +426,118 @@ extension ThemeX on BuildContext {
   TypeScale get type => AppTheme.of(this).type;
   FormFactor get formFactor => AppTheme.of(this).formFactor;
   bool get mobile => AppTheme.of(this).mobile;
+}
+
+// ---------------------------------------------------------------------------
+// Agent kit tokens: the values of the approved Scratch-skin mockup's
+// `theme.css` that Scratch's own tokens do not have. Widgets read them through
+// the agent kit's `BbTheme`.
+// ---------------------------------------------------------------------------
+
+/// Layout thresholds and sizes of the agent kit (`--size-*`, `--fit-composer`,
+/// `--pane-min-*`, `--edge-tab`, `--ctl-h`, `--row` in `theme.css`).
+///
+/// The kit lays out by the width of its own container, never the window:
+/// compact is below [sizeMedium], medium from there to below [sizeExpanded],
+/// expanded from [sizeExpanded] up.
+class KitLayout {
+  const KitLayout({
+    this.sizeMedium = 600,
+    this.sizeExpanded = 1000,
+    this.fitComposer = 460,
+    this.contextSplit = 680,
+    this.paneMinWidth = 200,
+    this.paneMinHeight = 120,
+    this.edgeTab = 28,
+    this.controlHeight = 32,
+    this.rowHeight = 28,
+  });
+
+  /// The values of `theme.css`.
+  static const standard = KitLayout();
+
+  /// Container width where compact ends.
+  final double sizeMedium;
+
+  /// Container width where medium ends.
+  final double sizeExpanded;
+
+  /// Composer width below which Stop and Send drop their labels.
+  final double fitComposer;
+
+  /// Context pane width from which a summary's detail sits beside the list
+  /// instead of replacing it.
+  final double contextSplit;
+
+  /// A workspace pane never renders narrower than this.
+  final double paneMinWidth;
+
+  /// A workspace pane never renders shorter than this.
+  final double paneMinHeight;
+
+  /// Width of a collapsed pane's edge tab.
+  final double edgeTab;
+
+  /// Height of the agent's buttons (`--ctl-h`).
+  final double controlHeight;
+
+  /// Height of a list row (`--row`).
+  final double rowHeight;
+}
+
+/// The kit's spacing scale. `theme.css` has no scale, so these are the steps
+/// `app.css` uses (2, 4, 6/8, 10/12, 16, 24 px).
+class KitSpacing {
+  const KitSpacing({
+    this.hair = 2,
+    this.xs = 4,
+    this.sm = 8,
+    this.md = 12,
+    this.lg = 16,
+    this.xl = 24,
+  });
+
+  static const standard = KitSpacing();
+
+  final double hair, xs, sm, md, lg, xl;
+}
+
+/// Motion that Scratch's [Motion] lacks.
+class KitMotion {
+  const KitMotion({this.breathe = const Duration(milliseconds: 2400)});
+
+  static const standard = KitMotion();
+
+  /// One cycle of the running mark's breathing loop (`--breathe`).
+  final Duration breathe;
+}
+
+/// Text colours for the state roles. Scratch has only fills for them
+/// (`okBg`, `dangerBg`, ...); these are the inks the mockup chose:
+/// constructive and danger from the edit-row counts in Scratch's
+/// `agent_turn.dart`, attention from `accentText` (light) or the attention
+/// hue at full strength (dark, 5.3:1 on the 20% fill).
+class KitInks {
+  const KitInks({
+    required this.constructive,
+    required this.danger,
+    required this.attention,
+  });
+
+  static final light = KitInks(
+    constructive: ProfileColors.light.constructiveInk,
+    danger: ProfileColors.light.dangerInk,
+    attention: ProfileColors.light.attentionInk,
+  );
+
+  static final dark = KitInks(
+    constructive: ProfileColors.dark.constructiveInk,
+    danger: ProfileColors.dark.dangerInk,
+    attention: ProfileColors.dark.attentionInk,
+  );
+
+  /// The inks that go with [colors].
+  static KitInks of(AppColors colors) => colors.dark ? dark : light;
+
+  final Color constructive, danger, attention;
 }

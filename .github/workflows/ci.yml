@@ -1,6 +1,3 @@
-# Format, analyze and test every package; on pushes, also check that a
-# consumer can depend on the packages through git, the way Scratch pins them.
-# Public repository: GitHub-hosted runners only.
 name: ci
 
 on:
@@ -14,7 +11,7 @@ permissions:
 jobs:
   format:
     name: dart format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -23,13 +20,23 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
+      - name: Save a format patch
+        if: failure()
+        run: dart format . && git diff > format.patch
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: format-patch
+          path: format.patch
+          if-no-files-found: ignore
 
   analyze:
     name: flutter analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -38,18 +45,50 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - run: flutter analyze
+      - run: flutter analyze --fatal-infos
+
+  colours:
+    name: colour drift and raw colours
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+      - run: flutter pub get
+      - name: Regenerate colours
+        working-directory: packages/bb_tokens
+        run: dart tool/generate_colors.dart
+      - name: Fail on generated colour drift
+        run: git diff --exit-code -- packages/bb_tokens/lib/src/colors.g.dart
+      - name: Check raw colours
+        if: ${{ !cancelled() }}
+        run: bash scripts/check-raw-colours.sh
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: regenerated-colours
+          path: packages/bb_tokens/lib/src/colors.g.dart
 
   test:
-    name: flutter test (${{ matrix.package }})
-    runs-on: ubuntu-latest
+    name: tests (${{ matrix.package }})
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        package: [bb_tokens, bb_ui]
+        include:
+          - {package: bb_tokens, dir: packages/bb_tokens}
+          - {package: bb_ui, dir: packages/bb_ui}
+          - {package: gallery, dir: apps/gallery}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,47 +96,114 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      - name: flutter test
-        working-directory: packages/${{ matrix.package }}
-        run: flutter test
+      - name: Run non-golden tests
+        working-directory: ${{ matrix.dir }}
+        run: flutter test --exclude-tags golden
+
+  goldens:
+    name: primitive goldens
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+      - run: flutter pub get
+      - name: Compare committed baselines (missing PNGs fail)
+        if: github.event_name != 'workflow_dispatch'
+        working-directory: apps/gallery
+        run: flutter test --tags golden
+      - name: Test gallery and render golden candidates
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: apps/gallery
+        run: |
+          flutter test --exclude-tags golden
+          flutter test --tags golden --update-goldens
+      - name: Collect candidates and rendering environment
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir -p shots/test/goldens
+          cp apps/gallery/test/goldens/primitives_*.png shots/test/goldens/
+          git rev-parse HEAD > shots/commit.txt
+          flutter --version > shots/flutter-version.txt
+          cat /etc/os-release > shots/os-release.txt
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: primitive-golden-candidates
+          path: shots
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: golden-failures
+          path: apps/gallery/test/failures
+          if-no-files-found: ignore
+
+  gallery-web:
+    name: build gallery web
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+      - run: flutter pub get
+      - working-directory: apps/gallery
+        run: flutter build web --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: primitives-gallery-web
+          path: apps/gallery/build/web
 
   git-consumer:
     name: git dependency resolves
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.5
           cache: true
-      # Two consumers: one declares both packages as git deps (as Scratch
-      # does), one only bb_ui, so bb_ui's path dep on bb_tokens resolves
-      # inside the git checkout.
-      - name: Resolve and analyze consumers
+      - name: Resolve and analyze a consumer at this commit
         env:
           URL: https://github.com/${{ github.repository }}.git
           REF: ${{ github.sha }}
         run: |
           set -euo pipefail
-          dep() {
-            printf '  %s:\n    git:\n      url: %s\n      ref: %s\n      path: packages/%s\n' "$1" "$URL" "$REF" "$1"
-          }
-          for kind in both ui-only; do
-            dir="$RUNNER_TEMP/consumer-$kind"
-            mkdir -p "$dir/lib"
-            {
-              printf 'name: consumer\npublish_to: none\nenvironment:\n  sdk: ^3.13.4\ndependencies:\n  flutter:\n    sdk: flutter\n'
-              dep bb_ui
-              if [ "$kind" = both ]; then dep bb_tokens; fi
-            } > "$dir/pubspec.yaml"
-            printf "import 'package:bb_ui/bb_ui.dart';\n\nfinal colors = AppColors.light;\nconst hint = AppTooltip.hoverDelay;\n" > "$dir/lib/ui_use.dart"
-            if [ "$kind" = both ]; then
-              printf "import 'package:bb_tokens/bb_tokens.dart';\n\nconst radius = Radii.md;\n" > "$dir/lib/tokens_use.dart"
-            fi
-            echo "== consumer ($kind)"
-            cat "$dir/pubspec.yaml"
-            (cd "$dir" && flutter pub get && flutter analyze && grep -A6 '^  bb_' pubspec.lock)
-          done
+          dir="$RUNNER_TEMP/consumer"
+          mkdir -p "$dir/lib"
+          cat > "$dir/pubspec.yaml" <<YAML
+          name: consumer
+          publish_to: none
+          environment:
+            sdk: ^3.13.4
+          dependencies:
+            flutter:
+              sdk: flutter
+            bb_ui:
+              git:
+                url: $URL
+                ref: $REF
+                path: packages/bb_ui
+          YAML
+          printf "import 'package:bb_ui/bb_ui.dart';\n\nfinal colors = AppColors.light;\nconst hint = AppTooltip.hoverDelay;\n" > "$dir/lib/ui_use.dart"
+          printf "import 'package:bb_ui/tokens.dart';\n\nconst radius = Radii.md;\n" > "$dir/lib/tokens_use.dart"
+          cd "$dir"
+          flutter pub get
+          flutter analyze --fatal-infos
