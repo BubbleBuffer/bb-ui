@@ -3,10 +3,20 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'search_gallery.dart';
+
+/// Which specimen page the gallery shows.
+enum GalleryScene { primitives, search }
+
 class GalleryApp extends StatefulWidget {
-  const GalleryApp({super.key, this.initialBrightness = Brightness.light});
+  const GalleryApp({
+    super.key,
+    this.initialBrightness = Brightness.light,
+    this.scene = GalleryScene.primitives,
+  });
 
   final Brightness initialBrightness;
+  final GalleryScene scene;
 
   @override
   State<GalleryApp> createState() => _GalleryAppState();
@@ -34,14 +44,17 @@ class _GalleryAppState extends State<GalleryApp> {
         child: child!,
       ),
     ),
-    home: PrimitiveGallery(
-      onThemeChanged: () => setState(() {
-        _brightness = _brightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light;
-      }),
-    ),
+    home: switch (widget.scene) {
+      GalleryScene.primitives => PrimitiveGallery(onThemeChanged: _toggleTheme),
+      GalleryScene.search => SearchGallery(onThemeChanged: _toggleTheme),
+    },
   );
+
+  void _toggleTheme() => setState(() {
+    _brightness = _brightness == Brightness.light
+        ? Brightness.dark
+        : Brightness.light;
+  });
 }
 
 class PrimitiveGallery extends StatefulWidget {

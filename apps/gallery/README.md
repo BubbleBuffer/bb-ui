@@ -18,8 +18,13 @@ The checked-in web runner is ready for `flutter build web`. To add a local
 desktop runner, run `flutter create --platforms=linux --project-name bb_ui_gallery .`
 here (or choose the target OS), then `flutter run -d linux`.
 
+A second page shows the search widgets over sample results: a panel with filters
+and keyboard selection, a phone list and a flat list with type labels. Run it
+with `flutter run -d chrome --dart-define=SCENE=search`.
+
 Golden tests render four new `primitives_*.png` specimens at 1000 and 390 logical
-pixels, light and dark, with bundled fonts and device pixel ratio 1. The tall
+pixels, and four `search_*.png` specimens of the search page at 1600 and 390,
+light and dark, with bundled fonts and device pixel ratio 1. The tall
 test windows capture the complete specimen sheet. These are new baselines;
 the old agent-scene references belong to agent-kit. Missing baselines fail the
 normal comparison job. Generate candidates on GitHub's pinned Linux runner
