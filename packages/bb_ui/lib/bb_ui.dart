@@ -13,6 +13,7 @@ export 'modal.dart';
 export 'picker_sheet.dart';
 export 'reference_chip.dart';
 export 'routes.dart';
+export 'search.dart';
 export 'selection.dart';
 export 'settings_controls.dart';
 export 'sheet.dart';
