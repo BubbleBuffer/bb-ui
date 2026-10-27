@@ -21,7 +21,13 @@ void main() {
     Finder row(String id) => find.byKey(ValueKey('sample-$id'));
     expect(row('garden-plan'), findsOneWidget);
     expect(row('garden-chat'), findsOneWidget);
-    expect(find.byKey(const ValueKey('search-group-document')), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('sample-panel')),
+        matching: find.byKey(const ValueKey('search-group-document')),
+      ),
+      findsOneWidget,
+    );
     expect(find.byKey(const ValueKey('search-narrowed-hint')), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey('search-type-chats')));

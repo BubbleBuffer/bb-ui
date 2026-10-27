@@ -7,12 +7,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// The widget the current test shows. A second [_pump] in the same test swaps
+/// it in place, so state (a panel's selection) survives, as in a rebuild.
+ValueNotifier<Widget>? _shown;
+
 Future<void> _pump(
   WidgetTester tester,
   Widget child, {
   FormFactor formFactor = FormFactor.desktop,
   bool dark = false,
 }) async {
+  final shown = _shown;
+  if (shown != null) {
+    shown.value = child;
+    await tester.pump();
+    return;
+  }
+  final notifier = _shown = ValueNotifier<Widget>(child);
   tester.view.physicalSize = const Size(700, 700);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -23,8 +34,16 @@ Future<void> _pump(
       formFactor: formFactor,
       child: WidgetsApp(
         color: const Color(0xFFFFFFFF),
-        builder: (context, _) =>
-            Overlay(initialEntries: [OverlayEntry(builder: (_) => child)]),
+        builder: (context, _) => Overlay(
+          initialEntries: [
+            OverlayEntry(
+              builder: (_) => ValueListenableBuilder<Widget>(
+                valueListenable: notifier,
+                builder: (_, widget, _) => widget,
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -64,6 +83,8 @@ Future<void> _key(WidgetTester tester, LogicalKeyboardKey key) async {
 }
 
 void main() {
+  setUp(() => _shown = null);
+
   group('termHighlights', () {
     test('matches terms in any case, in order', () {
       expect(termHighlights('Garden shed and garden', ['garden']), const [
