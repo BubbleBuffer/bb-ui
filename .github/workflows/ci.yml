@@ -133,6 +133,7 @@ jobs:
           mkdir -p shots/test/goldens
           cp apps/gallery/test/goldens/primitives_*.png shots/test/goldens/
           cp apps/gallery/test/goldens/search_*.png shots/test/goldens/
+          cp apps/gallery/test/goldens/palette_*.png shots/test/goldens/
           git rev-parse HEAD > shots/commit.txt
           flutter --version > shots/flutter-version.txt
           cat /etc/os-release > shots/os-release.txt
