@@ -296,6 +296,7 @@ class _CommandPaletteState extends State<CommandPalette> {
             SizedBox(
               height: PaletteMetrics.field(m),
               child: Stack(
+                fit: StackFit.expand,
                 children: [
                   Padding(
                     padding: EdgeInsets.only(
@@ -436,6 +437,7 @@ class _PaletteRow extends StatelessWidget {
                 borderRadius: Radii.ctl,
               ),
               child: Stack(
+                fit: StackFit.expand,
                 children: [
                   if (active)
                     Positioned(
