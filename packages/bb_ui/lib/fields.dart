@@ -20,6 +20,10 @@ class PlainField extends StatefulWidget {
     this.onSubmitted,
     this.autofocus = false,
     this.textInputAction = TextInputAction.search,
+    this.inputFormatters,
+    this.textCapitalization = TextCapitalization.none,
+    this.autocorrect = true,
+    this.keyboardType,
   });
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -29,6 +33,14 @@ class PlainField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
   final bool autofocus;
   final TextInputAction textInputAction;
+
+  /// Rewrites each edit, for example to upper-case or group a code.
+  final List<TextInputFormatter>? inputFormatters;
+  final TextCapitalization textCapitalization;
+
+  /// False for identifiers and codes: no suggestions or corrections.
+  final bool autocorrect;
+  final TextInputType? keyboardType;
 
   @override
   State<PlainField> createState() => _PlainFieldState();
@@ -90,6 +102,11 @@ class _PlainFieldState extends State<PlainField> {
           onSubmitted: widget.onSubmitted,
           selectionControls: noteSelectionControls,
           textInputAction: widget.textInputAction,
+          inputFormatters: widget.inputFormatters,
+          textCapitalization: widget.textCapitalization,
+          autocorrect: widget.autocorrect,
+          enableSuggestions: widget.autocorrect,
+          keyboardType: widget.keyboardType,
           maxLines: 1,
         ),
       ],

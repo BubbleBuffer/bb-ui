@@ -105,6 +105,7 @@ Future<bool> showConfirm(
   required String title,
   String? message,
   required String confirmLabel,
+  String cancelLabel = 'Cancel',
   bool danger = false,
 }) async {
   final r = await showModalPanel<bool>(
@@ -113,6 +114,7 @@ Future<bool> showConfirm(
       title: title,
       message: message,
       confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
       danger: danger,
       onDone: (v) => Navigator.of(ctx).pop(v),
     ),
@@ -129,9 +131,10 @@ class ConfirmBox extends StatelessWidget {
     this.message,
     required this.confirmLabel,
     required this.onDone,
+    this.cancelLabel = 'Cancel',
     this.danger = false,
   });
-  final String title, confirmLabel;
+  final String title, confirmLabel, cancelLabel;
   final String? message;
   final bool danger;
   final ValueChanged<bool> onDone;
@@ -170,7 +173,7 @@ class ConfirmBox extends StatelessWidget {
           const SizedBox(height: 8),
           DialogButton(
             key: const ValueKey('confirm-cancel'),
-            label: 'Cancel',
+            label: cancelLabel,
             onTap: () => onDone(false),
           ),
         ],

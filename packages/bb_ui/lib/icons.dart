@@ -46,6 +46,32 @@ enum Ico {
   hourglass,
   terminal,
   folder,
+  chevronUp,
+  monitor,
+  monitorPlay,
+  laptop,
+  server,
+  copy,
+  pencil,
+  refresh,
+  info,
+  circleCheck,
+  circleAlert,
+  triangleAlert,
+  pointer,
+  pointerClick,
+  activity,
+  gauge,
+  volume,
+  logOut,
+  gamepad,
+  qrCode,
+  globe,
+  radio,
+  arrowRight,
+  lock,
+  userCheck,
+  keyboard,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -241,6 +267,136 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.folder,
     LucideIcons.folder500,
   ), // folder
+  Ico.chevronUp: (
+    LucideIcons.chevronUp300,
+    LucideIcons.chevronUp,
+    LucideIcons.chevronUp500,
+  ), // chevronUp
+  Ico.monitor: (
+    LucideIcons.monitor300,
+    LucideIcons.monitor,
+    LucideIcons.monitor500,
+  ), // monitor
+  Ico.monitorPlay: (
+    LucideIcons.monitorPlay300,
+    LucideIcons.monitorPlay,
+    LucideIcons.monitorPlay500,
+  ), // monitorPlay
+  Ico.laptop: (
+    LucideIcons.laptop300,
+    LucideIcons.laptop,
+    LucideIcons.laptop500,
+  ), // laptop
+  Ico.server: (
+    LucideIcons.server300,
+    LucideIcons.server,
+    LucideIcons.server500,
+  ), // server
+  Ico.copy: (
+    LucideIcons.copy300,
+    LucideIcons.copy,
+    LucideIcons.copy500,
+  ), // copy
+  Ico.pencil: (
+    LucideIcons.pencil300,
+    LucideIcons.pencil,
+    LucideIcons.pencil500,
+  ), // pencil
+  Ico.refresh: (
+    LucideIcons.refreshCw300,
+    LucideIcons.refreshCw,
+    LucideIcons.refreshCw500,
+  ), // refreshCw
+  Ico.info: (
+    LucideIcons.info300,
+    LucideIcons.info,
+    LucideIcons.info500,
+  ), // info
+  Ico.circleCheck: (
+    LucideIcons.circleCheck300,
+    LucideIcons.circleCheck,
+    LucideIcons.circleCheck500,
+  ), // circleCheck
+  Ico.circleAlert: (
+    LucideIcons.circleAlert300,
+    LucideIcons.circleAlert,
+    LucideIcons.circleAlert500,
+  ), // circleAlert
+  Ico.triangleAlert: (
+    LucideIcons.triangleAlert300,
+    LucideIcons.triangleAlert,
+    LucideIcons.triangleAlert500,
+  ), // triangleAlert
+  Ico.pointer: (
+    LucideIcons.mousePointer2300,
+    LucideIcons.mousePointer2,
+    LucideIcons.mousePointer2500,
+  ), // mousePointer2
+  Ico.pointerClick: (
+    LucideIcons.mousePointerClick300,
+    LucideIcons.mousePointerClick,
+    LucideIcons.mousePointerClick500,
+  ), // mousePointerClick
+  Ico.activity: (
+    LucideIcons.activity300,
+    LucideIcons.activity,
+    LucideIcons.activity500,
+  ), // activity
+  Ico.gauge: (
+    LucideIcons.gauge300,
+    LucideIcons.gauge,
+    LucideIcons.gauge500,
+  ), // gauge
+  Ico.volume: (
+    LucideIcons.volume2300,
+    LucideIcons.volume2,
+    LucideIcons.volume2500,
+  ), // volume2
+  Ico.logOut: (
+    LucideIcons.logOut300,
+    LucideIcons.logOut,
+    LucideIcons.logOut500,
+  ), // logOut
+  Ico.gamepad: (
+    LucideIcons.gamepad2300,
+    LucideIcons.gamepad2,
+    LucideIcons.gamepad2500,
+  ), // gamepad2
+  Ico.qrCode: (
+    LucideIcons.qrCode300,
+    LucideIcons.qrCode,
+    LucideIcons.qrCode500,
+  ), // qrCode
+  Ico.globe: (
+    LucideIcons.globe300,
+    LucideIcons.globe,
+    LucideIcons.globe500,
+  ), // globe
+  Ico.radio: (
+    LucideIcons.radio300,
+    LucideIcons.radio,
+    LucideIcons.radio500,
+  ), // radio
+  Ico.arrowRight: (
+    LucideIcons.arrowRight300,
+    LucideIcons.arrowRight,
+    LucideIcons.arrowRight500,
+  ), // arrowRight
+  Ico.lock: (
+    LucideIcons.lock300,
+    LucideIcons.lock,
+    LucideIcons.lock500,
+  ), // lock
+  Ico.userCheck: (
+    LucideIcons.userCheck300,
+    LucideIcons.userCheck,
+    LucideIcons.userCheck500,
+  ), // userCheck
+  Ico.keyboard: (
+    LucideIcons.keyboard300,
+    LucideIcons.keyboard,
+    LucideIcons.keyboard500,
+  ), // keyboard
 };
 
 class Icon20 extends StatelessWidget {

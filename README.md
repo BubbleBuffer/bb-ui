@@ -1,12 +1,12 @@
 # bb-ui
 
 Shared BubbleBuffer Flutter primitives and design tokens, without Material or
-an agent backend. Both packages are version **0.6.0**.
+an agent backend. Both packages are version **0.7.0**.
 
 | Package | Purpose |
 | --- | --- |
 | `packages/bb_tokens` | Colours, typography, spacing, radii, motion and themes |
-| `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection and stacks |
+| `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection, stacks, device lists, pairing and session chrome |
 | `apps/gallery` | Interactive neutral specimens and Linux golden tests |
 
 The packages retain their existing APIs and directory names after extraction
@@ -25,7 +25,7 @@ dependencies:
   bb_ui:
     git:
       url: https://github.com/BubbleBuffer/bb-ui
-      ref: v0.6.0
+      ref: v0.7.0
       path: packages/bb_ui
 ```
 

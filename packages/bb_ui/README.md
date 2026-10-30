@@ -1,7 +1,8 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.6.0 keeps the
-API extracted from agent-kit and adds the search widgets and the command palette.
+Flutter primitives without Material, using `bb_tokens`. Version 0.7.0 keeps the
+API extracted from agent-kit, with the search widgets and the command palette,
+and adds the device, pairing and session components.
 
 Import `package:bb_ui/bb_ui.dart` for the primitives and re-exported tokens.
 `package:bb_ui/tokens.dart` remains a compatibility entry point. A host provides
@@ -27,7 +28,8 @@ presentation. Context accessors include `context.colors`, `context.type` and
 The public library exports buttons, fields, hover/focus surfaces, icons, ruled
 lines, marked lists, menus, modals, pickers, reference chips, routing, search,
 selection, settings controls, search, the command palette, sheets, foldable
-stacks and tooltips. See the
+stacks, tooltips, device lists, pairing and code entry, notices and toasts,
+and session chrome. See the
 [gallery](../../apps/gallery/README.md) for a small executable specimen set;
 it is not a complete state or accessibility audit of every export.
 
@@ -94,3 +96,42 @@ The look follows the workbench design mock (SPEC 7.13), in the BubbleBuffer
 skin: group labels are the mono uppercase labels search uses rather than the
 mock's sentence-case ones, the panel is `bgElevated` with a `borderStrong`
 edge, and the selected row has the `bgHover` fill with a 2px `threadStrong` bar.
+
+## Devices, pairing and session chrome
+
+Neutral components for an app that lists devices, pairs them with a code and
+shows a full-screen session. They take plain strings, icons and callbacks; the
+host keeps its data and behaviour. They read the same light and dark theme as
+everything else, so the dark theme is the whole of a dark-first product.
+
+- `StatusPill` (`StatusKind`: online, offline, active, attention, danger,
+  neutral). The word always says the status; the dot or ring only repeats it.
+- `DeviceRow`: an icon tile, a name with a status, a monospace identifier, meta
+  facts and a trailing action. A `selected` row has the accent seam.
+  `DetailPanel` and `KeyValueRow` describe the selected item.
+  `SectionHeader` and `SectionLabel` head a section.
+- Buttons: `PrimaryButton`, `SecondaryButton` (also `danger`) and `TextBtn`
+  take an `icon` from `Ico`; a null `onTap` draws the first two disabled and
+  `PrimaryButton(expand: true)` fills the width. `CopyableText(inline: true)` and `CopyButton` copy
+  an identifier. `Keycap` and `KeyChord` draw shortcuts.
+- Code entry: `CodeField` takes upper-case letters and digits in `groups`
+  (`[4, 4, 4, 4]`) and inserts the separators as the person types or pastes.
+  `CodeFormatter`, `formatCode` and `codeCharacters` are the same rules without
+  the widget. `OneTimeCode` shows a code with copy, `ComparisonNumber` the
+  number two people compare, and `QrFrame` the light square a QR code needs
+  (the host draws the code in `QrFrame.ink`).
+- Messages: `NoticeBanner` (`NoticeKind`: info, success, attention, danger,
+  with a title, actions and dismiss), `EmptyState`, `ConfirmBox` and
+  `showConfirm` (now with `cancelLabel`) and `ToastCard` with `showToast`,
+  which places a card on the root overlay, counts down with a line along its
+  edge (none with reduced motion) and removes itself.
+- Session chrome: `EdgeTab` (the resting tab) and `EdgeStrip` with
+  `EdgeStripButton`s hang from the top edge; `MetricsPanel` with `Sparkline`
+  shows live numbers; `DisplayPicker` draws the screens of a machine to scale
+  as a map and a list, and the number keys 1 to 9 pick one.
+
+Icons come from `Ico`, which maps to Lucide. This version adds `monitor`,
+`monitorPlay`, `laptop`, `server`, `copy`, `pencil`, `refresh`, `info`,
+`circleCheck`, `circleAlert`, `triangleAlert`, `pointer`, `pointerClick`,
+`activity`, `gauge`, `volume`, `logOut`, `gamepad`, `qrCode`, `globe`,
+`radio`, `arrowRight`, `lock`, `userCheck`, `keyboard` and `chevronUp`.

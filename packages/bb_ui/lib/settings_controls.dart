@@ -372,11 +372,23 @@ class OutlineButton extends StatelessWidget {
   }
 }
 
-/// Monospace text that can be copied, with a "Copy" button.
+/// Monospace text that can be copied, with a "Copy" button. An [inline] one
+/// has no box: the text with a small copy icon after it, for identifiers
+/// in running layouts. [size] is the text size in logical pixels.
 class CopyableText extends StatefulWidget {
-  const CopyableText(this.text, {super.key, this.textKey});
+  const CopyableText(
+    this.text, {
+    super.key,
+    this.textKey,
+    this.inline = false,
+    this.size = 13,
+    this.color,
+  });
   final String text;
   final Key? textKey;
+  final bool inline;
+  final double size;
+  final Color? color;
 
   @override
   State<CopyableText> createState() => _CopyableTextState();
@@ -396,6 +408,23 @@ class _CopyableTextState extends State<CopyableText> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final style = ts(
+      TypeSpec(widget.size, widget.size * 1.5, 400),
+      widget.color ?? c.textPrimary,
+      mono: true,
+    );
+    if (widget.inline) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(widget.text, key: widget.textKey, style: style),
+          ),
+          const SizedBox(width: 4),
+          CopyButton(widget.text),
+        ],
+      );
+    }
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
       decoration: BoxDecoration(
@@ -407,11 +436,7 @@ class _CopyableTextState extends State<CopyableText> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: Text(
-              widget.text,
-              key: widget.textKey,
-              style: ts(const TypeSpec(13, 19, 400), c.textPrimary, mono: true),
-            ),
+            child: Text(widget.text, key: widget.textKey, style: style),
           ),
           const SizedBox(width: 8),
           TextBtn(
@@ -423,4 +448,36 @@ class _CopyableTextState extends State<CopyableText> {
       ),
     );
   }
+}
+
+/// A small icon button that copies [text] to the clipboard and shows a check
+/// for two seconds.
+class CopyButton extends StatefulWidget {
+  const CopyButton(this.text, {super.key, this.size = 24, this.glyph = 16});
+  final String text;
+  final double size, glyph;
+
+  @override
+  State<CopyButton> createState() => _CopyButtonState();
+}
+
+class _CopyButtonState extends State<CopyButton> {
+  bool _copied = false;
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.text));
+    if (!mounted) return;
+    setState(() => _copied = true);
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _copied = false);
+  }
+
+  @override
+  Widget build(BuildContext context) => IconBtn(
+    _copied ? Ico.check : Ico.copy,
+    size: widget.size,
+    glyph: widget.glyph,
+    semanticLabel: _copied ? 'Copied' : 'Copy',
+    onTap: _copy,
+  );
 }

@@ -23,11 +23,15 @@ and keyboard selection, a phone list and a flat list with type labels. Run it
 with `flutter run -d chrome --dart-define=SCENE=search`. A third page shows the
 command palette over sample commands (grouped, filtered with matches marked, a
 disabled command, no match, and a button that opens it over the page): use
-`--dart-define=SCENE=palette`.
+`--dart-define=SCENE=palette`. A fourth page (`SCENE=devices`) shows device rows,
+the detail panel, code entry and display, notices, the empty state and the
+confirm dialog; a fifth (`SCENE=session`) shows the session edge tab and strip,
+the display picker, the metrics panel and toasts.
 
 Golden tests render four new `primitives_*.png` specimens at 1000 and 390 logical
 pixels, four `search_*.png` specimens of the search page and four `palette_*.png`
-specimens of the palette page at 1600 and 390, light and dark, with bundled fonts and device pixel ratio 1. The tall
+specimens of the palette page at 1600 and 390, four `devices_*.png` and four
+`session_*.png` specimens at 1000 and 390, light and dark, with bundled fonts and device pixel ratio 1. The tall
 test windows capture the complete specimen sheet. These are new baselines;
 the old agent-scene references belong to agent-kit. Missing baselines fail the
 normal comparison job. Generate candidates on GitHub's pinned Linux runner

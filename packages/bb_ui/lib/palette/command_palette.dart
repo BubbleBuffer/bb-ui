@@ -356,20 +356,27 @@ class _CommandPaletteState extends State<CommandPalette> {
   }
 }
 
-/// A small key label in a box: a shortcut such as "Ctrl+N", or "Esc".
+/// A small key label in a box: a shortcut such as "Ctrl+N", or "Esc". A
+/// [raised] one is a single key of a chord: a filled chip with a heavier
+/// bottom edge, as in `KeyChord`.
 class Keycap extends StatelessWidget {
-  const Keycap(this.label, {super.key, this.color});
+  const Keycap(this.label, {super.key, this.color, this.raised = false});
   final String label;
   final Color? color;
+  final bool raised;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final fg = color ?? c.textTertiary;
+    final fg = color ?? (raised ? c.textPrimary : c.textTertiary);
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border.all(color: c.border),
+        color: raised ? c.bgTertiary : null,
+        border: Border.all(color: raised ? c.thread : c.border),
         borderRadius: BorderRadius.circular(Radii.sm),
+        boxShadow: raised
+            ? [BoxShadow(color: c.threadStrong, offset: const Offset(0, 1.5))]
+            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
