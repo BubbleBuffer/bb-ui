@@ -112,7 +112,7 @@ everything else, so the dark theme is the whole of a dark-first product.
   `SectionHeader` and `SectionLabel` head a section.
 - Buttons: `PrimaryButton`, `SecondaryButton` (also `danger`) and `TextBtn`
   take an `icon` from `Ico`; a null `onTap` draws the first two disabled and
-  `expand` fills the width. `CopyableText(inline: true)` and `CopyButton` copy
+  `PrimaryButton(expand: true)` fills the width. `CopyableText(inline: true)` and `CopyButton` copy
   an identifier. `Keycap` and `KeyChord` draw shortcuts.
 - Code entry: `CodeField` takes upper-case letters and digits in `groups`
   (`[4, 4, 4, 4]`) and inserts the separators as the person types or pastes.
