@@ -260,16 +260,17 @@ class TextBtn extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SizedBox(
         height: height,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[
-              Icon20(icon!, size: 18, color: ink),
-              const SizedBox(width: 6),
-            ],
-            Text(label, style: ts(context.type.ui, ink)),
-          ],
+        child: Center(
+          child: icon == null
+              ? Text(label, style: ts(context.type.ui, ink))
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon20(icon!, size: 18, color: ink),
+                    const SizedBox(width: 6),
+                    Text(label, style: ts(context.type.ui, ink)),
+                  ],
+                ),
         ),
       ),
     );
