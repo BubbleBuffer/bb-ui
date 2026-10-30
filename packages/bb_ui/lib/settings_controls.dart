@@ -417,7 +417,9 @@ class _CopyableTextState extends State<CopyableText> {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Flexible(child: Text(widget.text, key: widget.textKey, style: style)),
+          Flexible(
+            child: Text(widget.text, key: widget.textKey, style: style),
+          ),
           const SizedBox(width: 4),
           CopyButton(widget.text),
         ],

@@ -18,7 +18,10 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
         await tester.pumpWidget(
-          GalleryApp(initialBrightness: brightness, scene: GalleryScene.devices),
+          GalleryApp(
+            initialBrightness: brightness,
+            scene: GalleryScene.devices,
+          ),
         );
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);

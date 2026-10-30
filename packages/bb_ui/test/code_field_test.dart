@@ -41,11 +41,17 @@ void main() {
   group('CodeFormatter', () {
     const formatter = CodeFormatter(_id);
 
-    test('typing the fifth character adds the separator and moves the caret', () {
-      final v = formatter.formatEditUpdate(_edit('ABCD', 4), _edit('ABCDe', 5));
-      expect(v.text, 'ABCD-E');
-      expect(v.selection.baseOffset, 6);
-    });
+    test(
+      'typing the fifth character adds the separator and moves the caret',
+      () {
+        final v = formatter.formatEditUpdate(
+          _edit('ABCD', 4),
+          _edit('ABCDe', 5),
+        );
+        expect(v.text, 'ABCD-E');
+        expect(v.selection.baseOffset, 6);
+      },
+    );
 
     test('typing inside a group keeps the caret after the typed character', () {
       final v = formatter.formatEditUpdate(_edit('ABCD', 4), _edit('ABxCD', 3));
@@ -72,7 +78,10 @@ void main() {
     });
 
     test('Backspace on the first character of a group works as usual', () {
-      final v = formatter.formatEditUpdate(_edit('ABCD-E', 6), _edit('ABCD-', 5));
+      final v = formatter.formatEditUpdate(
+        _edit('ABCD-E', 6),
+        _edit('ABCD-', 5),
+      );
       expect(v.text, 'ABCD');
       expect(v.selection.baseOffset, 4);
     });

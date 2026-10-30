@@ -54,7 +54,10 @@ class CodeFormatter extends TextInputFormatter {
     final caret = newValue.selection.isValid
         ? newValue.selection.extentOffset.clamp(0, newValue.text.length)
         : newValue.text.length;
-    var before = codeCharacters(newValue.text.substring(0, caret), groups).length;
+    var before = codeCharacters(
+      newValue.text.substring(0, caret),
+      groups,
+    ).length;
     if (chars == oldChars &&
         newValue.text.length < oldValue.text.length &&
         before > 0) {

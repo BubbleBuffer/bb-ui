@@ -265,10 +265,7 @@ class _Tile extends StatelessWidget {
                 Text(
                   shownLabel,
                   maxLines: 1,
-                  style: ts(
-                    const TypeSpec(10, 12, 600),
-                    c.accentText,
-                  ),
+                  style: ts(const TypeSpec(10, 12, 600), c.accentText),
                 ),
             ],
           ),
@@ -297,7 +294,8 @@ class _Row extends StatelessWidget {
       button: true,
       selected: selected,
       excludeSemantics: true,
-      label: '${display.label}${display.detail == null ? '' : ', ${display.detail}'}',
+      label:
+          '${display.label}${display.detail == null ? '' : ', ${display.detail}'}',
       child: Hover(
         onTap: onTap,
         selected: selected,

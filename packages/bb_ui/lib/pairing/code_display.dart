@@ -180,7 +180,12 @@ class ComparisonNumber extends StatelessWidget {
 /// code as [child] and draw its modules in [QrFrame.ink]; [caption] goes under
 /// the square.
 class QrFrame extends StatelessWidget {
-  const QrFrame({super.key, required this.child, this.size = 200, this.caption});
+  const QrFrame({
+    super.key,
+    required this.child,
+    this.size = 200,
+    this.caption,
+  });
   final Widget child;
   final double size;
   final String? caption;

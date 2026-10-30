@@ -77,7 +77,11 @@ class _SessionGalleryState extends State<SessionGallery> {
               const SizedBox(width: 8),
               Text(
                 '12 ms',
-                style: ts(const TypeSpec(11, 14, 400), c.textPrimary, mono: true),
+                style: ts(
+                  const TypeSpec(11, 14, 400),
+                  c.textPrimary,
+                  mono: true,
+                ),
               ),
             ],
           ),
@@ -105,11 +109,7 @@ class _SessionGalleryState extends State<SessionGallery> {
               selected: _open,
               onTap: () => setState(() => _open = !_open),
             ),
-            const EdgeStripButton(
-              icon: Ico.gamepad,
-              label: 'Game',
-              menu: true,
-            ),
+            const EdgeStripButton(icon: Ico.gamepad, label: 'Game', menu: true),
             const EdgeStripButton(icon: Ico.gauge, label: 'Auto', menu: true),
             const EdgeStripButton(icon: Ico.volume, semanticLabel: 'Audio'),
             EdgeStripButton(
@@ -162,7 +162,11 @@ class _SessionGalleryState extends State<SessionGallery> {
                       height: 140,
                       child: Column(
                         children: [
-                          EdgeTab(label: 'Studio PC', value: '12 ms', mark: c.accent),
+                          EdgeTab(
+                            label: 'Studio PC',
+                            value: '12 ms',
+                            mark: c.accent,
+                          ),
                           const SizedBox(height: 28),
                           if (compact)
                             SingleChildScrollView(
@@ -240,12 +244,16 @@ class _SessionGalleryState extends State<SessionGallery> {
                         ToastCard(
                           title: 'Mouse and keyboard now go to Studio PC',
                           icon: Ico.pointerClick,
-                          content: Row(
-                            mainAxisSize: MainAxisSize.min,
+                          content: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            runSpacing: 4,
                             children: [
                               Text(
                                 'Release with ',
-                                style: ts(context.type.uiSmall, c.textSecondary),
+                                style: ts(
+                                  context.type.uiSmall,
+                                  c.textSecondary,
+                                ),
                               ),
                               const KeyChord(['Ctrl', 'Alt', 'Shift', 'Z']),
                             ],

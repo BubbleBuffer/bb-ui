@@ -80,10 +80,7 @@ class NoticeBanner extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (title != null) ...[
-                    Text(
-                      title!,
-                      style: ts(ty.ui, c.textPrimary, weight: 700),
-                    ),
+                    Text(title!, style: ts(ty.ui, c.textPrimary, weight: 700)),
                     const SizedBox(height: 2),
                   ],
                   Padding(
@@ -389,8 +386,10 @@ class _ToastHostState extends State<_ToastHost>
       padding: widget.margin,
       child: AnimatedBuilder(
         animation: _ctl,
-        builder: (context, _) =>
-            widget.builder(context, widget.showProgress ? 1 - _ctl.value : null),
+        builder: (context, _) => widget.builder(
+          context,
+          widget.showProgress ? 1 - _ctl.value : null,
+        ),
       ),
     ),
   );

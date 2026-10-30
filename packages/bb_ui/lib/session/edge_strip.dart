@@ -189,10 +189,7 @@ class EdgeStripButton extends StatelessWidget {
               ),
               if (label != null) ...[
                 const SizedBox(width: 6),
-                Text(
-                  label!,
-                  style: ts(context.type.uiSmall, ink, weight: 600),
-                ),
+                Text(label!, style: ts(context.type.uiSmall, ink, weight: 600)),
               ],
               if (menu) ...[
                 const SizedBox(width: 4),
