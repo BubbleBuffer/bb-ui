@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.7.0 keeps the
+Flutter primitives without Material, using `bb_tokens`. Version 0.7.1 keeps the
 API extracted from agent-kit, with the search widgets and the command palette,
 and adds the device, pairing and session components.
 

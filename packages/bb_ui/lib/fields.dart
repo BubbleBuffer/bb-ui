@@ -238,3 +238,112 @@ class _FieldFocusRing extends CustomPainter {
   @override
   bool shouldRepaint(_FieldFocusRing old) => old.color != color;
 }
+
+/// A framed single-line field that hides what is typed, for passphrases.
+///
+/// Built like [PlainField] with hiding on and every learning feature off: no
+/// suggestions, no autocorrect, and no copying or cutting of the hidden text.
+/// The caller owns [controller] and [focusNode] is optional.
+class ObscuredField extends StatefulWidget {
+  const ObscuredField({
+    super.key,
+    required this.controller,
+    this.focusNode,
+    this.placeholder = 'Passphrase',
+    this.autofocus = false,
+    this.onChanged,
+    this.onSubmitted,
+    this.textInputAction = TextInputAction.done,
+    this.semanticLabel,
+  });
+  final TextEditingController controller;
+  final FocusNode? focusNode;
+  final String placeholder;
+  final bool autofocus;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final TextInputAction textInputAction;
+
+  /// Read out by screen readers; defaults to [placeholder].
+  final String? semanticLabel;
+
+  @override
+  State<ObscuredField> createState() => _ObscuredFieldState();
+}
+
+class _ObscuredFieldState extends State<ObscuredField> {
+  FocusNode? _own;
+  FocusNode get _focus => widget.focusNode ?? (_own ??= FocusNode());
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_changed);
+  }
+
+  @override
+  void didUpdateWidget(ObscuredField old) {
+    super.didUpdateWidget(old);
+    if (old.controller != widget.controller) {
+      old.controller.removeListener(_changed);
+      widget.controller.addListener(_changed);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_changed);
+    _own?.dispose();
+    super.dispose();
+  }
+
+  void _changed() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final style = ts(context.type.body, c.textPrimary);
+    return Semantics(
+      label: widget.semanticLabel ?? widget.placeholder,
+      textField: true,
+      obscured: true,
+      child: FieldFrame(
+        height: context.mobile ? 44 : 36,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            if (widget.controller.text.isEmpty)
+              IgnorePointer(
+                child: Text(
+                  widget.placeholder,
+                  maxLines: 1,
+                  overflow: TextOverflow.clip,
+                  style: style.copyWith(color: c.textTertiary),
+                ),
+              ),
+            EditableText(
+              controller: widget.controller,
+              focusNode: _focus,
+              style: style,
+              cursorColor: c.textPrimary,
+              backgroundCursorColor: c.textTertiary,
+              selectionColor: c.textSelection,
+              cursorWidth: 1.5,
+              autofocus: widget.autofocus,
+              obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              enableInteractiveSelection: false,
+              keyboardType: TextInputType.visiblePassword,
+              textInputAction: widget.textInputAction,
+              onChanged: widget.onChanged,
+              onSubmitted: widget.onSubmitted,
+              maxLines: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

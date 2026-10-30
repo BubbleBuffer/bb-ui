@@ -1,7 +1,7 @@
 # bb_tokens
 
 BubbleBuffer design tokens for Flutter: colours, type scale, spacing, layout,
-radii and motion. Version 0.7.0 keeps the API extracted from agent-kit.
+radii and motion. Version 0.7.1 keeps the API extracted from agent-kit.
 
 Import `package:bb_tokens/bb_tokens.dart` or the compatibility `tokens.dart`
 entry point. `AppTheme`, `AppColors`, `TypeScale`, `Radii`, `Motion` and the
