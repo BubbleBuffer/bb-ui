@@ -8,6 +8,66 @@ reviews:
   path_filters:
     - "!**/*.g.dart"
     - "!**/goldens/**"
+  path_instructions:
+    - path: "packages/bb_tokens/{lib,tokens,tool}/**"
+      instructions: >-
+        Keep bb_tokens.dart and the tokens.dart compatibility entry point.
+        Colours come from ProfileColors; kTransparent and kMaskOpaque are the
+        only hand-written colour constants. tokens/agent-kit.json is vendored
+        (see its vendored header), so flag hand edits. The generator must stay
+        SDK-only and resolve paths from its own script location.
+
+    - path: "packages/bb_ui/lib/**"
+      instructions: >-
+        No Material or Cupertino imports. Read colours through context.colors
+        (AppTheme/AppColors), never ad-hoc values. New primitives are exported
+        from bb_ui.dart, and tokens.dart keeps re-exporting bb_tokens.
+        Product data and actions stay in the host, passed via callbacks.
+
+    - path: "packages/bb_ui/lib/{search,palette}/**"
+      instructions: >-
+        Search: arrows wrap, Enter picks, field is focused on open,
+        selectionResetKey changes reset to row 0, highlight terms are escaped
+        literals. Palette: arrows clamp at the ends, disabled commands are
+        selectable but never run, Tab stays in the field, title matches rank
+        above subtitle matches, and showCommandPalette completes only after
+        focus is restored.
+
+    - path: "apps/gallery/lib/**"
+      instructions: >-
+        Specimens stay backend-free sample data. A new scene needs a
+        GalleryScene value, a SCENE case in main.dart and golden tests.
+
+    - path: "apps/gallery/test/**"
+      instructions: >-
+        Golden tests carry the golden tag, use devicePixelRatio 1, and cover
+        light and dark at a desktop and a phone width. A new golden file
+        prefix must also be added to the candidate copy step in ci.yml and to
+        docs/verification.md. Font loading must keep failing loudly when a
+        bundled or Lucide font is missing.
+
+    - path: "{.github/workflows/**,docs/verification.md}"
+      instructions: >-
+        Flutter stays pinned to 3.47.5 in every job, including the generated
+        git-consumer pubspec. Only workflow_dispatch may regenerate goldens;
+        push and PR runs compare committed baselines. Write permissions are
+        limited to the SARIF/Scorecard jobs. Keep verification.md in step with
+        the jobs, artifact names and commit.txt check.
+
+    - path: "scripts/*.sh"
+      instructions: >-
+        check-private-strings.sh must report sensitive hits as file:line only,
+        still run public checks (secret formats, self-hosted runners, tool
+        folders) without rules, and exit non-zero for --require-patterns with
+        no rules. check-raw-colours.sh must keep scanning untracked Dart under
+        packages/bb_ui and apps, excluding only tests and *.g.dart.
+
+    - path: "**/pubspec.yaml"
+      instructions: >-
+        Workspace members keep resolution: workspace and publish_to: none.
+        bb_ui keeps bb_tokens as a relative path dependency so Git consumers
+        resolve it. Gallery font entries must match flutter_test_config.dart
+        and the OFL notices in assets/fonts/licenses.
 knowledge_base:
   code_guidelines:
     enabled: true
