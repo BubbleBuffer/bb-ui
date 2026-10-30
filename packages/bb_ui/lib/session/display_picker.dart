@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 
 import '../hover.dart';
 import '../icons.dart';
-import '../keycap.dart';
+import '../palette.dart' show Keycap;
 import '../tokens.dart';
 
 /// One screen of a machine, in its own pixel coordinates: where its top-left
@@ -313,7 +313,7 @@ class _Row extends StatelessWidget {
                 width: 26,
                 child: selected
                     ? Icon20(Ico.check, size: 18, color: c.accentText)
-                    : Keycap('$number'),
+                    : Keycap('$number', raised: true),
               ),
               const SizedBox(width: 8),
               Expanded(

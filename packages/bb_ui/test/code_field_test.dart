@@ -2,7 +2,6 @@
 // the field typing and pasting through the real text input.
 
 import 'package:bb_ui/bb_ui.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

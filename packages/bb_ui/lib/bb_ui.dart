@@ -7,7 +7,7 @@ export 'feedback.dart';
 export 'fields.dart';
 export 'hover.dart';
 export 'icons.dart';
-export 'keycap.dart';
+export 'key_chord.dart';
 export 'lines.dart';
 export 'lucide.dart';
 export 'marked_list.dart';

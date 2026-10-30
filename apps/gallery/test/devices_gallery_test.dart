@@ -55,7 +55,7 @@ void main() {
     await tester.tap(find.text('Forget'));
     await tester.pumpAndSettle();
     expect(find.text('Keep'), findsWidgets);
-    await tester.tap(find.byKey(const ValueKey('confirm-cancel')));
+    await tester.tap(find.text('Keep').last);
     await tester.pumpAndSettle();
     expect(find.text('Confirm answer: Kept'), findsOneWidget);
     await tester.ensureVisible(find.byType(NoticeBanner).last);
