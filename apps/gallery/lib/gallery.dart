@@ -3,11 +3,13 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'devices_gallery.dart';
 import 'palette_gallery.dart';
 import 'search_gallery.dart';
+import 'session_gallery.dart';
 
 /// Which specimen page the gallery shows.
-enum GalleryScene { primitives, search, palette }
+enum GalleryScene { primitives, search, palette, devices, session }
 
 class GalleryApp extends StatefulWidget {
   const GalleryApp({
@@ -49,6 +51,8 @@ class _GalleryAppState extends State<GalleryApp> {
       GalleryScene.primitives => PrimitiveGallery(onThemeChanged: _toggleTheme),
       GalleryScene.search => SearchGallery(onThemeChanged: _toggleTheme),
       GalleryScene.palette => PaletteGallery(onThemeChanged: _toggleTheme),
+      GalleryScene.devices => DevicesGallery(onThemeChanged: _toggleTheme),
+      GalleryScene.session => SessionGallery(onThemeChanged: _toggleTheme),
     },
   );
 

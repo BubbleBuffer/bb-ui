@@ -65,7 +65,8 @@ class IconBtn extends StatelessWidget {
   }
 }
 
-/// The accent-coloured button (for example "New page" on desktop home).
+/// The accent-coloured button (for example "New page" on desktop home). A
+/// null [onTap] draws it disabled. [expand] fills the available width.
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
@@ -73,20 +74,25 @@ class PrimaryButton extends StatelessWidget {
     required this.onTap,
     this.height = 42,
     this.icon,
+    this.expand = false,
   });
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final double height;
   final Ico? icon;
+  final bool expand;
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final enabled = onTap != null;
+    final ink = enabled ? c.onAccent : c.textDisabled;
     return Semantics(
       button: true,
+      enabled: enabled,
       child: Hover(
         onTap: onTap,
         borderRadius: Radii.ctl,
-        background: c.accent,
+        background: enabled ? c.accent : c.bgTertiary,
         hoverBackground: c.accentHover,
         pressedBackground: c.accentHover,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -94,13 +100,20 @@ class PrimaryButton extends StatelessWidget {
           height: height,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon20(icon!, size: 18, color: c.onAccent),
+                Icon20(icon!, size: 18, color: ink),
                 const SizedBox(width: 6),
               ],
-              Text(label, style: ts(context.type.ui, c.onAccent, weight: 700)),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ts(context.type.ui, ink, weight: 700),
+                ),
+              ),
             ],
           ),
         ),
@@ -109,34 +122,70 @@ class PrimaryButton extends StatelessWidget {
   }
 }
 
-/// A sheet-coloured, thread-bordered secondary action.
+/// A sheet-coloured, thread-bordered secondary action. A null [onTap] draws
+/// it disabled; [danger] colours the label and border for a destructive step.
 class SecondaryButton extends StatelessWidget {
   const SecondaryButton({
     super.key,
     required this.label,
     this.onTap,
     this.height = 42,
+    this.icon,
+    this.danger = false,
+    this.expand = false,
   });
   final String label;
   final VoidCallback? onTap;
   final double height;
+  final Ico? icon;
+  final bool danger;
+  final bool expand;
   @override
-  Widget build(BuildContext context) => Hover(
-    onTap: onTap,
-    background: context.colors.bgPrimary,
-    border: Border.all(color: context.colors.thread),
-    borderRadius: Radii.ctl,
-    padding: const EdgeInsets.symmetric(horizontal: 12),
-    child: SizedBox(
-      height: height,
-      child: Center(
-        child: Text(
-          label,
-          style: ts(context.type.ui, context.colors.textPrimary, weight: 600),
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final enabled = onTap != null;
+    final ink = !enabled
+        ? c.textDisabled
+        : danger
+        ? c.inlineCodeText
+        : c.textPrimary;
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      child: Hover(
+        onTap: onTap,
+        background: c.bgPrimary,
+        border: Border.all(
+          color: danger && enabled
+              ? c.inlineCodeText.withValues(alpha: .5)
+              : c.thread,
+        ),
+        borderRadius: Radii.ctl,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: SizedBox(
+          height: height,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon20(icon!, size: 18, color: ink),
+                const SizedBox(width: 6),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ts(context.type.ui, ink, weight: 600),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// The shared task box used by Today, the editor and database cells.
@@ -191,29 +240,36 @@ class TextBtn extends StatelessWidget {
     this.onTap,
     this.height = 28,
     this.color,
+    this.icon,
   });
   final String label;
   final VoidCallback? onTap;
   final double height;
   final Color? color;
 
+  /// A leading icon, drawn in the label's colour.
+  final Ico? icon;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final ink = color == c.accent ? c.accentText : (color ?? c.textPrimary);
     return Hover(
       radius: Radii.md,
       onTap: onTap,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SizedBox(
         height: height,
-        child: Center(
-          child: Text(
-            label,
-            style: ts(
-              context.type.ui,
-              color == c.accent ? c.accentText : (color ?? c.textPrimary),
-            ),
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon20(icon!, size: 18, color: ink),
+              const SizedBox(width: 6),
+            ],
+            Text(label, style: ts(context.type.ui, ink)),
+          ],
         ),
       ),
     );
