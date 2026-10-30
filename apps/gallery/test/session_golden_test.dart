@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  for (final (width, height) in [(1000, 1560), (390, 1620)]) {
+  for (final (width, height) in [(1000, 1560), (390, 1600)]) {
     for (final brightness in Brightness.values) {
       final name = 'session_${width}_${brightness.name}';
       testWidgets(name, (tester) async {
