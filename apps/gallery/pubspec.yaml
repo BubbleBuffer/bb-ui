@@ -1,6 +1,6 @@
 name: bb_ui_gallery
 description: Interactive UI primitive specimens without a backend.
-version: 0.7.0
+version: 0.7.1
 publish_to: none
 resolution: workspace
 
