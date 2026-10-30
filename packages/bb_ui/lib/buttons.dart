@@ -132,14 +132,12 @@ class SecondaryButton extends StatelessWidget {
     this.height = 42,
     this.icon,
     this.danger = false,
-    this.expand = false,
   });
   final String label;
   final VoidCallback? onTap;
   final double height;
   final Ico? icon;
   final bool danger;
-  final bool expand;
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -164,9 +162,9 @@ class SecondaryButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: SizedBox(
           height: height,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+          child: Center(
+            child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
                 Icon20(icon!, size: 18, color: ink),
@@ -181,6 +179,7 @@ class SecondaryButton extends StatelessWidget {
                 ),
               ),
             ],
+          ),
           ),
         ),
       ),
