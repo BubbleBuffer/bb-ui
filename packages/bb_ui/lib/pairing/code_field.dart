@@ -124,31 +124,28 @@ class _CodeFieldState extends State<CodeField> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Semantics(
-      textField: true,
-      label: widget.semanticLabel,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _focus.requestFocus,
-        child: FieldFrame(
-          height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: PlainField(
-            key: widget.fieldKey,
-            controller: widget.controller,
-            focusNode: _focus,
-            style: ts(const TypeSpec(15, 22, 400), c.textPrimary, mono: true),
-            placeholder: widget.placeholder,
-            onChanged: widget.onChanged,
-            onSubmitted: widget.onSubmitted,
-            autofocus: widget.autofocus,
-            textInputAction: TextInputAction.done,
-            textCapitalization: TextCapitalization.characters,
-            autocorrect: false,
-            inputFormatters: [
-              CodeFormatter(widget.groups, separator: widget.separator),
-            ],
-          ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _focus.requestFocus,
+      child: FieldFrame(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: PlainField(
+          key: widget.fieldKey,
+          controller: widget.controller,
+          focusNode: _focus,
+          style: ts(const TypeSpec(15, 22, 400), c.textPrimary, mono: true),
+          placeholder: widget.placeholder,
+          semanticLabel: widget.semanticLabel,
+          onChanged: widget.onChanged,
+          onSubmitted: widget.onSubmitted,
+          autofocus: widget.autofocus,
+          textInputAction: TextInputAction.done,
+          textCapitalization: TextCapitalization.characters,
+          autocorrect: false,
+          inputFormatters: [
+            CodeFormatter(widget.groups, separator: widget.separator),
+          ],
         ),
       ),
     );

@@ -24,6 +24,7 @@ class PlainField extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.autocorrect = true,
     this.keyboardType,
+    this.semanticLabel,
   });
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -41,6 +42,10 @@ class PlainField extends StatefulWidget {
   /// False for identifiers and codes: no suggestions or corrections.
   final bool autocorrect;
   final TextInputType? keyboardType;
+
+  /// The field's name for screen readers and the semantics tree; defaults to
+  /// [placeholder].
+  final String? semanticLabel;
 
   @override
   State<PlainField> createState() => _PlainFieldState();
@@ -73,43 +78,52 @@ class _PlainFieldState extends State<PlainField> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Stack(
-      children: [
-        if (widget.controller.text.isEmpty)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.placeholder,
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  style: widget.style.copyWith(color: c.textTertiary),
+    // One node: the field's own text-field node merges the label with tap and
+    // focus, so an unfocused field can be found and focused.
+    return Semantics(
+      label: widget.semanticLabel ?? widget.placeholder,
+      onTap: widget.focusNode.requestFocus,
+      onFocus: widget.focusNode.requestFocus,
+      child: Stack(
+        children: [
+          if (widget.controller.text.isEmpty)
+            Positioned.fill(
+              child: ExcludeSemantics(
+                child: IgnorePointer(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.placeholder,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: widget.style.copyWith(color: c.textTertiary),
+                    ),
+                  ),
                 ),
               ),
             ),
+          EditableText(
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            style: widget.style,
+            cursorColor: c.textPrimary,
+            backgroundCursorColor: c.textTertiary,
+            selectionColor: c.textSelection,
+            cursorWidth: 1.5,
+            autofocus: widget.autofocus,
+            onChanged: widget.onChanged,
+            onSubmitted: widget.onSubmitted,
+            selectionControls: noteSelectionControls,
+            textInputAction: widget.textInputAction,
+            inputFormatters: widget.inputFormatters,
+            textCapitalization: widget.textCapitalization,
+            autocorrect: widget.autocorrect,
+            enableSuggestions: widget.autocorrect,
+            keyboardType: widget.keyboardType,
+            maxLines: 1,
           ),
-        EditableText(
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          style: widget.style,
-          cursorColor: c.textPrimary,
-          backgroundCursorColor: c.textTertiary,
-          selectionColor: c.textSelection,
-          cursorWidth: 1.5,
-          autofocus: widget.autofocus,
-          onChanged: widget.onChanged,
-          onSubmitted: widget.onSubmitted,
-          selectionControls: noteSelectionControls,
-          textInputAction: widget.textInputAction,
-          inputFormatters: widget.inputFormatters,
-          textCapitalization: widget.textCapitalization,
-          autocorrect: widget.autocorrect,
-          enableSuggestions: widget.autocorrect,
-          keyboardType: widget.keyboardType,
-          maxLines: 1,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -195,6 +209,8 @@ class _FieldFrameState extends State<FieldFrame> {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Focus(
+      // Only watches focus for the ring; the text field is the one node.
+      includeSemantics: false,
       onFocusChange: (value) => setState(() => _focus = value),
       child: MouseRegion(
         onEnter: (_) => setState(() => _hover = true),
@@ -305,8 +321,8 @@ class _ObscuredFieldState extends State<ObscuredField> {
     final style = ts(context.type.body, c.textPrimary);
     return Semantics(
       label: widget.semanticLabel ?? widget.placeholder,
-      textField: true,
-      obscured: true,
+      onTap: _focus.requestFocus,
+      onFocus: _focus.requestFocus,
       child: FieldFrame(
         height: context.mobile ? 44 : 36,
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -314,12 +330,14 @@ class _ObscuredFieldState extends State<ObscuredField> {
           alignment: Alignment.centerLeft,
           children: [
             if (widget.controller.text.isEmpty)
-              IgnorePointer(
-                child: Text(
-                  widget.placeholder,
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  style: style.copyWith(color: c.textTertiary),
+              ExcludeSemantics(
+                child: IgnorePointer(
+                  child: Text(
+                    widget.placeholder,
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
+                    style: style.copyWith(color: c.textTertiary),
+                  ),
                 ),
               ),
             EditableText(
