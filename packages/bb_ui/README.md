@@ -135,3 +135,21 @@ Icons come from `Ico`, which maps to Lucide. This version adds `monitor`,
 `circleCheck`, `circleAlert`, `triangleAlert`, `pointer`, `pointerClick`,
 `activity`, `gauge`, `volume`, `logOut`, `gamepad`, `qrCode`, `globe`,
 `radio`, `arrowRight`, `lock`, `userCheck`, `keyboard` and `chevronUp`.
+
+## D-pad focus
+
+For TV remotes. Wrap a screen in `DpadScope` and each control in `DpadFocus`:
+arrow keys move focus directionally, Enter, numpad Enter and Select activate,
+and Escape or Back calls `onBack`. A `DpadFocus` with primary focus from
+keyboard or D-pad traversal draws a thick ink ring (over a focus-coloured
+halo) with a gap; pointer focus draws nothing. `autofocus` picks the start.
+
+```dart
+DpadScope(
+  onBack: close,
+  child: Row(children: [
+    DpadFocus(autofocus: true, onActivate: play, child: PlayButton()),
+    DpadFocus(onActivate: more, child: MoreButton()),
+  ]),
+)
+```

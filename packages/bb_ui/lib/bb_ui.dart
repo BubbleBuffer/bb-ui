@@ -3,6 +3,7 @@ library;
 
 export 'buttons.dart';
 export 'devices.dart';
+export 'dpad_focus.dart';
 export 'feedback.dart';
 export 'fields.dart';
 export 'hover.dart';
