@@ -59,7 +59,7 @@ Use Flutter 3.47.5 with Dart 3.13.4, matching CI. From the repository root:
 ```sh
 flutter pub get
 dart format --output=none --set-exit-if-changed .
-flutter analyze --fatal-infos   # includes the bb_lints rules
+dart analyze --fatal-infos   # with the bb_lints rules; flutter analyze skips plugins
 (cd packages/bb_lints && dart pub get && dart analyze && dart test)
 (cd packages/bb_tokens && flutter test)
 (cd packages/bb_ui && flutter test)

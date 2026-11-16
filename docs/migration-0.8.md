@@ -11,8 +11,9 @@ questions. It breaks the API on purpose. Most of the change is mechanical and
 2. Run the migrate tool on the package, then `dart analyze`.
 3. Fix the compile errors (mostly the host's `AppTheme` and `context.mobile`
    uses that were about layout, below).
-4. Enable the plugin in `analysis_options.yaml` and work through what it
-   reports: name app-specific values in an `*_tokens.dart`, use scale steps
+4. Enable the plugin in `analysis_options.yaml`, switch CI from
+   `flutter analyze` to `dart analyze` (only the latter reports plugin
+   diagnostics), and work through what it reports: name app-specific values in an `*_tokens.dart`, use scale steps
    for the rest.
 5. Re-render screenshots or goldens and review them: spacing snapped to the
    scale moves things by a few pixels.

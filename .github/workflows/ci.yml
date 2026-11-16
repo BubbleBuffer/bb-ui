@@ -48,10 +48,12 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
-      # The bb_lints plugin is loaded from packages/bb_lints by path.
+      # The bb_lints plugin is loaded from packages/bb_lints by path. Only
+      # `dart analyze` reports analyzer-plugin diagnostics; `flutter analyze`
+      # (3.47) does not, so it would pass with every rule broken.
       - run: dart pub get
         working-directory: packages/bb_lints
-      - run: flutter analyze --fatal-infos
+      - run: dart analyze --fatal-infos
 
   lints:
     name: bb_lints package
@@ -237,10 +239,10 @@ jobs:
           YAML
           cd "$dir"
           flutter pub get
-          flutter analyze --fatal-infos
+          dart analyze --fatal-infos
           # The plugin loads from Git and reports a raw value.
           printf "import 'package:flutter/widgets.dart';\n\nconst pad = EdgeInsets.all(10);\n" > lib/raw.dart
-          if out=$(flutter analyze 2>&1); then
+          if out=$(dart analyze 2>&1); then
             echo "expected bb_lints to flag lib/raw.dart" >&2
             exit 1
           fi

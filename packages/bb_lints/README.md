@@ -2,8 +2,13 @@
 
 An analyzer plugin that keeps Flutter UI code on the `bb_tokens` scales: no
 hand-written spacing, sizes, radii, strokes, opacities, type, colours or
-durations in widgets. It runs in the IDE and in `dart analyze` /
-`flutter analyze`, so CI fails on a violation like on any other warning.
+durations in widgets. It runs in the IDE and in `dart analyze`, so CI fails on
+a violation like on any other warning.
+
+Run `dart analyze`, not `flutter analyze`, in CI: with Flutter 3.47
+`flutter analyze` does not report analyzer-plugin diagnostics at all. The
+first run after enabling the plugin fetches and compiles it; in a fresh CI
+workspace `dart analyze` waits for that.
 
 It also ships `dart run bb_lints:migrate`, which moves a package to bb_ui 0.8
 in bulk.
@@ -26,7 +31,8 @@ plugins:
       no_window_size: true
 ```
 
-Restart the analysis server after changing the `plugins` section. Plugins need
+Restart the analysis server (or the IDE) after changing the `plugins`
+section. Plugins need
 Dart 3.10 or later (bb-ui uses 3.13). Inside bb-ui the plugin is referenced by
 `path:` and excluded from the workspace's own analysis (see the root
 `analysis_options.yaml`).
