@@ -111,6 +111,8 @@ String? tokenFor(Expression literal) {
   final value = numericValue(literal)?.toDouble();
   if (value == null) return null;
   final kind = kindOf(literal);
+  // Inside a painter, a radius is glyph geometry, not a corner token.
+  if (kind == StyleKind.radius && _inPainter(literal)) return null;
   // Fully opaque is not a step: `opacity: shown ? 1 : 0` stays as written.
   if (kind == StyleKind.alpha && value >= 1) return null;
   final radiusNear = _radius.any(
@@ -124,4 +126,11 @@ String? tokenFor(Expression literal) {
     StyleKind.alpha => nearest(_alpha, value),
     _ => null,
   };
+}
+
+bool _inPainter(AstNode node) {
+  final cls = node.thisOrAncestorOfType<ClassDeclaration>();
+  final type = cls?.declaredFragment?.element.thisType;
+  return type != null &&
+      type.allSupertypes.any((t) => t.element.name == 'CustomPainter');
 }

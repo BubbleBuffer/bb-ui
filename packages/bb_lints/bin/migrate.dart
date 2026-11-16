@@ -1,5 +1,5 @@
 // dart run bb_lints:migrate <directory> [--type-scale <expr>] [--import <uri>]
-//                                      [--no-import] [--dry-run]
+//                                      [--no-import] [--no-format] [--dry-run]
 //
 // Applies the mechanical part of the bb_ui 0.8 migration to every library
 // under <directory>, then formats the changed files. Run `dart analyze`
@@ -13,7 +13,7 @@ Future<void> main(List<String> args) async {
   if (args.isEmpty || args.contains('-h') || args.contains('--help')) {
     stdout.writeln(
       'usage: dart run bb_lints:migrate <dir> [--type-scale <expr>] '
-      '[--import <uri>] [--no-import] [--dry-run]',
+      '[--import <uri>] [--no-import] [--no-format] [--dry-run]',
     );
     exit(args.isEmpty ? 64 : 0);
   }
@@ -33,7 +33,8 @@ Future<void> main(List<String> args) async {
   for (final path in changed) {
     stdout.writeln('migrated $path');
   }
-  if (changed.isNotEmpty && !options.dryRun) {
+  // A repository that is not dart-formatted keeps its own layout.
+  if (changed.isNotEmpty && !options.dryRun && !args.contains('--no-format')) {
     await Process.run('dart', ['format', ...changed], runInShell: true);
   }
   stdout.writeln('${changed.length} files changed.');

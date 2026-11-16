@@ -43,7 +43,10 @@ SizeClassScope(
 `Density` (pointer or touch) sets control heights, icon sizes, row padding and
 the type ramp. `SizeClass` (compact below 600, medium below 1000, expanded)
 sets layout. A phone is compact and touch; a narrow desktop window is compact
-and pointer; a tablet is medium or expanded and touch. `SizeClassScope` is
+and pointer; a tablet is medium or expanded and touch. An app whose chrome needs more room than 600 px to leave the compact layout
+(a 240 px sidebar beside a page) wraps its content in its own
+`SizeClassScope` computed from its own breakpoint; bb_ui components below
+then follow it. `SizeClassScope` is
 optional: without one, `context.sizeClass` falls back to the window width.
 Wrap the app in `MediaQuery.withClampedTextScaling(maxScaleFactor: 2.0, ...)`
 to follow the system text size up to double.

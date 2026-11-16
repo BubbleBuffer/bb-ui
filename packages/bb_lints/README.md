@@ -103,7 +103,12 @@ It resolves every library under `lib/` and rewrites what is mechanical:
 
 It adds `import 'package:bb_ui/bb_ui.dart';` where a rewritten library needs
 it (`--import <uri>` or `--no-import` to change that), then formats the files
-it changed. Run `dart analyze` afterwards: compile errors and the rules list
+it changed (`--no-format` for a repository that is not dart-formatted).
+
+Review its output where a number is not a design step: a spacer that must
+match a sibling's width (a leading icon column) is snapped like any other
+gap, and `tsRaw` calls whose size is an expression (`m ? 15 : 14`) are left
+for you. Radii inside a `CustomPainter` are left as written. Run `dart analyze` afterwards: compile errors and the rules list
 what needs a decision, such as a `context.touch` that was really about screen
 width (use `context.sizeClass.isCompact`), widths and heights to name, and
 colours to move into the palette. See
