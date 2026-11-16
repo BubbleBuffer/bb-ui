@@ -290,8 +290,8 @@ class ScreenScaffold extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              height: Layout.topbarHeight,
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: Layout.topbarHeight),
               child: Row(
                 children: [
                   const Gap(Space.xxs),

@@ -12,8 +12,9 @@ questions. It breaks the API on purpose. Most of the change is mechanical and
 3. Fix the compile errors (mostly the host's `AppTheme` and `context.mobile`
    uses that were about layout, below).
 4. Enable the plugin in `analysis_options.yaml`, switch CI from
-   `flutter analyze` to `dart analyze` (only the latter reports plugin
-   diagnostics), and work through what it reports: name app-specific values in an `*_tokens.dart`, use scale steps
+   `flutter analyze` to `dart analyze` at the package root, without `lib` /
+   `test` arguments (only that form reports plugin diagnostics), and work
+   through what it reports: name app-specific values in an `*_tokens.dart`, use scale steps
    for the rest.
 5. Re-render screenshots or goldens and review them: spacing snapped to the
    scale moves things by a few pixels.
@@ -104,7 +105,9 @@ values there.
 - Lay a component out by its own width (`AdaptiveLayout`, `LayoutBuilder`,
   `context.sizeClass` under a pane's own `SizeClassScope`), not the window's.
 - Prefer `Wrap`, `Flexible` with an ellipsis, and `Row`/`Column` `spacing:`
-  over fixed widths.
+  over fixed widths. `InlineOrStacked(main:, trailing:)` keeps an action
+  beside its text while the text's longest word still fits, and moves it
+  underneath otherwise.
 - Test it: the gallery's
   [`adaptive_matrix_test.dart`](../apps/gallery/test/adaptive_matrix_test.dart)
   renders every scene at six widths and three text sizes and fails on any

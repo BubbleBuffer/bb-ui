@@ -38,6 +38,9 @@ medium: ..., expanded: ...)`.
   `Row`/`Column`'s `spacing:`.
 - `AdaptiveLayout(builder: (context, sizeClass) => ...)` builds by its own
   width and sets that size class for everything below it.
+- `InlineOrStacked(main: text, trailing: action)` puts the action beside the
+  text while the text still fits at the current width and text size, and
+  under it otherwise (a `DeviceRow` uses it).
 - Components take sizes as steps: `IconBtn(size: ControlSize.sm, glyph:
   IconSize.lg)`, `Icon20(size: IconSize.md)`, `PrimaryButton(size:
   ControlSize.xl)`. Text-bearing controls have a minimum height, not a fixed

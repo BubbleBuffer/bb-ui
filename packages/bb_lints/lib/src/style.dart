@@ -172,7 +172,9 @@ bool inStylePosition(Expression value) {
           }
           return name != null &&
               styleArgNames.contains(name) &&
-              (isWidget(owner.staticType) || isStyleType(owner.staticType));
+              (isWidget(owner.staticType) ||
+                  isStyleType(owner.staticType) ||
+                  _fromUiLibrary(owner.methodName.element));
         }
         return false;
       case AssignmentExpression(:final leftHandSide, :final rightHandSide)
@@ -298,6 +300,18 @@ Expression? _initializerOf(AstNode node, Element variable) {
     return collector.found;
   }();
   return map[variable.baseElement];
+}
+
+/// Whether [element] is declared by Flutter or the kit, whose functions take
+/// visual arguments (`showModalPanel(width: ...)`, `showToast(duration:)`).
+bool _fromUiLibrary(Element? element) {
+  final uri = element?.library?.uri;
+  if (uri == null || !uri.isScheme('package')) return false;
+  final path = uri.path;
+  return path.startsWith('flutter/') ||
+      path.startsWith('bb_ui/') ||
+      path.startsWith('bb_tokens/') ||
+      path.startsWith('agent_kit/');
 }
 
 bool _isSdk(Uri uri) =>

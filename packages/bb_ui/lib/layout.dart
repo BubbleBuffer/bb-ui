@@ -1,5 +1,7 @@
 // Layout primitives that keep spacing on the scale and let a component adapt
-// to its own width: Gap and AdaptiveLayout.
+// to its own width: Gap, AdaptiveLayout and InlineOrStacked.
+
+import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -97,4 +99,159 @@ class AdaptiveLayout extends StatelessWidget {
       );
     },
   );
+}
+
+/// [main] with [trailing] after it on one line while [main] still gets its
+/// minimum width there (its longest word); otherwise [trailing] goes under
+/// [main], at its own width. The choice follows the text size as well as
+/// the width: a row's action drops below its text only when they no longer
+/// fit side by side.
+class InlineOrStacked extends MultiChildRenderObjectWidget {
+  InlineOrStacked({
+    super.key,
+    required Widget main,
+    required Widget trailing,
+    this.gap = Space.md,
+    this.runGap = Space.sm,
+  }) : super(children: [main, trailing]);
+
+  /// Between [main] and [trailing] on one line.
+  final double gap;
+
+  /// Between [main] and [trailing] when stacked.
+  final double runGap;
+
+  @override
+  RenderInlineOrStacked createRenderObject(BuildContext context) =>
+      RenderInlineOrStacked(gap, runGap);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    RenderInlineOrStacked renderObject,
+  ) {
+    renderObject
+      ..gap = gap
+      ..runGap = runGap;
+  }
+}
+
+class _SlotData extends ContainerBoxParentData<RenderBox> {}
+
+/// The render object of an [InlineOrStacked].
+class RenderInlineOrStacked extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _SlotData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _SlotData> {
+  RenderInlineOrStacked(this._gap, this._runGap);
+
+  double _gap, _runGap;
+  set gap(double v) {
+    if (v == _gap) return;
+    _gap = v;
+    markNeedsLayout();
+  }
+
+  set runGap(double v) {
+    if (v == _runGap) return;
+    _runGap = v;
+    markNeedsLayout();
+  }
+
+  /// Whether the last layout put the trailing child under the main one.
+  bool stacked = false;
+
+  RenderBox get _main => firstChild!;
+  RenderBox get _trailing => lastChild!;
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _SlotData) child.parentData = _SlotData();
+  }
+
+  bool _fits(double width) =>
+      width - _gap - _trailing.getMaxIntrinsicWidth(double.infinity) >=
+      _main.getMinIntrinsicWidth(double.infinity);
+
+  @override
+  double computeMinIntrinsicWidth(double height) => math.max(
+    _main.getMinIntrinsicWidth(height),
+    _trailing.getMinIntrinsicWidth(height),
+  );
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      _main.getMaxIntrinsicWidth(height) +
+      _gap +
+      _trailing.getMaxIntrinsicWidth(height);
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _height(width);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _height(width);
+
+  double _height(double width) {
+    final tw = _trailing.getMaxIntrinsicWidth(double.infinity);
+    if (_fits(width)) {
+      return math.max(
+        _main.getMinIntrinsicHeight(width - _gap - tw),
+        _trailing.getMinIntrinsicHeight(tw),
+      );
+    }
+    return _main.getMinIntrinsicHeight(width) +
+        _runGap +
+        _trailing.getMinIntrinsicHeight(math.min(tw, width));
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final width = constraints.maxWidth;
+    final tw = math.min(_trailing.getMaxIntrinsicWidth(double.infinity), width);
+    final t = _trailing.getDryLayout(BoxConstraints(maxWidth: tw));
+    if (_fits(width)) {
+      final m = _main.getDryLayout(BoxConstraints(maxWidth: width - _gap - tw));
+      return constraints.constrain(Size(width, math.max(m.height, t.height)));
+    }
+    final m = _main.getDryLayout(BoxConstraints(maxWidth: width));
+    return constraints.constrain(Size(width, m.height + _runGap + t.height));
+  }
+
+  @override
+  void performLayout() {
+    final width = constraints.maxWidth;
+    final tw = math.min(_trailing.getMaxIntrinsicWidth(double.infinity), width);
+    _trailing.layout(BoxConstraints(maxWidth: tw), parentUsesSize: true);
+    final mainData = _main.parentData! as _SlotData;
+    final trailingData = _trailing.parentData! as _SlotData;
+    stacked = !_fits(width);
+    if (!stacked) {
+      _main.layout(
+        BoxConstraints(maxWidth: width - _gap - tw),
+        parentUsesSize: true,
+      );
+      final h = math.max(_main.size.height, _trailing.size.height);
+      mainData.offset = Offset(0, (h - _main.size.height) / 2);
+      trailingData.offset = Offset(
+        width - _trailing.size.width,
+        (h - _trailing.size.height) / 2,
+      );
+      size = constraints.constrain(Size(width, h));
+    } else {
+      _main.layout(BoxConstraints(maxWidth: width), parentUsesSize: true);
+      mainData.offset = Offset.zero;
+      trailingData.offset = Offset(0, _main.size.height + _runGap);
+      size = constraints.constrain(
+        Size(width, _main.size.height + _runGap + _trailing.size.height),
+      );
+    }
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 }

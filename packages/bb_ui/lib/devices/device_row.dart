@@ -108,39 +108,18 @@ class DeviceRow extends StatelessWidget {
             Space.md,
             Space.md,
           ),
-          // A narrow row puts its action under the text, so the name and
-          // status keep room at any text size.
-          child: LayoutBuilder(
-            builder: (context, box) {
-              final stacked = trailing != null && box.maxWidth < Widths.dialog;
-              return Row(
-                crossAxisAlignment: stacked
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.center,
-                children: [
-                  tile,
-                  const Gap(Space.md),
-                  Expanded(
-                    child: stacked
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              body,
-                              const Gap(Space.sm),
-                              // At its own width, not the column's.
-                              IntrinsicWidth(child: trailing),
-                            ],
-                          )
-                        : body,
-                  ),
-                  if (trailing != null && !stacked) ...[
-                    const Gap(Space.md),
-                    trailing!,
-                  ],
-                ],
-              );
-            },
+          // The action goes under the text only when the two no longer fit
+          // side by side, at this width and text size.
+          child: Row(
+            children: [
+              tile,
+              const Gap(Space.md),
+              Expanded(
+                child: trailing == null
+                    ? body
+                    : InlineOrStacked(main: body, trailing: trailing!),
+              ),
+            ],
           ),
         ),
         if (selected)

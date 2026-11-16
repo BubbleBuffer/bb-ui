@@ -6,7 +6,9 @@ durations in widgets. It runs in the IDE and in `dart analyze`, so CI fails on
 a violation like on any other warning.
 
 Run `dart analyze`, not `flutter analyze`, in CI: with Flutter 3.47
-`flutter analyze` does not report analyzer-plugin diagnostics at all. The
+`flutter analyze` does not report analyzer-plugin diagnostics at all. Run it
+on the package or workspace root (or a whole package's directory), never on
+folders inside one: `dart analyze lib test` silently skips every plugin. The
 first run after enabling the plugin fetches and compiles it; in a fresh CI
 workspace `dart analyze` waits for that.
 

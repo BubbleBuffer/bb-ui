@@ -30,6 +30,9 @@ abstract class _RuleTest extends AnalysisRuleTest {
   @override
   void setUp() {
     rule = subject;
+    newPackage('bb_ui').addFile('lib/bb_ui.dart', r'''
+Future<void> showModalPanel({double width = 0}) async {}
+''');
     newPackage('bb_tokens').addFile('lib/bb_tokens.dart', r'''
 abstract final class Space {
   static const double sm = 8;
@@ -111,6 +114,21 @@ class Box extends StatelessWidget {
     await assertNoDiagnostics(r'''
 import 'package:flutter/widgets.dart';
 Widget f(double w) => SizedBox(width: w / 2);
+''');
+  }
+
+  Future<void> test_kitFunctionArgument() async {
+    const code = r'''
+import 'package:bb_ui/bb_ui.dart';
+void f() => showModalPanel(width: 560);
+''';
+    await assertDiagnostics(code, [at(code, '560')]);
+  }
+
+  Future<void> test_ownFunctionArgument() async {
+    await assertNoDiagnostics(r'''
+void resize({double width = 0}) {}
+void f() => resize(width: 560);
 ''');
   }
 
