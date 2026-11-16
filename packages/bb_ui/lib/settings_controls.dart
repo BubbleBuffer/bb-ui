@@ -102,7 +102,9 @@ class SettingsRow extends StatelessWidget {
         children: [
           Expanded(child: text),
           const Gap(Space.lg),
-          trailing!,
+          // Shares the row with the label, so a long value or large text
+          // ellipsises instead of overflowing.
+          Flexible(child: trailing!),
         ],
       ),
     );
@@ -235,12 +237,16 @@ class SelectButton<T> extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  labelOf(value),
-                  style: ts(
-                    context.type.ui,
-                    onChanged == null ? c.textDisabled : c.textSecondary,
-                    weight: Weight.regular,
+                Flexible(
+                  child: Text(
+                    labelOf(value),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: ts(
+                      context.type.ui,
+                      onChanged == null ? c.textDisabled : c.textSecondary,
+                      weight: Weight.regular,
+                    ),
                   ),
                 ),
                 const Gap(Space.hair),

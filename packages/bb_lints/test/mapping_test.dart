@@ -20,6 +20,10 @@ void main() {
     expect(roleFor(32, 34, mono: false, weight: 700).$1, 'display');
   });
 
+  test('a monospace constant keeps a code role', () {
+    expect(roleFor(12.5, 20, mono: true).$1, 'code');
+  });
+
   test('integer weights map to Weight', () {
     expect(weightFor(400), 'Weight.regular');
     expect(weightFor(640), 'Weight.display');

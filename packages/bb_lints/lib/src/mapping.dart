@@ -101,15 +101,25 @@ StyleKind? kindOf(Expression literal) {
   return null;
 }
 
+/// How far a radius may sit from a step and still snap to it; a smaller one
+/// (a square mark's 1-2 px corner) is a deliberate shape, left for a person.
+const _radiusTolerance = 2.0;
+
 /// The token source that replaces [literal], or null when there is no
 /// mechanical answer.
 String? tokenFor(Expression literal) {
   final value = numericValue(literal)?.toDouble();
   if (value == null) return null;
+  final kind = kindOf(literal);
+  // Fully opaque is not a step: `opacity: shown ? 1 : 0` stays as written.
+  if (kind == StyleKind.alpha && value >= 1) return null;
+  final radiusNear = _radius.any(
+    (r) => (r.$1 - value).abs() <= _radiusTolerance,
+  );
   // A leading minus stays in the source; only the magnitude is replaced.
-  return switch (kindOf(literal)) {
+  return switch (kind) {
     StyleKind.spacing when value <= maxSpacing => nearest(_space, value),
-    StyleKind.radius when value < 999 => nearest(_radius, value),
+    StyleKind.radius when radiusNear => nearest(_radius, value),
     StyleKind.stroke => nearest(_stroke, value),
     StyleKind.alpha => nearest(_alpha, value),
     _ => null,

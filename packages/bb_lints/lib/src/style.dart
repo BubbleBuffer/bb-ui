@@ -213,6 +213,10 @@ num? numericValue(Expression node) => switch (node) {
 bool isNeutral(Expression literal) {
   final v = numericValue(literal);
   if (v == null || v == 0) return true;
+  // Fully opaque: `opacity: 1`, `alpha: 1.0`.
+  if (v == 1 && const {'opacity', 'alpha'}.contains(_argNameOf(literal))) {
+    return true;
+  }
   final parent = literal.parent;
   if (parent is PrefixExpression &&
       parent.operator.type == TokenType.MINUS &&
@@ -226,6 +230,16 @@ bool isNeutral(Expression literal) {
     return numericValue(other.unParenthesized) == null;
   }
   return false;
+}
+
+/// The named argument [node] is the value of, directly or as a branch of a
+/// conditional (`opacity: shown ? 1 : 0`).
+String? _argNameOf(Expression node) {
+  AstNode? p = node.parent;
+  while (p is ConditionalExpression || p is ParenthesizedExpression) {
+    p = p?.parent;
+  }
+  return p is NamedArgument ? p.name.lexeme : null;
 }
 
 /// Whether [literal] sits in a named constant's initializer

@@ -132,6 +132,20 @@ void f() => resize(width: 560);
 ''');
   }
 
+  Future<void> test_fullyOpaque() async {
+    await assertNoDiagnostics(r'''
+import 'package:flutter/widgets.dart';
+// The mock Flutter package has no Opacity; this stands in.
+class Fade extends StatelessWidget {
+  const Fade({super.key, required this.opacity});
+  final double opacity;
+  @override
+  Widget build(BuildContext context) => const Text('');
+}
+Widget f(bool shown) => Fade(opacity: shown ? 1 : 0);
+''');
+  }
+
   Future<void> test_notAStylePosition() async {
     await assertNoDiagnostics(r'''
 import 'package:flutter/widgets.dart';

@@ -128,11 +128,9 @@ String _ensureImport(String source, CompilationUnit unit, MigrateOptions o) {
   final imports = unit.directives.whereType<ImportDirective>().map(
     (d) => d.uri.stringValue ?? '',
   );
+  // agent_kit does not re-export the tokens, so only these count.
   if (imports.any(
-    (u) =>
-        u.startsWith('package:bb_ui/') ||
-        u.startsWith('package:bb_tokens/') ||
-        u.startsWith('package:agent_kit/'),
+    (u) => u.startsWith('package:bb_ui/') || u.startsWith('package:bb_tokens/'),
   )) {
     return source;
   }
@@ -345,14 +343,24 @@ class _Collector extends RecursiveAstVisitor<void> {
     final weight = numericValue(args[2] as Expression);
     if (size == null || line == null || weight == null) return;
     final call = node.parent?.parent;
+    // Monospace if the style it feeds says so, or the constant it is named
+    // by does (`const mono = TypeSpec(...)`, `codeSpec`).
+    final declared = node.thisOrAncestorOfType<VariableDeclaration>();
+    final namedMono =
+        declared != null &&
+        RegExp(
+          'mono|code',
+          caseSensitive: false,
+        ).hasMatch(declared.name.lexeme);
     final mono =
+        namedMono ||
         call is MethodInvocation &&
-        call.argumentList.arguments.any(
-          (a) =>
-              a is NamedArgument &&
-              a.name.lexeme == 'mono' &&
-              a.argumentExpression.toSource() == 'true',
-        );
+            call.argumentList.arguments.any(
+              (a) =>
+                  a is NamedArgument &&
+                  a.name.lexeme == 'mono' &&
+                  a.argumentExpression.toSource() == 'true',
+            );
     final (role, roleWeight) = roleFor(
       size.toDouble(),
       line.toDouble(),
