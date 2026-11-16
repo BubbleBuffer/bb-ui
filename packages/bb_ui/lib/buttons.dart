@@ -6,15 +6,16 @@ import 'hover.dart';
 import 'icons.dart';
 import 'tokens.dart';
 import 'tooltip.dart';
+import 'layout.dart';
 
-/// A square icon button: [size] hit area with a [glyph]-sized icon.
+/// A square icon button: a [size] hit area with a [glyph]-sized icon.
 class IconBtn extends StatelessWidget {
   const IconBtn(
     this.icon, {
     super.key,
     this.onTap,
-    this.size = 28,
-    this.glyph = 20,
+    this.size = ControlSize.sm,
+    this.glyph = IconSize.lg,
     this.color,
     this.radius = Radii.md,
     this.selected = false,
@@ -25,7 +26,11 @@ class IconBtn extends StatelessWidget {
   });
   final Ico icon;
   final VoidCallback? onTap;
-  final double size, glyph, radius;
+  final ControlSize size;
+  final IconSize glyph;
+  final double radius;
+
+  /// A wider hit area than [size], for a button with a label beside it.
   final double? width;
   final Color? color;
   final bool selected;
@@ -51,8 +56,8 @@ class IconBtn extends StatelessWidget {
         selected: selected,
         selectedColor: c.bgPressed,
         child: SizedBox(
-          width: width ?? size,
-          height: size,
+          width: width ?? size.height,
+          height: size.height,
           child: Center(
             child: Icon20(icon, size: glyph, color: color ?? c.iconSecondary),
           ),
@@ -72,13 +77,13 @@ class PrimaryButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onTap,
-    this.height = 42,
+    this.size = ControlSize.xl,
     this.icon,
     this.expand = false,
   });
   final String label;
   final VoidCallback? onTap;
-  final double height;
+  final ControlSize size;
   final Ico? icon;
   final bool expand;
   @override
@@ -95,23 +100,23 @@ class PrimaryButton extends StatelessWidget {
         background: enabled ? c.accent : c.bgTertiary,
         hoverBackground: c.accentHover,
         pressedBackground: c.accentHover,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: SizedBox(
-          height: height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.md),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: size.height),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon20(icon!, size: 18, color: ink),
-                const SizedBox(width: 6),
+                Icon20(icon!, size: IconSize.md, color: ink),
+                const Gap(Space.xs),
               ],
               Flexible(
                 child: Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: ts(context.type.ui, ink, weight: 700),
+                  style: ts(context.type.ui, ink, weight: Weight.bold),
                 ),
               ),
             ],
@@ -129,13 +134,13 @@ class SecondaryButton extends StatelessWidget {
     super.key,
     required this.label,
     this.onTap,
-    this.height = 42,
+    this.size = ControlSize.xl,
     this.icon,
     this.danger = false,
   });
   final String label;
   final VoidCallback? onTap;
-  final double height;
+  final ControlSize size;
   final Ico? icon;
   final bool danger;
   @override
@@ -155,27 +160,27 @@ class SecondaryButton extends StatelessWidget {
         background: c.bgPrimary,
         border: Border.all(
           color: danger && enabled
-              ? c.inlineCodeText.withValues(alpha: .5)
+              ? c.inlineCodeText.withValues(alpha: Alpha.muted)
               : c.thread,
         ),
         borderRadius: Radii.ctl,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: SizedBox(
-          height: height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.md),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: size.height),
           child: Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[
-                  Icon20(icon!, size: 18, color: ink),
-                  const SizedBox(width: 6),
+                  Icon20(icon!, size: IconSize.md, color: ink),
+                  const Gap(Space.xs),
                 ],
                 Flexible(
                   child: Text(
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: ts(context.type.ui, ink, weight: 600),
+                    style: ts(context.type.ui, ink, weight: Weight.semibold),
                   ),
                 ),
               ],
@@ -192,7 +197,7 @@ class StacksCheckbox extends StatelessWidget {
   const StacksCheckbox({
     super.key,
     required this.checked,
-    this.size = 22,
+    this.size = Sizes.checkbox,
     this.onChanged,
     this.fill,
     this.ink,
@@ -219,11 +224,11 @@ class StacksCheckbox extends StatelessWidget {
             borderRadius: Radii.ctl,
             border: Border.all(
               color: checked ? (fill ?? c.accent) : c.threadStrong,
-              width: 1.5,
+              width: Stroke.regular,
             ),
           ),
           child: checked
-              ? Icon20(Ico.check, size: size * .72, color: ink ?? c.onAccent)
+              ? Icon20(Ico.check, size: IconSize.sm, color: ink ?? c.onAccent)
               : null,
         ),
       ),
@@ -237,13 +242,13 @@ class TextBtn extends StatelessWidget {
     this.label, {
     super.key,
     this.onTap,
-    this.height = 28,
+    this.size = ControlSize.sm,
     this.color,
     this.icon,
   });
   final String label;
   final VoidCallback? onTap;
-  final double height;
+  final ControlSize size;
   final Color? color;
 
   /// A leading icon, drawn in the label's colour.
@@ -256,17 +261,17 @@ class TextBtn extends StatelessWidget {
     return Hover(
       radius: Radii.md,
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: SizedBox(
-        height: height,
+      padding: const EdgeInsets.symmetric(horizontal: Space.sm),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: size.height),
         child: Center(
           child: icon == null
               ? Text(label, style: ts(context.type.ui, ink))
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon20(icon!, size: 18, color: ink),
-                    const SizedBox(width: 6),
+                    Icon20(icon!, size: IconSize.md, color: ink),
+                    const Gap(Space.xs),
                     Text(label, style: ts(context.type.ui, ink)),
                   ],
                 ),

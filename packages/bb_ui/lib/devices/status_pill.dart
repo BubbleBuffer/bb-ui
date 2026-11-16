@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../tokens.dart';
+import '../layout.dart';
 
 /// What a [StatusPill] reports. The word always says it; the mark and colour
 /// only repeat it.
@@ -51,17 +52,24 @@ class StatusPill extends StatelessWidget {
       StatusKind.neutral => (c.bgHover, c.textSecondary, c.textTertiary),
     };
     return Container(
-      height: 20,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      constraints: const BoxConstraints(minHeight: Sizes.pill),
+      padding: const EdgeInsets.symmetric(horizontal: Space.sm),
       decoration: BoxDecoration(color: fill, borderRadius: Radii.pill),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (kind != StatusKind.neutral) ...[
             _Mark(color: mark, ring: kind == StatusKind.offline),
-            const SizedBox(width: 6),
+            const Gap(Space.xs),
           ],
-          Text(label, style: ts(context.type.uiSmall, ink, weight: 600)),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: ts(context.type.uiSmall, ink, weight: Weight.semibold),
+            ),
+          ),
         ],
       ),
     );
@@ -75,12 +83,12 @@ class _Mark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: 8,
-    height: 8,
+    width: Sizes.dot,
+    height: Sizes.dot,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       color: ring ? null : color,
-      border: ring ? Border.all(color: color, width: 1.5) : null,
+      border: ring ? Border.all(color: color, width: Stroke.regular) : null,
     ),
   );
 }

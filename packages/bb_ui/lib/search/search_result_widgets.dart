@@ -8,6 +8,7 @@ import '../hover.dart';
 import '../icons.dart';
 import '../tokens.dart';
 import 'search_result.dart';
+import '../layout.dart';
 
 /// [text] with the [highlights] ranges marked. Without ranges it is a plain
 /// [Text], so the text stays as given.
@@ -73,20 +74,21 @@ class SearchResultRow extends StatelessWidget {
   /// Whether to draw [SearchResult.typeLabel] at the end of the row.
   final bool showTypeLabel;
 
-  /// The row's height.
-  static double extent(bool mobile) => mobile ? 72 : 64;
+  /// The row's height at density [m].
+  static double extent(Metrics m) => m.tallRow;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final m = context.mobile;
+    final m = context.metrics;
+    final touch = context.touch;
     final base = ts(
-      m ? ty.body : ty.ui,
+      ty.item,
       result.titleTone == SearchTitleTone.normal
           ? c.textPrimary
           : c.textSecondary,
-      weight: 500,
+      weight: Weight.medium,
     );
     final titleStyle = result.titleTone == SearchTitleTone.standIn
         ? base.copyWith(color: c.textTertiary, fontStyle: FontStyle.italic)
@@ -95,17 +97,18 @@ class SearchResultRow extends StatelessWidget {
     return Hover(
       key: result.rowKey,
       onTap: onTap,
-      radius: m ? 0 : Radii.md,
-      padding: EdgeInsets.symmetric(horizontal: m ? Layout.gutter : 8),
+      // By touch, rows run edge to edge.
+      radius: touch ? 0 : Radii.md,
+      padding: EdgeInsets.symmetric(horizontal: m.insetX),
       child: Row(
         children: [
           result.leading ??
               Icon20(
                 result.icon ?? Ico.page,
-                size: m ? 22 : 20,
+                size: m.icon,
                 color: c.iconSecondary,
               ),
-          SizedBox(width: m ? 12 : 10),
+          Gap(m.iconGap),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -123,24 +126,37 @@ class SearchResultRow extends StatelessWidget {
                     key: result.secondaryKey,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: ts(ty.uiSmall, c.textTertiary, weight: 400),
+                    style: ts(
+                      ty.uiSmall,
+                      c.textTertiary,
+                      weight: Weight.regular,
+                    ),
                   ),
                 if (result.snippet.isNotEmpty)
                   HighlightedText(
                     result.snippet,
                     key: result.snippetKey,
-                    style: ts(ty.uiSmall, c.textSecondary, weight: 400),
+                    style: ts(
+                      ty.uiSmall,
+                      c.textSecondary,
+                      weight: Weight.regular,
+                    ),
                     highlights: result.snippetHighlights,
                   ),
               ],
             ),
           ),
           if (showTypeLabel && typeLabel != null) ...[
-            SizedBox(width: m ? 12 : 10),
+            Gap(m.iconGap),
             Text(
               typeLabel.toUpperCase(),
               maxLines: 1,
-              style: ts(ty.uiSmall, c.textTertiary, weight: 500, mono: true),
+              style: ts(
+                ty.uiSmall,
+                c.textTertiary,
+                weight: Weight.medium,
+                mono: true,
+              ),
             ),
           ],
         ],
@@ -159,37 +175,50 @@ class SearchGroupHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final m = context.mobile;
     return Padding(
-      padding: EdgeInsets.fromLTRB(m ? Layout.gutter : 10, 10, 10, 4),
+      padding: EdgeInsets.fromLTRB(
+        context.touch ? Layout.gutter : Space.md,
+        Space.md,
+        Space.md,
+        Space.xxs,
+      ),
       child: Text(
         section.label.toUpperCase(),
-        style: ts(ty.uiSmall, c.textTertiary, weight: 500, mono: true),
+        style: ts(
+          ty.uiSmall,
+          c.textTertiary,
+          weight: Weight.medium,
+          mono: true,
+        ),
       ),
     );
   }
 }
 
 /// The grouped results: a header per section, then its rows. [active] is the
-/// keyboard selection, an index into the flattened results (desktop only).
+/// keyboard selection, an index into the flattened results (pointer only).
 class SearchResultsList extends StatelessWidget {
   const SearchResultsList({
     super.key,
     required this.sections,
     required this.onPick,
-    required this.mobile,
     this.active,
+    this.showActive,
     this.padding = EdgeInsets.zero,
   });
   final List<SearchResultSection> sections;
   final ValueChanged<SearchResult> onPick;
-  final bool mobile;
+
+  /// Whether to mark the [active] row. By default only with a pointer,
+  /// where arrow keys move it; a keyboard-driven panel sets it.
+  final bool? showActive;
   final int? active;
   final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final mark = showActive ?? !context.touch;
     // Headers have no index; rows carry their position in the flat order.
     final items =
         <({SearchResultSection? header, SearchResult? result, int index})>[];
@@ -213,11 +242,13 @@ class SearchResultsList extends StatelessWidget {
             key: ValueKey('search-group-${header.id}'),
           );
         }
-        final row = SizedBox(
-          height: SearchResultRow.extent(mobile),
+        final row = ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: SearchResultRow.extent(context.metrics),
+          ),
           child: SearchResultRow(result: result, onTap: () => onPick(result)),
         );
-        if (mobile) return row;
+        if (!mark) return row;
         return DecoratedBox(
           decoration: BoxDecoration(
             color: item.index == active ? c.bgHover : null,

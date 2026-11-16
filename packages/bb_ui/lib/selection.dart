@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'tokens.dart';
 
 class NoteSelectionControls extends TextSelectionControls {
-  static const _r = 7.0;
+  static const _r = Sizes.selectionHandle;
 
   @override
   Widget buildHandle(
@@ -18,7 +18,7 @@ class NoteSelectionControls extends TextSelectionControls {
   ]) {
     final color = context.colors.accent;
     return SizedBox(
-      width: _r * 2 + 8,
+      width: _r * 2 + Space.sm,
       height: textLineHeight + _r * 2,
       child: CustomPaint(painter: _HandlePainter(color, type, textLineHeight)),
     );
@@ -27,13 +27,13 @@ class NoteSelectionControls extends TextSelectionControls {
   @override
   Offset getHandleAnchor(TextSelectionHandleType type, double textLineHeight) =>
       Offset(
-        _r + 4,
+        _r + Space.xxs,
         type == TextSelectionHandleType.collapsed ? 0 : textLineHeight,
       );
 
   @override
   Size getHandleSize(double textLineHeight) =>
-      Size(_r * 2 + 8, textLineHeight + _r * 2);
+      Size(_r * 2 + Space.sm, textLineHeight + _r * 2);
 
   @override
   Widget buildToolbar(
@@ -55,6 +55,10 @@ class _HandlePainter extends CustomPainter {
   final Color color;
   final TextSelectionHandleType type;
   final double lineHeight;
+
+  /// The collapsed caret's dot, and the dot under a range's end.
+  static const _caretDot = Space.xs, _endDot = 5.0;
+
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()..color = color;
@@ -62,11 +66,14 @@ class _HandlePainter extends CustomPainter {
     // A thin stem through the line and a dot below it, as on mobile
     // handles.
     if (type == TextSelectionHandleType.collapsed) {
-      canvas.drawCircle(Offset(cx, 8), 6, p);
+      canvas.drawCircle(Offset(cx, Space.sm), _caretDot, p);
       return;
     }
-    canvas.drawRect(Rect.fromLTWH(cx - 1, 0, 2, lineHeight), p);
-    canvas.drawCircle(Offset(cx, lineHeight + 6), 5, p);
+    canvas.drawRect(
+      Rect.fromLTWH(cx - Stroke.bold / 2, 0, Stroke.bold, lineHeight),
+      p,
+    );
+    canvas.drawCircle(Offset(cx, lineHeight + Space.xs), _endDot, p);
   }
 
   @override

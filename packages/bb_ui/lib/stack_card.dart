@@ -7,11 +7,19 @@ import 'package:flutter/widgets.dart';
 import 'hover.dart';
 import 'icons.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// A folding card. Folded it shows the label, title and [peek]; open it shows
 /// [body]. [footer] sits below either state (return null to show nothing).
 /// [stacked] draws two sheets behind the face. Open state is internal unless
 /// [open] is given, then the caller owns it and [onOpenChanged] reports taps.
+
+/// A chevron's rotation when its section is open.
+const _halfTurn = .5;
+
+/// A stack's title wraps to two lines before it ellipsises.
+const _titleLines = 2;
+
 class FoldableStackCard extends StatefulWidget {
   const FoldableStackCard({
     super.key,
@@ -26,7 +34,7 @@ class FoldableStackCard extends StatefulWidget {
     this.initiallyOpen = false,
     this.open,
     this.onOpenChanged,
-    this.titleMaxLines = 2,
+    this.titleMaxLines = _titleLines,
   });
 
   /// The colour of the left edge.
@@ -99,7 +107,7 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
                     overflow: TextOverflow.ellipsis,
                     style: ts(ty.uiSmall, c.textTertiary),
                   ),
-                  const SizedBox(height: 1),
+                  const Gap(Space.hair),
                 ],
                 Text(
                   widget.title,
@@ -108,21 +116,21 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
                   style: tsDisplay(ty.h3, c.textPrimary),
                 ),
                 if (!open && widget.peek != null) ...[
-                  const SizedBox(height: 3),
+                  const Gap(Space.xxs),
                   widget.peek!,
                 ],
               ],
             ),
           ),
-          const SizedBox(width: 10),
+          const Gap(Space.md),
           Padding(
-            padding: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.only(top: Space.hair),
             child: AnimatedRotation(
-              turns: open ? .5 : 0,
+              turns: open ? _halfTurn : 0,
               duration: Motion.standard,
               child: Container(
-                width: 26,
-                height: 26,
+                width: ControlSize.xs.height,
+                height: ControlSize.xs.height,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   borderRadius: Radii.ctl,
@@ -130,7 +138,7 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
                 ),
                 child: Icon20(
                   Ico.chevronDown,
-                  size: 14,
+                  size: IconSize.xs,
                   color: c.iconSecondary,
                 ),
               ),
@@ -146,7 +154,10 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (open && body != null)
-          Padding(padding: const EdgeInsets.only(top: 8), child: body),
+          Padding(
+            padding: const EdgeInsets.only(top: Space.sm),
+            child: body,
+          ),
         ?foot,
       ],
     );
@@ -165,11 +176,16 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
               left: 0,
               top: 0,
               bottom: 0,
-              width: 4,
+              width: Sizes.edge,
               child: ColoredBox(color: widget.edge),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+              padding: const EdgeInsets.fromLTRB(
+                Space.lg,
+                Space.md,
+                Space.md,
+                Space.md,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,24 +206,27 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
     );
 
     return Padding(
-      padding: EdgeInsets.only(top: widget.stacked ? 10 : 0, bottom: 6),
+      padding: EdgeInsets.only(
+        top: widget.stacked ? Space.md : 0,
+        bottom: Space.xs,
+      ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           // Later children paint on top, so the farthest sheet comes first.
           if (widget.stacked) ...[
             Positioned(
-              top: -10,
-              left: 13,
-              right: 13,
-              height: 30,
+              top: -Space.md,
+              left: Space.md,
+              right: Space.md,
+              height: Space.xxl,
               child: _PaperSheet(colour: c.bgTertiary, border: c.border),
             ),
             Positioned(
-              top: -5,
-              left: 6,
-              right: 6,
-              height: 30,
+              top: -Space.xs,
+              left: Space.xs,
+              right: Space.xs,
+              height: Space.xxl,
               child: _PaperSheet(colour: c.bgSecondary, border: c.border),
             ),
           ],
@@ -254,7 +273,10 @@ class FooterAction extends StatelessWidget {
       radius: Radii.md,
       border: Border.all(color: main ? c.accent : c.borderSubtle),
       background: main ? c.accent : null,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Space.md,
+        vertical: Space.xxs,
+      ),
       child: Text(
         label,
         style: ts(context.type.uiSmall, main ? c.onAccent : c.textPrimary),

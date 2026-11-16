@@ -24,7 +24,7 @@ Future<void> _pump(
   await tester.pumpWidget(
     AppTheme(
       colors: dark ? AppColors.darkTheme : AppColors.light,
-      formFactor: mobile ? FormFactor.mobile : FormFactor.desktop,
+      density: mobile ? Density.touch : Density.pointer,
       child: WidgetsApp(
         color: const Color(0xFFFFFFFF),
         pageRouteBuilder: <T>(settings, builder) => PageRouteBuilder<T>(

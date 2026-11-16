@@ -2,8 +2,21 @@
 // The app's icon enums (Ico in icons.dart, Ix in icon_x.dart) map their names
 // to Lucide glyphs here; call sites keep using Icon20/IconX/IconBtn/IconBtnX.
 // Source, version and licence: THIRD_PARTY.md at the repo root.
+//
+// Glyphs are drawn as text from the icon font, in Lucide's own units, so the
+// type and token rules do not apply to their metrics.
+// ignore_for_file: bb_lints/no_raw_text_style, bb_lints/tokens_only
 
 import 'package:flutter/widgets.dart';
+
+/// Lucide draws on a 24-unit grid, in three stroke weights.
+const _grid = 24.0,
+    _lightStroke = 1.55,
+    _regularStroke = 2.0,
+    _boldStroke = 2.5;
+
+/// A glyph's line box is exactly its size.
+const _glyphLine = 1.0;
 
 /// One Lucide glyph in three stroke weights (1.55, 2 and 2.5 on Lucide's
 /// 24-unit grid). Each is a const IconData, so release builds can subset
@@ -14,10 +27,10 @@ typedef LucideGlyph = (IconData light, IconData regular, IconData bold);
 /// keep the app's line weight at every size (1.5 px at 20 px is Lucide's
 /// default weight).
 IconData lucideWeight(LucideGlyph g, double size, double stroke) {
-  final k = size / 24;
-  final light = (1.55 * k - stroke).abs();
-  final regular = (2.0 * k - stroke).abs();
-  final bold = (2.5 * k - stroke).abs();
+  final k = size / _grid;
+  final light = (_lightStroke * k - stroke).abs();
+  final regular = (_regularStroke * k - stroke).abs();
+  final bold = (_boldStroke * k - stroke).abs();
   if (light < regular && light < bold) return g.$1;
   if (bold < regular) return g.$3;
   return g.$2;
@@ -29,7 +42,7 @@ TextStyle _style(IconData d, double size, Color color) => TextStyle(
   fontSize: size,
   fontFamily: d.fontFamily,
   package: d.fontPackage,
-  height: 1,
+  height: _glyphLine,
   leadingDistribution: TextLeadingDistribution.even,
 );
 
@@ -106,7 +119,7 @@ class _FillPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final k = size.shortestSide / 24;
+    final k = size.shortestSide / _grid;
     final path = Path()..addPolygon([for (final p in points) p * k], true);
     canvas.drawPath(path, Paint()..color = color);
   }

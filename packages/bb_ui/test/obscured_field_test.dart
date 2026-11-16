@@ -13,7 +13,7 @@ Future<void> _pump(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(
     AppTheme(
       colors: AppColors.light,
-      formFactor: FormFactor.desktop,
+      density: Density.pointer,
       child: WidgetsApp(
         color: const Color(0xFF000000),
         builder: (context, _) => Align(

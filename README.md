@@ -1,12 +1,14 @@
 # bb-ui
 
 Shared BubbleBuffer Flutter primitives and design tokens, without Material or
-an agent backend. Both packages are version **0.7.2**.
+an agent backend. The packages are version **0.8.0**; moving from 0.7 is in
+the [migration guide](docs/migration-0.8.md).
 
 | Package | Purpose |
 | --- | --- |
 | `packages/bb_tokens` | Colours, typography, spacing, radii, motion and themes |
 | `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection, stacks, device lists, pairing and session chrome |
+| `packages/bb_lints` | Analyzer plugin that keeps UI code on the tokens, and the 0.8 migrate tool |
 | `apps/gallery` | Interactive neutral specimens and Linux golden tests |
 
 The packages retain their existing APIs and directory names after extraction
@@ -25,13 +27,30 @@ dependencies:
   bb_ui:
     git:
       url: https://github.com/BubbleBuffer/bb-ui
-      ref: v0.7.2
+      ref: v0.8.0
       path: packages/bb_ui
 ```
 
 For a tokens-only consumer use the same Git dependency with
 `path: packages/bb_tokens`. See [bb_ui](packages/bb_ui/README.md) for theme setup
-and [bb_tokens](packages/bb_tokens/README.md) for colour generation.
+and [bb_tokens](packages/bb_tokens/README.md) for the scales and colour
+generation.
+
+### Style rules
+
+No widget writes a number for spacing, size, type, stroke, opacity, colour or
+timing; it picks a token. Enable [bb_lints](packages/bb_lints/README.md) in
+your `analysis_options.yaml` so the analyzer (IDE and CI) enforces the same
+rules bb-ui follows:
+
+```yaml
+plugins:
+  bb_lints:
+    git:
+      url: https://github.com/BubbleBuffer/bb-ui
+      ref: v0.8.0
+      path: packages/bb_lints
+```
 
 ## Develop
 
@@ -40,12 +59,12 @@ Use Flutter 3.47.5 with Dart 3.13.4, matching CI. From the repository root:
 ```sh
 flutter pub get
 dart format --output=none --set-exit-if-changed .
-flutter analyze --fatal-infos
+dart analyze --fatal-infos   # with the bb_lints rules; flutter analyze skips plugins
+(cd packages/bb_lints && dart pub get && dart analyze && dart test)
 (cd packages/bb_tokens && flutter test)
 (cd packages/bb_ui && flutter test)
 (cd apps/gallery && flutter test --exclude-tags golden)
 (cd apps/gallery && flutter test --tags golden)
-bash scripts/check-raw-colours.sh
 bash scripts/check-private-strings.sh --patterns /path/to/private-rules
 ```
 

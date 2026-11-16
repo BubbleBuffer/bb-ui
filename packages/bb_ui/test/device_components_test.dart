@@ -19,7 +19,9 @@ Future<void> _pump(
   await tester.pumpWidget(
     AppTheme(
       colors: dark ? AppColors.darkTheme : AppColors.light,
-      formFactor: FormFactor.forWidth(size.width),
+      density: size.width < SizeClass.mediumWidth
+          ? Density.touch
+          : Density.pointer,
       child: WidgetsApp(
         color: const Color(0xFF000000),
         builder: (context, _) => Overlay(
@@ -53,7 +55,7 @@ void main() {
           onTap: () => row++,
           trailing: PrimaryButton(
             label: 'Connect',
-            height: 34,
+            size: ControlSize.lg,
             onTap: () => action++,
           ),
         ),

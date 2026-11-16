@@ -17,14 +17,23 @@ import '../search/search_result_widgets.dart';
 import '../tokens.dart';
 import 'fuzzy.dart';
 import 'palette_command.dart';
+import '../layout.dart';
+
+/// A match only in a command's subtitle ranks below every title match.
+const _subtitlePenalty = 5000;
 
 /// The row height of a command, the group header's and the query field's.
 class PaletteMetrics {
   const PaletteMetrics._();
-  static double row(bool mobile) => mobile ? 44 : 36;
-  static const header = 30.0;
-  static double field(bool mobile) => mobile ? 52 : 48;
-  static const listPadding = EdgeInsets.fromLTRB(6, 4, 6, 8);
+  static double row(Metrics m) => m.listRow.height;
+  static double get header => ControlSize.md.height;
+  static double get field => ControlSize.xxl.height;
+  static const listPadding = EdgeInsets.fromLTRB(
+    Space.xs,
+    Space.xxs,
+    Space.xs,
+    Space.sm,
+  );
 }
 
 class _Item {
@@ -51,7 +60,9 @@ List<_Item> _filter(List<PaletteCommand> commands, String query) {
     if (match == null && command.subtitle.isNotEmpty) {
       final sub = fuzzyMatch(query, command.subtitle);
       // A hit in the subtitle ranks below any in the title, and marks nothing.
-      if (sub != null) match = FuzzyMatch(sub.score - 5000, const []);
+      if (sub != null) {
+        match = FuzzyMatch(sub.score - _subtitlePenalty, const []);
+      }
     }
     if (match != null) hits.add((match.score, i, command, match.ranges));
   }
@@ -203,7 +214,7 @@ class _CommandPaletteState extends State<CommandPalette> {
   void _reveal() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scroll.hasClients) return;
-      final m = context.mobile;
+      final m = context.metrics;
       const pad = PaletteMetrics.listPadding;
       var top = pad.top;
       var at = -1;
@@ -229,22 +240,25 @@ class _CommandPaletteState extends State<CommandPalette> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final m = context.mobile;
+    final m = context.metrics;
+    // On a compact window the palette fills it, with no frame of its own
+    // (showCommandPalette makes the same choice).
+    final full = context.windowSizeClass.isCompact;
     final active = _clamp(_active);
     final Widget body;
     if (_items.isEmpty) {
       body = Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(Space.lg),
         child: Text(
           widget.emptyNote,
           key: const ValueKey('palette-empty'),
-          style: ts(ty.ui, c.textTertiary, weight: 400),
+          style: ts(ty.ui, c.textTertiary, weight: Weight.regular),
         ),
       );
     } else {
       body = ListView.builder(
         controller: _scroll,
-        shrinkWrap: !m,
+        shrinkWrap: !full,
         padding: PaletteMetrics.listPadding,
         itemCount: _items.length,
         itemBuilder: (context, i) {
@@ -283,49 +297,53 @@ class _CommandPaletteState extends State<CommandPalette> {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: c.bgElevated,
-        border: m ? null : Border.all(color: c.borderStrong),
-        borderRadius: m ? null : Radii.panel,
-        boxShadow: m ? null : c.seamHover,
+        border: full ? null : Border.all(color: c.borderStrong),
+        borderRadius: full ? null : Radii.panel,
+        boxShadow: full ? null : c.seamHover,
       ),
       child: ClipRRect(
-        borderRadius: m ? BorderRadius.zero : Radii.panel,
+        borderRadius: full ? BorderRadius.zero : Radii.panel,
         child: Column(
-          mainAxisSize: m ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: full ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: PaletteMetrics.field(m),
+              height: PaletteMetrics.field,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Padding(
                     padding: EdgeInsets.only(
-                      left: m ? 16 : 14,
-                      right: m ? 4 : 14,
+                      left: Space.lg,
+                      right: full ? Space.xxs : Space.lg,
                     ),
                     child: Row(
                       children: [
                         Icon20(
                           Ico.search,
-                          size: m ? 20 : 16,
+                          size: m.iconSmall,
                           color: c.iconTertiary,
                         ),
-                        SizedBox(width: m ? 12 : 10),
+                        Gap(m.iconGap),
                         Expanded(
                           child: PlainField(
                             key: widget.fieldKey,
                             controller: _controller,
                             focusNode: _focus,
-                            style: ts(ty.body, c.textPrimary, weight: 400),
+                            style: ts(
+                              ty.body,
+                              c.textPrimary,
+                              weight: Weight.regular,
+                            ),
                             placeholder: widget.placeholder,
                             onChanged: _query,
                           ),
                         ),
-                        if (m)
+                        if (full)
                           TextBtn(
                             'Cancel',
                             key: const ValueKey('palette-cancel'),
-                            height: 44,
+                            size: ControlSize.xl,
                             onTap: widget.onClose,
                           )
                         else
@@ -338,7 +356,7 @@ class _CommandPaletteState extends State<CommandPalette> {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      height: 2,
+                      height: Stroke.bold,
                       child: ColoredBox(
                         key: const ValueKey('palette-field-focus'),
                         color: c.focus,
@@ -348,7 +366,7 @@ class _CommandPaletteState extends State<CommandPalette> {
               ),
             ),
             HLine(color: c.divider),
-            if (m) Expanded(child: body) else Flexible(child: body),
+            if (full) Expanded(child: body) else Flexible(child: body),
           ],
         ),
       ),
@@ -375,15 +393,28 @@ class Keycap extends StatelessWidget {
         border: Border.all(color: raised ? c.thread : c.border),
         borderRadius: BorderRadius.circular(Radii.sm),
         boxShadow: raised
-            ? [BoxShadow(color: c.threadStrong, offset: const Offset(0, 1.5))]
+            ? [
+                BoxShadow(
+                  color: c.threadStrong,
+                  offset: const Offset(0, Stroke.regular),
+                ),
+              ]
             : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Space.xs,
+          vertical: Space.hair,
+        ),
         child: Text(
           label,
           maxLines: 1,
-          style: ts(context.type.uiSmall, fg, weight: 400, mono: true),
+          style: ts(
+            context.type.uiSmall,
+            fg,
+            weight: Weight.regular,
+            mono: true,
+          ),
         ),
       ),
     );
@@ -408,7 +439,7 @@ class _PaletteRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final m = context.mobile;
+    final m = context.metrics;
     final enabled = command.enabled;
     final icon = command.icon;
     final reason = command.disabledReason;
@@ -420,7 +451,7 @@ class _PaletteRow extends StatelessWidget {
                   reason,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: ts(ty.uiSmall, c.textTertiary, weight: 400),
+                  style: ts(ty.uiSmall, c.textTertiary, weight: Weight.regular),
                 ))
         : (shortcut == null || shortcut.isEmpty ? null : Keycap(shortcut));
     return Semantics(
@@ -451,29 +482,29 @@ class _PaletteRow extends StatelessWidget {
                       left: 0,
                       top: 0,
                       bottom: 0,
-                      width: 2,
+                      width: Stroke.bold,
                       child: ColoredBox(
                         key: const ValueKey('palette-active-bar'),
                         color: c.threadStrong,
                       ),
                     ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: m ? 12 : 8),
+                    padding: EdgeInsets.symmetric(horizontal: m.padX),
                     child: Row(
                       children: [
                         SizedBox(
-                          width: 20,
+                          width: m.iconSmall.px,
                           child: icon == null
                               ? null
                               : Icon20(
                                   icon,
-                                  size: m ? 20 : 16,
+                                  size: m.iconSmall,
                                   color: enabled
                                       ? c.iconSecondary
                                       : c.iconTertiary,
                                 ),
                         ),
-                        SizedBox(width: m ? 12 : 10),
+                        Gap(m.iconGap),
                         Expanded(
                           child: Row(
                             children: [
@@ -482,14 +513,14 @@ class _PaletteRow extends StatelessWidget {
                                   command.title,
                                   highlights: marks,
                                   style: ts(
-                                    m ? ty.body : ty.ui,
+                                    ty.item,
                                     enabled ? c.textPrimary : c.textDisabled,
-                                    weight: 400,
+                                    weight: Weight.regular,
                                   ),
                                 ),
                               ),
                               if (command.subtitle.isNotEmpty) ...[
-                                const SizedBox(width: 10),
+                                const Gap(Space.md),
                                 Flexible(
                                   child: Text(
                                     command.subtitle,
@@ -498,7 +529,7 @@ class _PaletteRow extends StatelessWidget {
                                     style: ts(
                                       ty.uiSmall,
                                       c.textTertiary,
-                                      weight: 400,
+                                      weight: Weight.regular,
                                     ),
                                   ),
                                 ),
@@ -507,7 +538,7 @@ class _PaletteRow extends StatelessWidget {
                           ),
                         ),
                         if (trailing != null) ...[
-                          const SizedBox(width: 10),
+                          const Gap(Space.md),
                           Flexible(flex: 0, child: trailing),
                         ],
                       ],
