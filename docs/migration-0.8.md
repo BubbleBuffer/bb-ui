@@ -54,7 +54,8 @@ to follow the system text size up to double.
 | --- | --- |
 | `FormFactor`, `AppTheme.formFactor` | `Density` + `SizeClass` |
 | `context.mobile` for sizes, padding, type | `context.touch`, or better `context.metrics.*` |
-| `context.mobile` for layout (sheet vs popover, full screen, columns) | `context.sizeClass.isCompact`, `context.adaptive(...)`, `AdaptiveLayout` |
+| `context.mobile` for layout inside a pane (columns, stacking) | `context.sizeClass.isCompact`, `context.adaptive(...)`, `AdaptiveLayout` |
+| `context.mobile` for overlays and app chrome (sheet vs popover, full-screen routes) | `context.windowSizeClass.isCompact` |
 | `TypeScale.desktop` / `.mobile` | `TypeScale.pointer` / `.touch` |
 | `TypeSpec(16, 20, 640)` | a role: `context.type.title`; new roles `display`, `title`, `item`, `caption`, `micro`, `codeSmall` |
 | `tsRaw(size, line, weight, color)` | `ts(context.type.<role>, color, weight: Weight.x)` |

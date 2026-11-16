@@ -141,7 +141,7 @@ Future<T?> showPickerSheet<T>(
   bool desktopScroll = false,
   double? sheetHeightFactor,
 }) {
-  if (context.sizeClass.isCompact) {
+  if (context.windowSizeClass.isCompact) {
     return showSheet<T>(
       context,
       (ctx) => SheetSurface(

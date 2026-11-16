@@ -25,7 +25,7 @@ class SettingsHeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    if (primary && context.sizeClass.isCompact) {
+    if (primary && context.windowSizeClass.isCompact) {
       return const SizedBox(height: Space.xxs);
     }
     return Padding(
@@ -178,7 +178,9 @@ class SelectButton<T> extends StatelessWidget {
 
   Future<void> _open(BuildContext context) async {
     T? picked;
-    if (context.sizeClass.isCompact) {
+    // A sheet on a phone-sized window, even from inside a narrow pane or
+    // dialog; a popover elsewhere.
+    if (context.windowSizeClass.isCompact) {
       picked = await showSheet<T>(
         context,
         (ctx) => SheetSurface(
@@ -186,6 +188,7 @@ class SelectButton<T> extends StatelessWidget {
             if (title != null) SheetHeader(title!),
             for (final o in options)
               SheetItem(
+                key: ValueKey('option-${labelOf(o)}'),
                 label: labelOf(o),
                 selected: o == value,
                 onTap: () => Navigator.of(ctx).pop(o),

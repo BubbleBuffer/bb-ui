@@ -103,7 +103,7 @@ class CommandPaletteRoute extends PopupRoute<PaletteCommand> {
       onRun: (command) => Navigator.of(context).pop(command),
       onClose: () => Navigator.of(context).maybePop(),
     );
-    if (context.sizeClass.isCompact) return palette;
+    if (context.windowSizeClass.isCompact) return palette;
     return Align(
       alignment: Alignment.topCenter,
       child: Padding(

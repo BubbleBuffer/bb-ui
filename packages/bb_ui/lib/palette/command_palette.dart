@@ -241,8 +241,9 @@ class _CommandPaletteState extends State<CommandPalette> {
     final c = context.colors;
     final ty = context.type;
     final m = context.metrics;
-    // On a compact screen the palette fills it, with no frame of its own.
-    final full = context.sizeClass.isCompact;
+    // On a compact window the palette fills it, with no frame of its own
+    // (showCommandPalette makes the same choice).
+    final full = context.windowSizeClass.isCompact;
     final active = _clamp(_active);
     final Widget body;
     if (_items.isEmpty) {

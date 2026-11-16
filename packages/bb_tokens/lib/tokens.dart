@@ -839,6 +839,13 @@ extension ThemeX on BuildContext {
   bool get touch => density == Density.touch;
   SizeClass get sizeClass => SizeClassScope.of(this);
 
+  /// The window's class, whatever pane this context is in. Overlays and app
+  /// chrome follow it: whether a menu opens as a sheet or a popover, whether
+  /// the command palette fills the screen. Content inside a pane follows
+  /// [sizeClass].
+  SizeClass get windowSizeClass =>
+      SizeClass.forWidth(MediaQuery.sizeOf(this).width);
+
   /// The value for the current [SizeClass]; a missing class takes the next
   /// narrower one that is given.
   T adaptive<T>({required T compact, T? medium, T? expanded}) =>
