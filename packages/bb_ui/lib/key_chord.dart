@@ -18,8 +18,8 @@ class KeyChord extends StatelessWidget {
       label: keys.join(' plus '),
       excludeSemantics: true,
       child: Wrap(
-        spacing: 4,
-        runSpacing: 4,
+        spacing: Space.xxs,
+        runSpacing: Space.xxs,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           for (var i = 0; i < keys.length; i++) ...[

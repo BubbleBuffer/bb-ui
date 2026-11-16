@@ -92,6 +92,8 @@ class CommandPaletteRoute extends PopupRoute<PaletteCommand> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
+    // The palette route places itself against the screen it covers.
+    // ignore: bb_lints/no_window_size
     final size = MediaQuery.sizeOf(context);
     final palette = CommandPalette(
       commands: commands,
@@ -101,15 +103,20 @@ class CommandPaletteRoute extends PopupRoute<PaletteCommand> {
       onRun: (command) => Navigator.of(context).pop(command),
       onClose: () => Navigator.of(context).maybePop(),
     );
-    if (context.mobile) return palette;
+    if (context.sizeClass.isCompact) return palette;
     return Align(
       alignment: Alignment.topCenter,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(16, size.height * 0.14, 16, 16),
+        padding: EdgeInsets.fromLTRB(
+          Space.lg,
+          size.height * Layout.paletteTop,
+          Space.lg,
+          Space.lg,
+        ),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: 560,
-            maxHeight: size.height * 0.6,
+            maxWidth: Widths.palette,
+            maxHeight: size.height * Layout.paletteHeight,
           ),
           child: palette,
         ),

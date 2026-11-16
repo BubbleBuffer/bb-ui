@@ -94,7 +94,7 @@ void main() {
     await tester.pumpWidget(
       AppTheme(
         colors: AppColors.darkTheme,
-        formFactor: FormFactor.desktop,
+        density: Density.pointer,
         child: WidgetsApp(
           color: const Color(0xFF000000),
           builder: (context, _) => Overlay(

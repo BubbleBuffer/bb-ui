@@ -5,7 +5,12 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'gallery_tokens.dart';
+
 enum _Kind { document, conversation }
+
+/// On a phone a result's title may wrap once.
+const _compactTitleLines = 2;
 
 class _Sample {
   const _Sample(this.id, this.kind, this.title, this.snippet, [this.path = '']);
@@ -79,13 +84,13 @@ class _SearchGalleryState extends State<SearchGallery> {
 
   SearchResult _result(
     _Sample sample, {
-    bool mobile = false,
+    bool compact = false,
     String keyPrefix = 'sample',
   }) => SearchResult(
     id: sample.id,
     title: sample.title,
     titleHighlights: termHighlights(sample.title, _terms),
-    titleMaxLines: mobile ? 2 : 1,
+    titleMaxLines: compact ? _compactTitleLines : 1,
     secondary: sample.path,
     snippet: sample.snippet,
     snippetHighlights: termHighlights(sample.snippet, _terms),
@@ -95,7 +100,7 @@ class _SearchGalleryState extends State<SearchGallery> {
   );
 
   /// The samples that match the query and the chosen kind, grouped by kind.
-  List<SearchResultSection>? _sections({bool mobile = false}) {
+  List<SearchResultSection>? _sections({bool compact = false}) {
     if (_terms.isEmpty) return null;
     bool matches(_Sample s) {
       final text = '${s.title} ${s.snippet}'.toLowerCase();
@@ -120,8 +125,8 @@ class _SearchGalleryState extends State<SearchGallery> {
                 if (s.kind == kind)
                   _result(
                     s,
-                    mobile: mobile,
-                    keyPrefix: mobile ? 'phone' : 'sample',
+                    compact: compact,
+                    keyPrefix: compact ? 'phone' : 'sample',
                   ),
             ],
           ),
@@ -151,9 +156,9 @@ class _SearchGalleryState extends State<SearchGallery> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final mobile = context.mobile;
+    final narrow = context.sizeClass.isCompact;
     final sections = _sections();
-    final compact = _sections(mobile: true);
+    final compact = _sections(compact: true);
     return ColoredBox(
       color: c.bgPrimary,
       child: SafeArea(
@@ -161,15 +166,15 @@ class _SearchGalleryState extends State<SearchGallery> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 880),
+              constraints: const BoxConstraints(maxWidth: PageWidths.standard),
               child: Padding(
-                padding: EdgeInsets.all(mobile ? 20 : 40),
+                padding: EdgeInsets.all(narrow ? Space.xl : Space.xxxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 12,
+                      spacing: Space.xl,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
@@ -180,11 +185,11 @@ class _SearchGalleryState extends State<SearchGallery> {
                           c.dark ? 'Use light theme' : 'Use dark theme',
                           key: const ValueKey('theme-toggle'),
                           onTap: widget.onThemeChanged,
-                          height: 44,
+                          size: ControlSize.xl,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       'Type to filter the samples, choose a kind, move with '
                       'the arrow keys and press Enter to open one.',
@@ -194,9 +199,11 @@ class _SearchGalleryState extends State<SearchGallery> {
                     Align(
                       alignment: Alignment.topLeft,
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 640),
+                        constraints: const BoxConstraints(
+                          maxWidth: PageWidths.narrow,
+                        ),
                         child: SizedBox(
-                          height: 460,
+                          height: Specimen.search,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: c.bgPrimary,
@@ -228,7 +235,7 @@ class _SearchGalleryState extends State<SearchGallery> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       _picked,
                       key: const ValueKey('sample-picked'),
@@ -241,22 +248,28 @@ class _SearchGalleryState extends State<SearchGallery> {
                         style: ts(context.type.ui, c.textTertiary),
                       )
                     else
-                      SizedBox(
-                        height: 360,
-                        child: SearchResultsList(
-                          sections: compact,
-                          mobile: true,
-                          onPick: _pick,
+                      // The phone layout, shown by touch whatever the window.
+                      AppTheme(
+                        colors: c,
+                        density: Density.touch,
+                        child: SizedBox(
+                          height: Heights.list,
+                          child: SearchResultsList(
+                            sections: compact,
+                            onPick: _pick,
+                          ),
                         ),
                       ),
                     const _Heading('Flat list with type labels'),
-                    for (final sample in _samples.take(3))
-                      SizedBox(
-                        height: SearchResultRow.extent(mobile),
+                    for (final sample in _samples.take(Specimen.flatSamples))
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: SearchResultRow.extent(context.metrics),
+                        ),
                         child: SearchResultRow(
                           result: _result(
                             sample,
-                            mobile: mobile,
+                            compact: narrow,
                             keyPrefix: 'flat',
                           ),
                           showTypeLabel: true,
@@ -281,7 +294,7 @@ class _Heading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 32, bottom: 16),
+    padding: const EdgeInsets.only(top: Space.xxl, bottom: Space.lg),
     child: SettingsHeading(label),
   );
 }

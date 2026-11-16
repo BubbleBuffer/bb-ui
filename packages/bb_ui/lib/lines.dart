@@ -10,20 +10,20 @@ class HLine extends StatelessWidget {
   final double indent;
   @override
   Widget build(BuildContext context) => Container(
-    height: 1,
+    height: Stroke.hair,
     margin: EdgeInsets.symmetric(horizontal: indent),
     color: color ?? context.colors.borderSubtle,
   );
 }
 
 class VLine extends StatelessWidget {
-  const VLine({super.key, this.height = 20});
+  const VLine({super.key, this.height = Sizes.rule});
   final double height;
   @override
   Widget build(BuildContext context) => Container(
-    width: 1,
+    width: Stroke.hair,
     height: height,
-    margin: const EdgeInsets.symmetric(horizontal: 2),
+    margin: const EdgeInsets.symmetric(horizontal: Space.hair),
     color: context.colors.border,
   );
 }

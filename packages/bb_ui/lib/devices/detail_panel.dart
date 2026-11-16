@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import '../settings_controls.dart';
 import '../tokens.dart';
+import '../layout.dart';
 
 /// One label and value pair in a [DetailPanel] or on its own. The label has a
 /// fixed column, so several rows line up. A [mono] value is for identifiers
@@ -15,7 +16,7 @@ class KeyValueRow extends StatelessWidget {
     this.value, {
     super.key,
     this.mono = false,
-    this.labelWidth = 88,
+    this.labelWidth = Sizes.labelColumn,
   });
   final String label, value;
   final bool mono;
@@ -26,24 +27,23 @@ class KeyValueRow extends StatelessWidget {
     final c = context.colors;
     final ty = context.type;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: Space.xxs),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
           SizedBox(
             width: labelWidth,
-            child: Text(label, style: ts(ty.ui, c.textTertiary, weight: 400)),
+            child: Text(
+              label,
+              style: ts(ty.ui, c.textTertiary, weight: Weight.regular),
+            ),
           ),
           Expanded(
             child: mono
                 ? Text(
                     value,
-                    style: ts(
-                      const TypeSpec(13, 20, 400),
-                      c.textPrimary,
-                      mono: true,
-                    ),
+                    style: ts(context.type.code, c.textPrimary, mono: true),
                   )
                 : Text(value, style: ts(ty.ui, c.textPrimary)),
           ),
@@ -82,26 +82,27 @@ class DetailPanel extends StatelessWidget {
         if (eyebrow != null) ...[
           Text(
             eyebrow!,
-            style: ts(context.type.uiSmall, c.textTertiary, weight: 600),
+            style: ts(
+              context.type.uiSmall,
+              c.textTertiary,
+              weight: Weight.semibold,
+            ),
           ),
-          const SizedBox(height: 6),
+          const Gap(Space.xs),
         ],
-        Text(
-          title,
-          style: tsDisplay(const TypeSpec(32, 34, 700), c.textPrimary),
-        ),
+        Text(title, style: tsDisplay(context.type.display, c.textPrimary)),
         if (id != null) ...[
-          const SizedBox(height: 4),
+          const Gap(Space.xxs),
           Align(
             alignment: Alignment.centerLeft,
-            child: CopyableText(id!, inline: true, size: 14),
+            child: CopyableText(id!, inline: true),
           ),
         ],
-        if (rows.isNotEmpty) ...[const SizedBox(height: 16), ...rows],
+        if (rows.isNotEmpty) ...[const Gap(Space.lg), ...rows],
         if (actions.isNotEmpty) ...[
-          const SizedBox(height: 20),
+          const Gap(Space.xl),
           for (var i = 0; i < actions.length; i++) ...[
-            if (i > 0) const SizedBox(height: 8),
+            if (i > 0) const Gap(Space.sm),
             actions[i],
           ],
         ],

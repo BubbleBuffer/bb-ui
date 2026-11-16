@@ -6,6 +6,8 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'gallery_tokens.dart';
+
 const _commands = [
   PaletteCommand(id: 'home', title: 'Go home', icon: Ico.home),
   PaletteCommand(
@@ -80,16 +82,20 @@ class _PaletteGalleryState extends State<PaletteGallery> {
     if (command != null && mounted) _run(command);
   }
 
-  Widget _frame(BuildContext context, Widget palette, {double height = 440}) {
+  Widget _frame(
+    BuildContext context,
+    Widget palette, {
+    double height = Specimen.palette,
+  }) {
     final c = context.colors;
     // On a phone the palette is flat; the specimen frames it.
     return Align(
       alignment: Alignment.topLeft,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
+        constraints: const BoxConstraints(maxWidth: Widths.palette),
         child: SizedBox(
           height: height,
-          child: context.mobile
+          child: context.sizeClass.isCompact
               ? DecoratedBox(
                   decoration: BoxDecoration(
                     border: Border.all(color: c.borderStrong),
@@ -106,7 +112,7 @@ class _PaletteGalleryState extends State<PaletteGallery> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final mobile = context.mobile;
+    final compact = context.sizeClass.isCompact;
     return ColoredBox(
       color: c.bgPrimary,
       child: SafeArea(
@@ -114,15 +120,15 @@ class _PaletteGalleryState extends State<PaletteGallery> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 880),
+              constraints: const BoxConstraints(maxWidth: PageWidths.standard),
               child: Padding(
-                padding: EdgeInsets.all(mobile ? 20 : 40),
+                padding: EdgeInsets.all(compact ? Space.xl : Space.xxxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 12,
+                      spacing: Space.xl,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
@@ -133,11 +139,11 @@ class _PaletteGalleryState extends State<PaletteGallery> {
                           c.dark ? 'Use light theme' : 'Use dark theme',
                           key: const ValueKey('theme-toggle'),
                           onTap: widget.onThemeChanged,
-                          height: 44,
+                          size: ControlSize.xl,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       'Type to filter the commands, move with the arrow keys '
                       'and press Enter to run one. Escape closes.',
@@ -154,7 +160,7 @@ class _PaletteGalleryState extends State<PaletteGallery> {
                         onClose: () => setState(() => _ran = 'Closed'),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       _ran,
                       key: const ValueKey('sample-ran'),
@@ -170,7 +176,7 @@ class _PaletteGalleryState extends State<PaletteGallery> {
                         onRun: _run,
                         onClose: () {},
                       ),
-                      height: 160,
+                      height: Specimen.paletteShort,
                     ),
                     const _Heading('No match'),
                     _frame(
@@ -182,7 +188,7 @@ class _PaletteGalleryState extends State<PaletteGallery> {
                         onRun: _run,
                         onClose: () {},
                       ),
-                      height: 120,
+                      height: Specimen.paletteTiny,
                     ),
                     const _Heading('Over the page'),
                     Align(
@@ -211,7 +217,7 @@ class _Heading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 32, bottom: 16),
+    padding: const EdgeInsets.only(top: Space.xxl, bottom: Space.lg),
     child: SettingsHeading(label),
   );
 }

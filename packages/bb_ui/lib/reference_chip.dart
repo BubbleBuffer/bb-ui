@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import 'hover.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// A small label with a colour dot, for a place in running text. Tapping it
 /// (when [onTap] is set) is up to the caller.
@@ -26,17 +27,20 @@ class ReferenceChip extends StatelessWidget {
     return Hover(
       radius: Radii.sm,
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Space.xs,
+        vertical: Space.hair,
+      ),
       background: c.bgSecondary,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: Sizes.dot,
+            height: Sizes.dot,
             decoration: BoxDecoration(color: colour, shape: BoxShape.circle),
           ),
-          const SizedBox(width: 6),
+          const Gap(Space.xs),
           Flexible(
             child: Text(
               label ?? segments.join(' › '),

@@ -6,17 +6,21 @@ import 'package:flutter/widgets.dart';
 import '../settings_controls.dart';
 import '../tokens.dart';
 import 'code_field.dart';
+import '../layout.dart';
+
+/// A comparison number reads in groups of three digits.
+const _comparisonGroup = 3;
 
 /// Size of the characters in a [CodeDisplay].
 enum CodeDisplaySize {
-  /// A code to type: 22 px.
-  medium(22),
+  /// A code to type.
+  medium(NumeralSize.md),
 
-  /// A number to compare at a glance: 44 px.
-  large(44);
+  /// A number to compare at a glance.
+  large(NumeralSize.lg);
 
-  const CodeDisplaySize(this.px);
-  final double px;
+  const CodeDisplaySize(this.numerals);
+  final NumeralSize numerals;
 }
 
 /// A code or number in large monospace, cut into groups. Characters are
@@ -46,11 +50,7 @@ class CodeDisplay extends StatelessWidget {
       child: Text(
         shown,
         maxLines: 1,
-        style: ts(
-          TypeSpec(size.px, size.px * 1.15, 400),
-          color ?? c.textPrimary,
-          mono: true,
-        ).copyWith(letterSpacing: size.px * .04),
+        style: tsNumeral(size.numerals, color ?? c.textPrimary),
       ),
     );
   }
@@ -77,7 +77,7 @@ class OneTimeCode extends StatelessWidget {
     final c = context.colors;
     final ty = context.type;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(Space.lg),
       decoration: BoxDecoration(
         color: c.bgSecondary,
         borderRadius: Radii.panel,
@@ -88,8 +88,11 @@ class OneTimeCode extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (label != null) ...[
-            Text(label!, style: ts(ty.uiSmall, c.textSecondary, weight: 600)),
-            const SizedBox(height: 8),
+            Text(
+              label!,
+              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.semibold),
+            ),
+            const Gap(Space.sm),
           ],
           Row(
             children: [
@@ -104,13 +107,16 @@ class OneTimeCode extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const Gap(Space.sm),
               CopyButton(formatCode(code, groups, separator: separator)),
             ],
           ),
           if (caption != null) ...[
-            const SizedBox(height: 8),
-            Text(caption!, style: ts(ty.uiSmall, c.textTertiary, weight: 400)),
+            const Gap(Space.sm),
+            Text(
+              caption!,
+              style: ts(ty.uiSmall, c.textTertiary, weight: Weight.regular),
+            ),
           ],
         ],
       ),
@@ -124,7 +130,7 @@ class ComparisonNumber extends StatelessWidget {
   const ComparisonNumber(
     this.digits, {
     super.key,
-    this.group = 3,
+    this.group = _comparisonGroup,
     this.label,
     this.caption,
   });
@@ -142,7 +148,7 @@ class ComparisonNumber extends StatelessWidget {
         at + group <= count ? group : count - at,
     ];
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(Space.xl),
       decoration: BoxDecoration(
         color: c.bgSecondary,
         borderRadius: Radii.panel,
@@ -153,8 +159,11 @@ class ComparisonNumber extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (label != null) ...[
-            Text(label!, style: ts(ty.uiSmall, c.textSecondary, weight: 600)),
-            const SizedBox(height: 8),
+            Text(
+              label!,
+              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.semibold),
+            ),
+            const Gap(Space.sm),
           ],
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -167,8 +176,11 @@ class ComparisonNumber extends StatelessWidget {
             ),
           ),
           if (caption != null) ...[
-            const SizedBox(height: 8),
-            Text(caption!, style: ts(ty.uiSmall, c.textTertiary, weight: 400)),
+            const Gap(Space.sm),
+            Text(
+              caption!,
+              style: ts(ty.uiSmall, c.textTertiary, weight: Weight.regular),
+            ),
           ],
         ],
       ),
@@ -183,7 +195,7 @@ class QrFrame extends StatelessWidget {
   const QrFrame({
     super.key,
     required this.child,
-    this.size = 200,
+    this.size = Sizes.qr,
     this.caption,
   });
   final Widget child;
@@ -205,7 +217,7 @@ class QrFrame extends StatelessWidget {
         Container(
           width: size,
           height: size,
-          padding: EdgeInsets.all(size / 12),
+          padding: EdgeInsets.all(size * Sizes.qrQuietZone),
           decoration: BoxDecoration(
             color: paper,
             borderRadius: Radii.field,
@@ -214,11 +226,15 @@ class QrFrame extends StatelessWidget {
           child: child,
         ),
         if (caption != null) ...[
-          const SizedBox(height: 8),
+          const Gap(Space.sm),
           Text(
             caption!,
             textAlign: TextAlign.center,
-            style: ts(context.type.uiSmall, c.textSecondary, weight: 400),
+            style: ts(
+              context.type.uiSmall,
+              c.textSecondary,
+              weight: Weight.regular,
+            ),
           ),
         ],
       ],

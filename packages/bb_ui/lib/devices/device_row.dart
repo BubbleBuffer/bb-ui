@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import '../hover.dart';
 import '../icons.dart';
 import '../tokens.dart';
+import '../layout.dart';
 
 /// A device or machine in a list.
 ///
@@ -40,8 +41,8 @@ class DeviceRow extends StatelessWidget {
     final c = context.colors;
     final ty = context.type;
     final tile = Container(
-      width: 40,
-      height: 40,
+      width: Sizes.tile,
+      height: Sizes.tile,
       decoration: BoxDecoration(
         color: selected ? c.textPrimary : c.bgHover,
         borderRadius: Radii.field,
@@ -49,7 +50,7 @@ class DeviceRow extends StatelessWidget {
       child: Center(
         child: Icon20(
           icon,
-          size: 22,
+          size: IconSize.xl,
           color: selected ? c.bgPrimary : c.iconSecondary,
         ),
       ),
@@ -59,31 +60,36 @@ class DeviceRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Wrap(
-          spacing: 8,
-          runSpacing: 4,
+          spacing: Space.sm,
+          runSpacing: Space.xxs,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(
-              title,
-              style: tsDisplay(const TypeSpec(16, 20, 640), c.textPrimary),
-            ),
+            Text(title, style: tsDisplay(context.type.title, c.textPrimary)),
             ?status,
           ],
         ),
         if (id != null) ...[
-          const SizedBox(height: 2),
+          const Gap(Space.hair),
           Text(
             id!,
-            style: ts(const TypeSpec(12, 16, 400), c.textSecondary, mono: true),
+            style: ts(
+              context.type.uiSmall,
+              c.textSecondary,
+              mono: true,
+              weight: Weight.regular,
+            ),
           ),
         ],
         if (meta.isNotEmpty) ...[
-          const SizedBox(height: 2),
+          const Gap(Space.hair),
           Wrap(
-            spacing: 12,
+            spacing: Space.md,
             children: [
               for (final m in meta)
-                Text(m, style: ts(ty.uiSmall, c.textTertiary, weight: 400)),
+                Text(
+                  m,
+                  style: ts(ty.uiSmall, c.textTertiary, weight: Weight.regular),
+                ),
             ],
           ),
         ],
@@ -96,24 +102,50 @@ class DeviceRow extends StatelessWidget {
           selected: selected,
           selectedColor: c.bgHover,
           borderRadius: Radii.ctl,
-          padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
-          child: Row(
-            children: [
-              tile,
-              const SizedBox(width: 12),
-              Expanded(child: body),
-              if (trailing != null) ...[const SizedBox(width: 12), trailing!],
-            ],
+          padding: const EdgeInsets.fromLTRB(
+            Space.lg,
+            Space.md,
+            Space.md,
+            Space.md,
+          ),
+          // A narrow row puts its action under the text, so the name and
+          // status keep room at any text size.
+          child: LayoutBuilder(
+            builder: (context, box) {
+              final stacked = trailing != null && box.maxWidth < Widths.dialog;
+              return Row(
+                crossAxisAlignment: stacked
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
+                children: [
+                  tile,
+                  const Gap(Space.md),
+                  Expanded(
+                    child: stacked
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [body, const Gap(Space.sm), trailing!],
+                          )
+                        : body,
+                  ),
+                  if (trailing != null && !stacked) ...[
+                    const Gap(Space.md),
+                    trailing!,
+                  ],
+                ],
+              );
+            },
           ),
         ),
         if (selected)
           Positioned(
             left: 0,
-            top: 8,
-            bottom: 8,
+            top: Space.sm,
+            bottom: Space.sm,
             child: IgnorePointer(
               child: Container(
-                width: 3,
+                width: Stroke.seam,
                 decoration: BoxDecoration(
                   color: c.accent,
                   borderRadius: Radii.pill,

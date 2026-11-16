@@ -4,6 +4,11 @@
 
 import 'package:flutter/widgets.dart';
 
+// Scores. A contiguous match always outranks a spread one; within each kind,
+// matches at a word start, at the start and in runs rank higher.
+const _substring = 1000, _atWord = 200, _atStart = 100;
+const _perHit = 10, _hitAtWord = 8, _hitInRun = 6;
+
 /// How well a query matches a text, and where (ranges index into the text).
 @immutable
 class FuzzyMatch {
@@ -39,7 +44,8 @@ FuzzyMatch? fuzzyMatch(String query, String text) {
   }
   if (first >= 0) {
     final at = best >= 0 ? best : first;
-    final score = 1000 + (best >= 0 ? 200 : 0) + (at == 0 ? 100 : 0) - at;
+    final score =
+        _substring + (best >= 0 ? _atWord : 0) + (at == 0 ? _atStart : 0) - at;
     return FuzzyMatch(score, [TextRange(start: at, end: at + q.length)]);
   }
 
@@ -54,9 +60,9 @@ FuzzyMatch? fuzzyMatch(String query, String text) {
   }
   var score = 0;
   for (var k = 0; k < hits.length; k++) {
-    score += 10;
-    if (_wordStart(text, hits[k])) score += 8;
-    if (k > 0 && hits[k] == hits[k - 1] + 1) score += 6;
+    score += _perHit;
+    if (_wordStart(text, hits[k])) score += _hitAtWord;
+    if (k > 0 && hits[k] == hits[k - 1] + 1) score += _hitInRun;
   }
   score -= hits.first;
   final ranges = <TextRange>[];

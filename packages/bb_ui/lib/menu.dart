@@ -10,6 +10,7 @@ import 'hover.dart';
 import 'icons.dart';
 import 'lines.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// Elevated menu surface: `bgElevated`, `shadowMenu`, radius.
 class MenuSurface extends StatelessWidget {
@@ -55,7 +56,7 @@ class MenuHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+    padding: const EdgeInsets.fromLTRB(Space.sm, Space.xs, Space.sm, Space.xs),
     child: Text(
       text,
       style: ts(context.type.uiSmall, context.colors.textTertiary),
@@ -95,23 +96,23 @@ class MenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final m = context.mobile;
+    final m = context.metrics;
     final color = danger ? c.inlineCodeText : null;
     final lead =
         leading ??
         (icon == null
             ? null
-            : Icon20(icon!, size: m ? 22 : 20, color: color ?? c.iconPrimary));
+            : Icon20(icon!, size: m.icon, color: color ?? c.iconPrimary));
     Widget row = Hover(
       onTap: onTap,
       selected: selected,
       radius: Radii.md,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: SizedBox(
-        height: m ? 44 : 28,
+      padding: const EdgeInsets.symmetric(horizontal: Space.sm),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: m.row.height),
         child: Row(
           children: [
-            if (lead != null) ...[lead, SizedBox(width: m ? 12 : 8)],
+            if (lead != null) ...[lead, Gap(m.iconGap)],
             Expanded(
               child: Text(
                 label,
@@ -119,14 +120,14 @@ class MenuItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: firstLine
                     ? ts(
-                        m ? ty.body : ty.ui,
+                        ty.item,
                         c.textTertiary,
-                        weight: 400,
+                        weight: Weight.regular,
                       ).copyWith(fontStyle: FontStyle.italic)
                     : ts(
-                        m ? ty.body : ty.ui,
+                        ty.item,
                         color ?? c.textPrimary,
-                        weight: 400,
+                        weight: Weight.regular,
                       ),
               ),
             ),
@@ -146,7 +147,7 @@ class MenuSeparator extends StatelessWidget {
   const MenuSeparator({super.key});
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: const EdgeInsets.symmetric(vertical: Space.xs),
     child: HLine(color: context.colors.border),
   );
 }
@@ -156,7 +157,7 @@ class MenuList extends StatelessWidget {
   const MenuList({
     super.key,
     required this.children,
-    this.width = 265,
+    this.width = Widths.menu,
     this.header,
   });
   final List<Widget> children;
@@ -166,7 +167,7 @@ class MenuList extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MenuSurface(
     width: width,
-    padding: const EdgeInsets.all(6),
+    padding: const EdgeInsets.all(Space.xs),
     child: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -227,12 +228,12 @@ class _PopoverLayout extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size child) {
-    const m = 8.0;
+    const m = Space.sm;
     final x = math.max(m, math.min(anchor.left, size.width - child.width - m));
-    final below = anchor.bottom + 4;
+    final below = anchor.bottom + Space.xxs;
     final y = below + child.height <= size.height - m
         ? below
-        : math.max(m, anchor.top - 4 - child.height);
+        : math.max(m, anchor.top - Space.xxs - child.height);
     return Offset(x, y);
   }
 

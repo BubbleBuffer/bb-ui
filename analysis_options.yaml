@@ -1,1 +1,13 @@
 include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    # The plugin is analyzed on its own (packages/bb_lints).
+    - packages/bb_lints/**
+
+plugins:
+  bb_lints:
+    path: packages/bb_lints
+    diagnostics:
+      no_magic_numbers: true
+      no_window_size: true

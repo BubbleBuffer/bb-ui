@@ -3,10 +3,14 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'gallery_tokens.dart';
 import 'devices_gallery.dart';
 import 'palette_gallery.dart';
 import 'search_gallery.dart';
 import 'session_gallery.dart';
+
+/// How far text follows the system text size.
+const _maxTextScale = 2.0;
 
 /// Which specimen page the gallery shows.
 enum GalleryScene { primitives, search, palette, devices, session }
@@ -38,14 +42,25 @@ class _GalleryAppState extends State<GalleryApp> {
       pageBuilder: (context, animation, secondary) => builder(context),
     ),
     // The theme wraps the Navigator and its Overlay, including text handles.
+    // A narrow window stands in for a phone: compact and by touch. Text
+    // follows the system size up to double.
     builder: (context, child) => LayoutBuilder(
-      builder: (context, constraints) => AppTheme(
-        colors: _brightness == Brightness.dark
-            ? AppColors.darkTheme
-            : AppColors.light,
-        formFactor: FormFactor.forWidth(constraints.maxWidth),
-        child: child!,
-      ),
+      builder: (context, constraints) {
+        final sizeClass = SizeClass.forWidth(constraints.maxWidth);
+        return MediaQuery.withClampedTextScaling(
+          maxScaleFactor: _maxTextScale,
+          child: SizeClassScope(
+            sizeClass: sizeClass,
+            child: AppTheme(
+              colors: _brightness == Brightness.dark
+                  ? AppColors.darkTheme
+                  : AppColors.light,
+              density: sizeClass.isCompact ? Density.touch : Density.pointer,
+              child: child!,
+            ),
+          ),
+        );
+      },
     ),
     home: switch (widget.scene) {
       GalleryScene.primitives => PrimitiveGallery(onThemeChanged: _toggleTheme),
@@ -93,15 +108,17 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 880),
+              constraints: const BoxConstraints(maxWidth: PageWidths.standard),
               child: Padding(
-                padding: EdgeInsets.all(context.mobile ? 20 : 40),
+                padding: EdgeInsets.all(
+                  context.adaptive(compact: Space.xl, medium: Space.xxxl),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 12,
+                      spacing: Space.xl,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
@@ -112,11 +129,11 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                           c.dark ? 'Use light theme' : 'Use dark theme',
                           key: const ValueKey('theme-toggle'),
                           onTap: widget.onThemeChanged,
-                          height: 44,
+                          size: ControlSize.xl,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       'Try the controls, edit a field, and open a stack. '
                       'Every specimen uses the same light and dark tokens.',
@@ -124,33 +141,33 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                     ),
                     const _Section('Buttons'),
                     Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                      spacing: Space.md,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         PrimaryButton(
                           label: 'Add sample',
-                          height: 46,
+                          size: ControlSize.xxl,
                           onTap: () => setState(() => _count++),
                         ),
                         SizedBox(
-                          width: 120,
+                          width: Specimen.buttonWidth,
                           child: SecondaryButton(
                             label: 'Reset',
-                            height: 46,
+                            size: ControlSize.xxl,
                             onTap: () => setState(() => _count = 0),
                           ),
                         ),
                         const OutlineButton(label: 'Unavailable', onTap: null),
                         IconBtn(
                           Ico.check,
-                          size: 46,
+                          size: ControlSize.xxl,
                           semanticLabel: 'Add with icon',
                           onTap: () => setState(() => _count++),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       'Samples added: $_count',
                       style: ts(context.type.ui, c.textSecondary),
@@ -160,7 +177,7 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                       'Collection name',
                       style: ts(context.type.ui, c.textPrimary),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(Space.sm),
                     Semantics(
                       label: 'Collection name',
                       textField: true,
@@ -170,22 +187,22 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                         onChanged: (_) => setState(() {}),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(Space.sm),
                     Text(
                       'Preview: ${_name.text}',
                       style: ts(context.type.uiSmall, c.textSecondary),
                     ),
-                    const SizedBox(height: 16),
+                    const Gap(Space.lg),
                     Row(
                       children: [
                         StacksCheckbox(
                           key: const ValueKey('selection-checkbox'),
                           checked: _checked,
-                          size: 32,
+                          size: Specimen.checkbox,
                           onChanged: (value) =>
                               setState(() => _checked = value),
                         ),
-                        const SizedBox(width: 12),
+                        const Gap(Space.md),
                         Expanded(
                           child: Text(
                             _checked
@@ -198,14 +215,14 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                     ),
                     const _Section('References and stacks'),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: Space.sm,
+                      runSpacing: Space.sm,
                       children: [
                         ReferenceChip(label: 'Reference', colour: c.accent),
                         ReferenceChip(label: 'Collection', colour: c.pawBg),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const Gap(Space.lg),
                     FoldableStackCard(
                       edge: c.accent,
                       label: 'Three items',
@@ -223,8 +240,8 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                     ),
                     const _Section('Semantic colours'),
                     Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                      spacing: Space.md,
+                      runSpacing: Space.md,
                       children: [
                         for (final (label, colour) in [
                           ('Surface', c.bgSecondary),
@@ -235,19 +252,19 @@ class _PrimitiveGalleryState extends State<PrimitiveGallery> {
                           ('Danger', c.dangerBg),
                         ])
                           SizedBox(
-                            width: 128,
+                            width: Specimen.swatchWidth,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Container(
-                                  height: 48,
+                                  height: ControlSize.xxl.height,
                                   decoration: BoxDecoration(
                                     color: colour,
                                     border: Border.all(color: c.borderStrong),
                                     borderRadius: Radii.field,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                const Gap(Space.xs),
                                 Text(
                                   label,
                                   style: ts(
@@ -278,7 +295,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 32, bottom: 16),
+    padding: const EdgeInsets.only(top: Space.xxl, bottom: Space.lg),
     child: SettingsHeading(label),
   );
 }

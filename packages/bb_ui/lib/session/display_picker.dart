@@ -9,6 +9,7 @@ import '../hover.dart';
 import '../icons.dart';
 import '../palette.dart' show Keycap;
 import '../tokens.dart';
+import '../layout.dart';
 
 /// One screen of a machine, in its own pixel coordinates: where its top-left
 /// corner sits ([x], [y]) and how big it is ([width], [height]).
@@ -58,7 +59,7 @@ class DisplayPicker extends StatelessWidget {
     this.subtitle,
     this.shownLabel = 'Showing',
     this.footer,
-    this.width = 340,
+    this.width = Widths.picker,
     this.autofocus = false,
   });
   final List<DisplayInfo> displays;
@@ -92,7 +93,7 @@ class DisplayPicker extends StatelessWidget {
       },
       child: Container(
         width: width,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(Space.lg),
         decoration: BoxDecoration(
           color: c.bgElevated,
           borderRadius: Radii.panel,
@@ -108,28 +109,28 @@ class DisplayPicker extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: ts(ty.uiSmall, c.textSecondary, weight: 600),
+                    style: ts(
+                      ty.uiSmall,
+                      c.textSecondary,
+                      weight: Weight.semibold,
+                    ),
                   ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
-                    style: ts(
-                      const TypeSpec(11, 15, 400),
-                      c.textTertiary,
-                      mono: true,
-                    ),
+                    style: ts(context.type.caption, c.textTertiary, mono: true),
                   ),
               ],
             ),
-            const SizedBox(height: 10),
+            const Gap(Space.md),
             _Map(
               displays: displays,
               selectedId: selectedId,
               shownLabel: shownLabel,
               onSelect: onSelect,
             ),
-            const SizedBox(height: 10),
+            const Gap(Space.md),
             for (var i = 0; i < displays.length; i++)
               _Row(
                 number: i + 1,
@@ -138,9 +139,9 @@ class DisplayPicker extends StatelessWidget {
                 onTap: () => onSelect(displays[i]),
               ),
             if (footer != null) ...[
-              const SizedBox(height: 6),
-              Container(height: 1, color: c.border),
-              const SizedBox(height: 6),
+              const Gap(Space.xs),
+              Container(height: Stroke.hair, color: c.border),
+              const Gap(Space.xs),
               footer!,
             ],
           ],
@@ -162,9 +163,9 @@ class _Map extends StatelessWidget {
   final String shownLabel;
   final ValueChanged<DisplayInfo> onSelect;
 
-  static const _height = 124.0;
-  static const _pad = 10.0;
-  static const _gap = 4.0;
+  static const _height = Sizes.displayMap;
+  static const _pad = Space.md;
+  static const _gap = Space.xxs;
 
   @override
   Widget build(BuildContext context) {
@@ -248,24 +249,28 @@ class _Tile extends StatelessWidget {
         background: selected ? c.bgSelectedBlock : c.bgSecondary,
         border: Border.all(
           color: selected ? c.accent : c.thread,
-          width: selected ? 1.5 : 1,
+          width: selected ? Stroke.regular : Stroke.hair,
         ),
-        child: Center(
+        // The map keeps the screens' proportions, so large text shrinks to
+        // fit its tile instead of growing it.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 '$number',
                 style: tsDisplay(
-                  const TypeSpec(18, 20, 700),
+                  context.type.title,
                   selected ? c.textPrimary : c.textSecondary,
+                  weight: Weight.bold,
                 ),
               ),
               if (selected)
                 Text(
                   shownLabel,
                   maxLines: 1,
-                  style: ts(const TypeSpec(10, 12, 600), c.accentText),
+                  style: ts(context.type.micro, c.accentText),
                 ),
             ],
           ),
@@ -302,34 +307,38 @@ class _Row extends StatelessWidget {
         selectedColor: c.bgHover,
         borderRadius: Radii.field,
         lift: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: SizedBox(
-          height: 38,
+        padding: const EdgeInsets.symmetric(horizontal: Space.sm),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: ControlSize.lg.height),
           child: Row(
             children: [
               SizedBox(
-                width: 26,
+                width: ControlSize.xs.height,
                 child: selected
-                    ? Icon20(Ico.check, size: 18, color: c.accentText)
+                    ? Icon20(Ico.check, size: IconSize.md, color: c.accentText)
                     : Keycap('$number', raised: true),
               ),
-              const SizedBox(width: 8),
+              const Gap(Space.sm),
               Expanded(
                 child: Text(
                   display.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: ts(context.type.ui, c.textPrimary, weight: 600),
+                  style: ts(
+                    context.type.ui,
+                    c.textPrimary,
+                    weight: Weight.semibold,
+                  ),
                 ),
               ),
               if (display.detail != null) ...[
-                const SizedBox(width: 8),
-                Text(
-                  display.detail!,
-                  style: ts(
-                    const TypeSpec(11, 15, 400),
-                    c.textTertiary,
-                    mono: true,
+                const Gap(Space.sm),
+                Flexible(
+                  child: Text(
+                    display.detail!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: ts(context.type.caption, c.textTertiary, mono: true),
                   ),
                 ),
               ],

@@ -33,6 +33,10 @@ String? commandShortcutLabel(String id) {
   return s == null || s.isEmpty ? null : shortcutLabel(s.first);
 }
 
+/// A tooltip's label grows with the system text size only this far, so it
+/// stays a tooltip.
+const _maxTextScale = 1.5;
+
 class AppTooltip extends StatefulWidget {
   const AppTooltip({
     super.key,
@@ -88,8 +92,7 @@ class _AppTooltipState extends State<AppTooltip>
     // Moving straight from one tooltip to the next skips the delay.
     final warm =
         _lastHidden != null &&
-        DateTime.now().difference(_lastHidden!) <
-            const Duration(milliseconds: 300);
+        DateTime.now().difference(_lastHidden!) < Motion.warm;
     if (delay == Duration.zero || warm) {
       _show();
     } else {
@@ -227,8 +230,11 @@ class _AppTooltipState extends State<AppTooltip>
               opacity: CurvedAnimation(parent: _fade, curve: Motion.ease),
               child: Container(
                 key: const ValueKey('app-tooltip'),
-                constraints: const BoxConstraints(maxWidth: 280),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                constraints: const BoxConstraints(maxWidth: Widths.tooltip),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Space.sm,
+                  vertical: Space.xs,
+                ),
                 decoration: BoxDecoration(
                   color: c.bgElevated,
                   borderRadius: BorderRadius.circular(Radii.md),
@@ -245,12 +251,16 @@ class _AppTooltipState extends State<AppTooltip>
                       if (shortcut != null)
                         TextSpan(
                           text: '  $shortcut',
-                          style: ts(type.uiSmall, c.textTertiary, weight: 400),
+                          style: ts(
+                            type.uiSmall,
+                            c.textTertiary,
+                            weight: Weight.regular,
+                          ),
                         ),
                     ],
                   ),
                   textScaler: MediaQuery.textScalerOf(context)
-                      .clamp(maxScaleFactor: 1.5),
+                      .clamp(maxScaleFactor: _maxTextScale),
                 ),
               ),
             ),
@@ -267,7 +277,7 @@ class _Below extends SingleChildLayoutDelegate {
   _Below(this.anchor, this.safe);
   final Rect anchor;
   final EdgeInsets safe;
-  static const _gap = 6.0, _margin = 8.0;
+  static const _gap = Space.xs, _margin = Space.sm;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints c) =>

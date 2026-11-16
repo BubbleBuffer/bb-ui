@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import 'hover.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// One row: the mark, the [label], an optional [trailing] widget and a
 /// [detail] line under the label (indented to the label). [oneLine] clips the
@@ -21,7 +22,7 @@ class MarkedRow extends StatelessWidget {
     this.labelStyle,
     this.trailing,
     this.detail,
-    this.padding = const EdgeInsets.symmetric(vertical: 5),
+    this.padding = const EdgeInsets.symmetric(vertical: Space.xs),
   });
   final String label;
   final Color colour;
@@ -46,16 +47,16 @@ class MarkedRow extends StatelessWidget {
     final ty = context.type;
     final mark = dot
         ? Container(
-            width: 9,
-            height: 9,
+            width: Sizes.bullet,
+            height: Sizes.bullet,
             decoration: BoxDecoration(color: colour, shape: BoxShape.circle),
           )
         : Container(
-            width: 4,
-            height: 12,
+            width: Sizes.barWidth,
+            height: Sizes.barHeight,
             decoration: BoxDecoration(
               color: colour,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(Radii.sm),
             ),
           );
     final content = Row(
@@ -63,10 +64,10 @@ class MarkedRow extends StatelessWidget {
       children: [
         // Centred on the first line of text (a line is about 20 px).
         Padding(
-          padding: EdgeInsets.only(top: dot ? 5 : 4),
+          padding: EdgeInsets.only(top: dot ? Space.xs : Space.xxs),
           child: mark,
         ),
-        const SizedBox(width: 8),
+        const Gap(Space.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

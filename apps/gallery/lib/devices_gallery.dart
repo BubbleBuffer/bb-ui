@@ -5,6 +5,8 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'gallery_tokens.dart';
+
 class DevicesGallery extends StatefulWidget {
   const DevicesGallery({super.key, required this.onThemeChanged});
 
@@ -46,12 +48,12 @@ class _DevicesGalleryState extends State<DevicesGallery> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final compact = context.mobile;
+    final compact = context.sizeClass.isCompact;
     final list = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SectionLabel('This PC', icon: Ico.radio),
-        const SizedBox(height: 8),
+        const Gap(Space.sm),
         DeviceRow(
           icon: Ico.server,
           title: 'DESKTOP-K9TR',
@@ -59,18 +61,18 @@ class _DevicesGalleryState extends State<DevicesGallery> {
           meta: const ['Pixel 8 connected', 'Admin mode off'],
           trailing: TextBtn('Manage', icon: Ico.settings, onTap: () {}),
         ),
-        const SizedBox(height: 20),
+        const Gap(Space.xl),
         SectionHeader(
           'Your PCs',
           subtitle: 'Other PCs paired with this device.',
           trailing: SecondaryButton(
             label: 'Pair a new PC',
             icon: Ico.plus,
-            height: 40,
+            size: ControlSize.xl,
             onTap: () {},
           ),
         ),
-        const SizedBox(height: 12),
+        const Gap(Space.md),
         DeviceRow(
           key: const ValueKey('row-studio'),
           icon: Ico.monitor,
@@ -83,7 +85,7 @@ class _DevicesGalleryState extends State<DevicesGallery> {
           trailing: PrimaryButton(
             label: 'Connect',
             icon: Ico.monitorPlay,
-            height: 36,
+            size: ControlSize.lg,
             onTap: () {},
           ),
         ),
@@ -96,7 +98,11 @@ class _DevicesGalleryState extends State<DevicesGallery> {
           meta: const ['Last mode Work'],
           selected: _selected == 'living',
           onTap: () => setState(() => _selected = 'living'),
-          trailing: SecondaryButton(label: 'Connect', height: 36, onTap: () {}),
+          trailing: SecondaryButton(
+            label: 'Connect',
+            size: ControlSize.lg,
+            onTap: () {},
+          ),
         ),
         DeviceRow(
           key: const ValueKey('row-office'),
@@ -107,7 +113,10 @@ class _DevicesGalleryState extends State<DevicesGallery> {
           meta: const ['Last seen 2 Oct'],
           selected: _selected == 'office',
           onTap: () => setState(() => _selected = 'office'),
-          trailing: const SecondaryButton(label: 'Connect', height: 36),
+          trailing: const SecondaryButton(
+            label: 'Connect',
+            size: ControlSize.lg,
+          ),
         ),
       ],
     );
@@ -132,18 +141,24 @@ class _DevicesGalleryState extends State<DevicesGallery> {
         PrimaryButton(
           label: 'Connect to Studio PC',
           icon: Ico.monitorPlay,
-          height: 46,
+          size: ControlSize.xxl,
           expand: true,
           onTap: () {},
         ),
-        Row(
+        // Both ends of the row when they fit, stacked when the text is large.
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
           children: [
-            TextBtn('Rename', icon: Ico.pencil, height: 36, onTap: () {}),
-            const Spacer(),
+            TextBtn(
+              'Rename',
+              icon: Ico.pencil,
+              size: ControlSize.lg,
+              onTap: () {},
+            ),
             TextBtn(
               'Forget',
               icon: Ico.trash,
-              height: 36,
+              size: ControlSize.lg,
               color: c.inlineCodeText,
               onTap: _confirm,
             ),
@@ -158,15 +173,15 @@ class _DevicesGalleryState extends State<DevicesGallery> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 960),
+              constraints: const BoxConstraints(maxWidth: PageWidths.wide),
               child: Padding(
-                padding: EdgeInsets.all(compact ? 20 : 40),
+                padding: EdgeInsets.all(compact ? Space.xl : Space.xxxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 12,
+                      spacing: Space.xl,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
@@ -177,7 +192,7 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           c.dark ? 'Use light theme' : 'Use dark theme',
                           key: const ValueKey('theme-toggle'),
                           onTap: widget.onThemeChanged,
-                          height: 44,
+                          size: ControlSize.xl,
                         ),
                       ],
                     ),
@@ -185,26 +200,26 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                     if (compact)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [list, const SizedBox(height: 24), detail],
+                        children: [list, const Gap(Space.xl), detail],
                       )
                     else
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(flex: 3, child: list),
-                          const SizedBox(width: 32),
-                          Expanded(flex: 2, child: detail),
+                          Expanded(flex: Specimen.listFlex, child: list),
+                          const Gap(Space.xxl),
+                          Expanded(flex: Specimen.detailFlex, child: detail),
                         ],
                       ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     Text(
                       'Confirm answer: $_answer',
                       style: ts(context.type.uiSmall, c.textSecondary),
                     ),
                     const _Section('Status'),
                     const Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: Space.sm,
+                      runSpacing: Space.sm,
                       children: [
                         StatusPill('Online', kind: StatusKind.online),
                         StatusPill('Offline', kind: StatusKind.offline),
@@ -216,8 +231,8 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                     ),
                     const _Section('Buttons'),
                     Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                      spacing: Space.md,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         PrimaryButton(
@@ -243,11 +258,11 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                     ),
                     const _Section('Code entry and display'),
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 24,
+                      spacing: Space.xl,
+                      runSpacing: Space.xl,
                       children: [
                         SizedBox(
-                          width: compact ? double.infinity : 400,
+                          width: compact ? double.infinity : Specimen.column,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -255,7 +270,7 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                                 'PC ID',
                                 style: ts(context.type.ui, c.textPrimary),
                               ),
-                              const SizedBox(height: 8),
+                              const Gap(Space.sm),
                               CodeField(
                                 fieldKey: const ValueKey('id-field'),
                                 controller: _id,
@@ -264,12 +279,12 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                                 semanticLabel: 'PC ID',
                                 onChanged: (_) => setState(() {}),
                               ),
-                              const SizedBox(height: 16),
+                              const Gap(Space.lg),
                               Text(
                                 'One-time code',
                                 style: ts(context.type.ui, c.textPrimary),
                               ),
-                              const SizedBox(height: 8),
+                              const Gap(Space.sm),
                               CodeField(
                                 fieldKey: const ValueKey('code-field'),
                                 controller: _code,
@@ -278,7 +293,7 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                                 semanticLabel: 'One-time code',
                                 onChanged: (_) => setState(() {}),
                               ),
-                              const SizedBox(height: 8),
+                              const Gap(Space.sm),
                               Text(
                                 'Typed: ${codeCharacters(_id.text, _idGroups).length} '
                                 'of 16 and '
@@ -292,17 +307,17 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           ),
                         ),
                         SizedBox(
-                          width: compact ? double.infinity : 400,
+                          width: compact ? double.infinity : Specimen.column,
                           child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               OneTimeCode(
                                 '7KQ2M9XP',
-                                groups: [4, 4],
+                                groups: Specimen.codeGroups,
                                 label: 'One-time code',
                                 caption: 'Works once and expires in 5 minutes.',
                               ),
-                              SizedBox(height: 16),
+                              Gap(Space.lg),
                               ComparisonNumber(
                                 '482913',
                                 label: 'Number on this device',
@@ -312,13 +327,15 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           ),
                         ),
                         QrFrame(
-                          size: 168,
+                          size: Specimen.qr,
                           caption: 'Scan with the phone camera',
-                          child: Center(
+                          // A stand-in for a real code: the glyph scaled up to
+                          // fill the frame, with its light stroke.
+                          child: FittedBox(
                             child: Icon20(
                               Ico.qrCode,
-                              size: 120,
-                              stroke: 2,
+                              size: IconSize.xxl,
+                              stroke: Stroke.hair,
                               color: QrFrame.ink,
                             ),
                           ),
@@ -331,13 +348,13 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           'If the PC is asleep or its display is off, it may '
                           'not send video. Wake it, then try again.',
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     const NoticeBanner(
                       kind: NoticeKind.success,
                       title: 'Paired',
                       message: 'Studio PC is in your list.',
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     const NoticeBanner(
                       kind: NoticeKind.attention,
                       title: 'Input to the elevated window is blocked',
@@ -345,7 +362,7 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           'Video keeps playing. Run the host as administrator '
                           'to send input there.',
                     ),
-                    const SizedBox(height: 12),
+                    const Gap(Space.md),
                     if (!_dismissed)
                       NoticeBanner(
                         kind: NoticeKind.danger,
@@ -357,12 +374,12 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           PrimaryButton(
                             label: 'Try again',
                             icon: Ico.refresh,
-                            height: 36,
+                            size: ControlSize.lg,
                             onTap: () {},
                           ),
                           SecondaryButton(
                             label: 'Back to your PCs',
-                            height: 36,
+                            size: ControlSize.lg,
                             onTap: () {},
                           ),
                         ],
@@ -370,11 +387,11 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                       ),
                     const _Section('Empty state and confirm'),
                     Wrap(
-                      spacing: 32,
-                      runSpacing: 24,
+                      spacing: Space.xxl,
+                      runSpacing: Space.xl,
                       children: [
                         SizedBox(
-                          width: compact ? double.infinity : 420,
+                          width: compact ? double.infinity : Widths.form,
                           child: EmptyState(
                             icon: Ico.monitor,
                             title: 'No PCs yet',
@@ -389,7 +406,7 @@ class _DevicesGalleryState extends State<DevicesGallery> {
                           ),
                         ),
                         SizedBox(
-                          width: 320,
+                          width: Widths.dialog,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: c.bgElevated,
@@ -427,7 +444,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 32, bottom: 16),
+    padding: const EdgeInsets.only(top: Space.xxl, bottom: Space.lg),
     child: SettingsHeading(label),
   );
 }

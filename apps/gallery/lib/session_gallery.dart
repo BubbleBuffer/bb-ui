@@ -4,6 +4,8 @@
 import 'package:bb_ui/bb_ui.dart';
 import 'package:flutter/widgets.dart';
 
+import 'gallery_tokens.dart';
+
 const _displays = [
   DisplayInfo(
     id: '1',
@@ -53,35 +55,35 @@ class _SessionGalleryState extends State<SessionGallery> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final compact = context.mobile;
+    final compact = context.sizeClass.isCompact;
     final strip = EdgeStrip(
       groups: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: Space.sm),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: Sizes.dot,
+                height: Sizes.dot,
                 decoration: BoxDecoration(
                   color: c.accent,
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 8),
+              const Gap(Space.sm),
               Text(
                 'Studio PC',
-                style: ts(context.type.uiSmall, c.textPrimary, weight: 700),
+                style: ts(
+                  context.type.uiSmall,
+                  c.textPrimary,
+                  weight: Weight.bold,
+                ),
               ),
-              const SizedBox(width: 8),
+              const Gap(Space.sm),
               Text(
                 '12 ms',
-                style: ts(
-                  const TypeSpec(11, 14, 400),
-                  c.textPrimary,
-                  mono: true,
-                ),
+                style: ts(context.type.caption, c.textPrimary, mono: true),
               ),
             ],
           ),
@@ -94,9 +96,9 @@ class _SessionGalleryState extends State<SessionGallery> {
               label: 'Captured',
               signal: true,
             ),
-            const SizedBox(width: 6),
+            const Gap(Space.xs),
             const KeyChord(['Ctrl', 'Alt', 'Shift', 'Z']),
-            const SizedBox(width: 6),
+            const Gap(Space.xs),
           ],
         ),
         Row(
@@ -134,15 +136,15 @@ class _SessionGalleryState extends State<SessionGallery> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 960),
+              constraints: const BoxConstraints(maxWidth: PageWidths.wide),
               child: Padding(
-                padding: EdgeInsets.all(compact ? 20 : 40),
+                padding: EdgeInsets.all(compact ? Space.xl : Space.xxxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 12,
+                      spacing: Space.xl,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
@@ -153,13 +155,13 @@ class _SessionGalleryState extends State<SessionGallery> {
                           c.dark ? 'Use light theme' : 'Use dark theme',
                           key: const ValueKey('theme-toggle'),
                           onTap: widget.onThemeChanged,
-                          height: 44,
+                          size: ControlSize.xl,
                         ),
                       ],
                     ),
                     const _Section('Resting tab and open strip'),
                     _Stage(
-                      height: 140,
+                      height: Specimen.strip,
                       child: Column(
                         children: [
                           EdgeTab(
@@ -167,7 +169,7 @@ class _SessionGalleryState extends State<SessionGallery> {
                             value: '12 ms',
                             mark: c.accent,
                           ),
-                          const SizedBox(height: 28),
+                          const Gap(Space.xxl),
                           if (compact)
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
@@ -180,14 +182,14 @@ class _SessionGalleryState extends State<SessionGallery> {
                     ),
                     const _Section('Display picker'),
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 16,
+                      spacing: Space.xl,
+                      runSpacing: Space.lg,
                       children: [
                         DisplayPicker(
                           displays: _displays,
                           selectedId: _display,
                           subtitle: '3 on Studio PC',
-                          width: compact ? 350 : 340,
+                          width: Widths.picker,
                           onSelect: (d) => setState(() => _display = d.id),
                           footer: Row(
                             children: [
@@ -197,7 +199,7 @@ class _SessionGalleryState extends State<SessionGallery> {
                                   style: ts(
                                     context.type.ui,
                                     c.textPrimary,
-                                    weight: 700,
+                                    weight: Weight.bold,
                                   ),
                                 ),
                               ),
@@ -206,7 +208,7 @@ class _SessionGalleryState extends State<SessionGallery> {
                                 style: ts(
                                   context.type.uiSmall,
                                   c.textTertiary,
-                                  weight: 400,
+                                  weight: Weight.regular,
                                 ),
                               ),
                             ],
@@ -237,8 +239,8 @@ class _SessionGalleryState extends State<SessionGallery> {
                     ),
                     const _Section('Toasts and keycaps'),
                     Wrap(
-                      spacing: 24,
-                      runSpacing: 16,
+                      spacing: Space.xl,
+                      runSpacing: Space.lg,
                       crossAxisAlignment: WrapCrossAlignment.start,
                       children: [
                         ToastCard(
@@ -246,7 +248,7 @@ class _SessionGalleryState extends State<SessionGallery> {
                           icon: Ico.pointerClick,
                           content: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
-                            runSpacing: 4,
+                            runSpacing: Space.xxs,
                             children: [
                               Text(
                                 'Release with ',
@@ -258,37 +260,37 @@ class _SessionGalleryState extends State<SessionGallery> {
                               const KeyChord(['Ctrl', 'Alt', 'Shift', 'Z']),
                             ],
                           ),
-                          progress: .6,
-                          width: 440,
+                          progress: Specimen.toastProgress,
+                          width: Specimen.toast,
                         ),
                         const ToastCard(
                           title: 'Input released',
                           message: 'One click on the stream captures again.',
                           icon: Ico.pointer,
-                          width: 440,
+                          width: Specimen.toast,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const Gap(Space.lg),
                     Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                      spacing: Space.md,
+                      runSpacing: Space.md,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         SecondaryButton(
                           label: 'Show a toast',
-                          height: 40,
+                          size: ControlSize.xl,
                           onTap: () {
                             setState(() => _toasts++);
                             showToast(
                               context,
-                              duration: const Duration(seconds: 4),
+                              duration: Motion.toast,
                               builder: (context, progress) => ToastCard(
                                 title: 'Toast $_toasts',
                                 message: 'Closes by itself after four seconds.',
                                 icon: Ico.info,
                                 progress: progress,
-                                width: 360,
+                                width: Widths.notice,
                               ),
                             );
                           },
@@ -341,7 +343,7 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 32, bottom: 16),
+    padding: const EdgeInsets.only(top: Space.xxl, bottom: Space.lg),
     child: SettingsHeading(label),
   );
 }
