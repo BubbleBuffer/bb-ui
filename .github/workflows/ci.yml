@@ -48,7 +48,29 @@ jobs:
           flutter-version: 3.47.5
           cache: true
       - run: flutter pub get
+      # The bb_lints plugin is loaded from packages/bb_lints by path.
+      - run: dart pub get
+        working-directory: packages/bb_lints
       - run: flutter analyze --fatal-infos
+
+  lints:
+    name: bb_lints package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+          cache: true
+      - working-directory: packages/bb_lints
+        run: |
+          dart pub get
+          dart analyze --fatal-infos
+          dart test
 
   colours:
     name: colour drift and raw colours
@@ -69,9 +91,6 @@ jobs:
         run: dart tool/generate_colors.dart
       - name: Fail on generated colour drift
         run: git diff --exit-code -- packages/bb_tokens/lib/src/colors.g.dart
-      - name: Check raw colours
-        if: ${{ !cancelled() }}
-        run: bash scripts/check-raw-colours.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
@@ -208,6 +227,21 @@ jobs:
           YAML
           printf "import 'package:bb_ui/bb_ui.dart';\n\nfinal colors = AppColors.light;\nconst hint = AppTooltip.hoverDelay;\n" > "$dir/lib/ui_use.dart"
           printf "import 'package:bb_ui/tokens.dart';\n\nconst radius = Radii.md;\n" > "$dir/lib/tokens_use.dart"
+          cat > "$dir/analysis_options.yaml" <<YAML
+          plugins:
+            bb_lints:
+              git:
+                url: $URL
+                ref: $REF
+                path: packages/bb_lints
+          YAML
           cd "$dir"
           flutter pub get
           flutter analyze --fatal-infos
+          # The plugin loads from Git and reports a raw value.
+          printf "import 'package:flutter/widgets.dart';\n\nconst pad = EdgeInsets.all(10);\n" > lib/raw.dart
+          if out=$(flutter analyze 2>&1); then
+            echo "expected bb_lints to flag lib/raw.dart" >&2
+            exit 1
+          fi
+          echo "$out" | grep -q 'tokens_only' || { echo "$out" >&2; exit 1; }

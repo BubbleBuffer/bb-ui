@@ -63,10 +63,10 @@ class AppTooltip extends StatefulWidget {
 
   static List<SingleActivator>? _noShortcuts(String id) => null;
 
-  static const hoverDelay = Duration(milliseconds: 500);
+  static const hoverDelay = Motion.hoverDelay;
 
   /// How long a touch tooltip stays after the finger lifts.
-  static const touchLinger = Duration(milliseconds: 1500);
+  static const touchLinger = Motion.linger;
 
   @override
   State<AppTooltip> createState() => _AppTooltipState();

@@ -1,20 +1,25 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.7.2 keeps the
-API extracted from agent-kit, with the search widgets and the command palette,
-and adds the device, pairing and session components.
+Flutter primitives without Material, using `bb_tokens`. Version 0.8.0 builds
+every component from token scales only, adapts by density and by its own
+width, and grows with the system text size. Moving from 0.7 is in the
+[migration guide](../../docs/migration-0.8.md).
 
 Import `package:bb_ui/bb_ui.dart` for the primitives and re-exported tokens.
 `package:bb_ui/tokens.dart` remains a compatibility entry point. A host provides
-an `AppTheme` under its `WidgetsApp`, with a form factor derived from the current
-available width:
+an `AppTheme` under its `WidgetsApp` with a `Density` (how the user points),
+and optionally a `SizeClassScope` (how much room there is; without one the
+window width decides):
 
 ```dart
 LayoutBuilder(
-  builder: (context, constraints) => AppTheme(
-    colors: AppColors.light,
-    formFactor: FormFactor.forWidth(constraints.maxWidth),
-    child: PrimaryButton(label: 'Save', onTap: save),
+  builder: (context, constraints) => SizeClassScope(
+    sizeClass: SizeClass.forWidth(constraints.maxWidth),
+    child: AppTheme(
+      colors: AppColors.light,
+      density: Density.forPlatform(defaultTargetPlatform),
+      child: PrimaryButton(label: 'Save', onTap: save),
+    ),
   ),
 )
 ```
@@ -22,8 +27,23 @@ LayoutBuilder(
 The host registers the fonts named by the tokens. The
 [gallery pubspec](../../apps/gallery/pubspec.yaml) shows the bundled font setup
 and includes the corresponding licences. Use `AppColors.darkTheme` for dark
-presentation. Context accessors include `context.colors`, `context.type` and
-`context.mobile`.
+presentation. Context accessors are `context.colors`, `context.type`,
+`context.metrics` (sizes that follow density), `context.density`,
+`context.touch`, `context.sizeClass` and `context.adaptive(compact: ...,
+medium: ..., expanded: ...)`.
+
+## Layout and adapting
+
+- `Gap(Space.sm)` is space along its parent's axis; for equal gaps prefer a
+  `Row`/`Column`'s `spacing:`.
+- `AdaptiveLayout(builder: (context, sizeClass) => ...)` builds by its own
+  width and sets that size class for everything below it.
+- Components take sizes as steps: `IconBtn(size: ControlSize.sm, glyph:
+  IconSize.lg)`, `Icon20(size: IconSize.md)`, `PrimaryButton(size:
+  ControlSize.xl)`. Text-bearing controls have a minimum height, not a fixed
+  one, so large text grows them instead of clipping.
+- Presentation follows the size class: a compact screen gets sheets instead
+  of popovers, a full-screen command palette and full-width rows.
 
 The public library exports buttons, fields, hover/focus surfaces, icons, ruled
 lines, marked lists, menus, modals, pickers, reference chips, routing, search,
@@ -33,7 +53,8 @@ and session chrome. See the
 [gallery](../../apps/gallery/README.md) for a small executable specimen set;
 it is not a complete state or accessibility audit of every export.
 
-Widgets read theme roles; raw colour literals belong only in the token source.
+Widgets read theme roles and token scales; raw values belong only in the
+token source, which the [bb_lints](../bb_lints/README.md) rules enforce.
 Run `flutter test` in this package for the inherited tooltip interaction tests.
 AGPL-3.0-or-later; see the repository [LICENSE](../../LICENSE).
 
@@ -74,8 +95,8 @@ command onto a neutral model and runs the one the user picks.
   its keys), `enabled` with a `disabledReason`, an `icon` from `Ico`, and a
   `rowKey`.
 - `showCommandPalette(context, commands: ...)` opens the palette on the
-  navigator: a 560-wide panel 14% from the top on a wide window, the full
-  screen with a Cancel button on a phone. The future completes with the command
+  navigator: a `Widths.palette` panel `Layout.paletteTop` from the top, or the
+  full screen with a Cancel button on a compact screen. The future completes with the command
   the user ran, or null when they closed it, once the palette is gone and
   focus is back on what had it before. The host then runs the command, so a
   command that opens something or moves focus is not overtaken by the restore.

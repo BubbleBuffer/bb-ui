@@ -319,29 +319,38 @@ class _Row extends StatelessWidget {
                     : Keycap('$number', raised: true),
               ),
               const Gap(Space.sm),
+              // Name and detail share the line when they fit; otherwise the
+              // detail moves under the name.
               Expanded(
-                child: Text(
-                  display.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: ts(
-                    context.type.ui,
-                    c.textPrimary,
-                    weight: Weight.semibold,
-                  ),
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: Space.sm,
+                  children: [
+                    Text(
+                      display.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ts(
+                        context.type.ui,
+                        c.textPrimary,
+                        weight: Weight.semibold,
+                      ),
+                    ),
+                    if (display.detail != null)
+                      Text(
+                        display.detail!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: ts(
+                          context.type.caption,
+                          c.textTertiary,
+                          mono: true,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              if (display.detail != null) ...[
-                const Gap(Space.sm),
-                Flexible(
-                  child: Text(
-                    display.detail!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: ts(context.type.caption, c.textTertiary, mono: true),
-                  ),
-                ),
-              ],
             ],
           ),
         ),

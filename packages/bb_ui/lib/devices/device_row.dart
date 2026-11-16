@@ -125,7 +125,12 @@ class DeviceRow extends StatelessWidget {
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
-                            children: [body, const Gap(Space.sm), trailing!],
+                            children: [
+                              body,
+                              const Gap(Space.sm),
+                              // At its own width, not the column's.
+                              IntrinsicWidth(child: trailing),
+                            ],
                           )
                         : body,
                   ),
