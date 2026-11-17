@@ -72,6 +72,14 @@ enum Ico {
   lock,
   userCheck,
   keyboard,
+  scanLine,
+  tv,
+  ban,
+  wifi,
+  wifiOff,
+  bookmark,
+  link2,
+  smartphone,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -397,6 +405,46 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.keyboard,
     LucideIcons.keyboard500,
   ), // keyboard
+  Ico.scanLine: (
+    LucideIcons.scanLine300,
+    LucideIcons.scanLine,
+    LucideIcons.scanLine500,
+  ), // scan-line
+  Ico.tv: (
+    LucideIcons.tv300,
+    LucideIcons.tv,
+    LucideIcons.tv500,
+  ), // tv
+  Ico.ban: (
+    LucideIcons.ban300,
+    LucideIcons.ban,
+    LucideIcons.ban500,
+  ), // ban
+  Ico.wifi: (
+    LucideIcons.wifi300,
+    LucideIcons.wifi,
+    LucideIcons.wifi500,
+  ), // wifi
+  Ico.wifiOff: (
+    LucideIcons.wifiOff300,
+    LucideIcons.wifiOff,
+    LucideIcons.wifiOff500,
+  ), // wifi-off
+  Ico.bookmark: (
+    LucideIcons.bookmark300,
+    LucideIcons.bookmark,
+    LucideIcons.bookmark500,
+  ), // bookmark
+  Ico.link2: (
+    LucideIcons.link2300,
+    LucideIcons.link2,
+    LucideIcons.link2500,
+  ), // link-2
+  Ico.smartphone: (
+    LucideIcons.smartphone300,
+    LucideIcons.smartphone,
+    LucideIcons.smartphone500,
+  ), // smartphone
 };
 
 class Icon20 extends StatelessWidget {
