@@ -12,10 +12,10 @@ reviews:
     - path: "packages/bb_tokens/{lib,tokens,tool}/**"
       instructions: >-
         Keep bb_tokens.dart and the tokens.dart compatibility entry point.
-        Colours come from ProfileColors; kTransparent and kMaskOpaque are the
-        only hand-written colour constants. tokens/agent-kit.json is vendored
-        (see its vendored header), so flag hand edits. The generator must stay
-        SDK-only and resolve paths from its own script location.
+        Colours and design numbers come from lib/src/bb_tokens.g.dart (ProfileColors,
+        Contract); kTransparent and kMaskOpaque are the only hand-written
+        colour constants. bb_tokens.g.dart is a vendored copy of the design
+        repository's generated Dart (see its header), so flag hand edits.
 
     - path: "packages/bb_ui/lib/**"
       instructions: >-

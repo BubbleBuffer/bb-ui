@@ -112,7 +112,7 @@ class DisplayPicker extends StatelessWidget {
                     style: ts(
                       ty.uiSmall,
                       c.textSecondary,
-                      weight: Weight.semibold,
+                      weight: Weight.strong,
                     ),
                   ),
                 ),
@@ -263,7 +263,7 @@ class _Tile extends StatelessWidget {
                 style: tsDisplay(
                   context.type.title,
                   selected ? c.textPrimary : c.textSecondary,
-                  weight: Weight.bold,
+                  weight: Weight.displayStrong,
                 ),
               ),
               if (selected)
@@ -334,7 +334,7 @@ class _Row extends StatelessWidget {
                       style: ts(
                         context.type.ui,
                         c.textPrimary,
-                        weight: Weight.semibold,
+                        weight: Weight.strong,
                       ),
                     ),
                     if (display.detail != null)

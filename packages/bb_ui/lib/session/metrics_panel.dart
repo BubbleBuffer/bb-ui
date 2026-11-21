@@ -129,7 +129,7 @@ class MetricsPanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: ts(ty.uiSmall, c.textPrimary, weight: Weight.bold),
+                  style: ts(ty.uiSmall, c.textPrimary, weight: Weight.strong),
                 ),
               ),
               if (hint != null)

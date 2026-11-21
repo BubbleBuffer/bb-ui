@@ -1,6 +1,6 @@
 name: bb_lints
 description: Analyzer plugin that keeps BubbleBuffer UI code on its design tokens.
-version: 0.8.0
+version: 0.9.0
 publish_to: none
 
 environment:

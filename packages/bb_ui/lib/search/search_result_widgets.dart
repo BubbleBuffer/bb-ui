@@ -88,7 +88,7 @@ class SearchResultRow extends StatelessWidget {
       result.titleTone == SearchTitleTone.normal
           ? c.textPrimary
           : c.textSecondary,
-      weight: Weight.medium,
+      weight: Weight.strong,
     );
     final titleStyle = result.titleTone == SearchTitleTone.standIn
         ? base.copyWith(color: c.textTertiary, fontStyle: FontStyle.italic)
@@ -154,7 +154,7 @@ class SearchResultRow extends StatelessWidget {
               style: ts(
                 ty.uiSmall,
                 c.textTertiary,
-                weight: Weight.medium,
+                weight: Weight.strong,
                 mono: true,
               ),
             ),
@@ -187,7 +187,7 @@ class SearchGroupHeader extends StatelessWidget {
         style: ts(
           ty.uiSmall,
           c.textTertiary,
-          weight: Weight.medium,
+          weight: Weight.strong,
           mono: true,
         ),
       ),

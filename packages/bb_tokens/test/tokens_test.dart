@@ -31,6 +31,25 @@ void main() {
     expect(spaceColor('nope', Brightness.dark), isNull);
   });
 
+  test('the kit takes the unified contract values', () {
+    expect(Radii.ctl, Contract.radiusControl);
+    expect(Radii.panel, Contract.radiusPanel);
+    expect(Motion.fast, const Duration(milliseconds: 140));
+    expect(Motion.ease, const Cubic(.2, .8, .2, 1));
+    expect(Weight.regular.axis, 450);
+    expect(Weight.strong.axis, 720);
+    expect(ControlSize.standard.height, 46);
+    expect(ControlSize.dense.height, 34);
+    expect(ControlSize.xxl.height, 48);
+    expect(ControlSize.xs.height, 24);
+    expect(ProfileColors.light.accentText, const Color(0xFF874016));
+    expect(ProfileColors.light.accentInk, const Color(0xFF282A2F));
+    expect(AppColors.light.accentInk, ProfileColors.light.accentInk);
+    expect(ProfileColors.dark.desk, FamilyColors.dark.desk);
+    expect(ProfileColors.light.shadow, Contract.shadowLightSeam);
+    expect(ProfileColors.dark.shadowHover, Contract.shadowDarkSeamHover);
+  });
+
   test('the size class follows the width', () {
     expect(SizeClass.forWidth(SizeClass.mediumWidth - 1), SizeClass.compact);
     expect(SizeClass.forWidth(SizeClass.mediumWidth), SizeClass.medium);
