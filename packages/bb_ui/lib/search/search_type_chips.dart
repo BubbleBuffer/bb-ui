@@ -76,7 +76,7 @@ class _TypeChip extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: ts(m ? ty.ui : ty.uiSmall, ink, weight: Weight.medium),
+                  style: ts(m ? ty.ui : ty.uiSmall, ink, weight: Weight.strong),
                 ),
                 if (removable) ...[
                   const Gap(Space.xxs),

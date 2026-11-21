@@ -67,7 +67,7 @@ class StatusPill extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: ts(context.type.uiSmall, ink, weight: Weight.semibold),
+              style: ts(context.type.uiSmall, ink, weight: Weight.strong),
             ),
           ),
         ],

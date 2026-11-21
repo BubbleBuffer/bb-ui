@@ -187,10 +187,13 @@ const _controlSizes = [
 
 const _weights = [
   (400, 'Weight.regular'),
-  (500, 'Weight.medium'),
-  (600, 'Weight.semibold'),
+  (450, 'Weight.regular'),
+  (500, 'Weight.strong'),
+  (600, 'Weight.strong'),
   (640, 'Weight.display'),
-  (700, 'Weight.bold'),
+  (700, 'Weight.strong'),
+  (720, 'Weight.strong'),
+  (760, 'Weight.displayStrong'),
 ];
 
 /// The role nearest a hand-written size and line height; a monospace style

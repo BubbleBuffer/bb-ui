@@ -77,7 +77,7 @@ class _SessionGalleryState extends State<SessionGallery> {
                 style: ts(
                   context.type.uiSmall,
                   c.textPrimary,
-                  weight: Weight.bold,
+                  weight: Weight.strong,
                 ),
               ),
               const Gap(Space.sm),
@@ -199,7 +199,7 @@ class _SessionGalleryState extends State<SessionGallery> {
                                   style: ts(
                                     context.type.ui,
                                     c.textPrimary,
-                                    weight: Weight.bold,
+                                    weight: Weight.strong,
                                   ),
                                 ),
                               ),

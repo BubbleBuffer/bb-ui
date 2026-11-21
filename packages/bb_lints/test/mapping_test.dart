@@ -27,6 +27,7 @@ void main() {
   test('integer weights map to Weight', () {
     expect(weightFor(400), 'Weight.regular');
     expect(weightFor(640), 'Weight.display');
-    expect(weightFor(700), 'Weight.bold');
+    expect(weightFor(700), 'Weight.strong');
+    expect(weightFor(760), 'Weight.displayStrong');
   });
 }

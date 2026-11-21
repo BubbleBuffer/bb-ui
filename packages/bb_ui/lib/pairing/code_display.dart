@@ -90,7 +90,7 @@ class OneTimeCode extends StatelessWidget {
           if (label != null) ...[
             Text(
               label!,
-              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.semibold),
+              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.strong),
             ),
             const Gap(Space.sm),
           ],
@@ -161,7 +161,7 @@ class ComparisonNumber extends StatelessWidget {
           if (label != null) ...[
             Text(
               label!,
-              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.semibold),
+              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.strong),
             ),
             const Gap(Space.sm),
           ],

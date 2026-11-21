@@ -88,7 +88,7 @@ class NoticeBanner extends StatelessWidget {
                   if (title != null) ...[
                     Text(
                       title!,
-                      style: ts(ty.ui, c.textPrimary, weight: Weight.bold),
+                      style: ts(ty.ui, c.textPrimary, weight: Weight.strong),
                     ),
                     const Gap(Space.hair),
                   ],
@@ -174,7 +174,11 @@ class EmptyState extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: tsDisplay(ty.h3, c.textPrimary, weight: Weight.bold),
+                style: tsDisplay(
+                  ty.h3,
+                  c.textPrimary,
+                  weight: Weight.displayStrong,
+                ),
               ),
               if (message != null) ...[
                 const Gap(Space.sm),
@@ -268,7 +272,7 @@ class ToastCard extends StatelessWidget {
                             style: ts(
                               ty.ui,
                               c.textPrimary,
-                              weight: Weight.bold,
+                              weight: Weight.strong,
                             ),
                           ),
                           if (message != null) ...[

@@ -37,7 +37,7 @@ class SectionHeader extends StatelessWidget {
           style: tsDisplay(
             large ? ty.h1 : ty.h3,
             c.textPrimary,
-            weight: Weight.bold,
+            weight: Weight.displayStrong,
           ),
         ),
         if (subtitle != null) ...[

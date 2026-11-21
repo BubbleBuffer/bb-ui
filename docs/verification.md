@@ -5,7 +5,7 @@ permissions. Flutter is pinned to 3.47.5. CI checks format, strict analysis
 with every bb_lints rule (tokens only, no raw colours or type, gaps, no
 window size in components, no magic numbers), the bb_lints package's own
 tests, package and gallery tests (including the width and text-scale matrix),
-committed golden comparison, generated-colour drift and private strings. It
+committed golden comparison, the generated-token header and private strings. It
 also builds the web gallery and, on pushes, resolves the package and loads
 the plugin through Git dependencies at the pushed commit.
 
@@ -34,8 +34,7 @@ or open an approval automatically. Push and pull-request runs always compare
 committed baselines; manual `ci` runs explicitly generate candidates.
 
 If format fails on a machine without Dart, download the `format-patch` artifact,
-review it, and apply with `git apply format.patch`. A colour drift failure
-uploads the regenerated Dart for review. Golden failures upload their diff
+review it, and apply with `git apply format.patch`. Golden failures upload their diff
 images separately. Neither artifact changes the accepted source by itself.
 
 ## Private-string rules
