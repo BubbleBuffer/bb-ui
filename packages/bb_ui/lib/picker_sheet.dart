@@ -8,6 +8,7 @@ import 'fields.dart';
 import 'modal.dart';
 import 'sheet.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// The search field of a [PickerSheet]: the caller keeps the controller and
 /// focus node and filters the list in [onChanged].
@@ -50,8 +51,13 @@ class PickerSheet extends StatelessWidget {
     this.header,
     this.above,
     this.search,
-    this.listHeight = 360,
-    this.listPadding = const EdgeInsets.fromLTRB(8, 0, 8, 12),
+    this.listHeight = Heights.list,
+    this.listPadding = const EdgeInsets.fromLTRB(
+      Space.sm,
+      0,
+      Space.sm,
+      Space.md,
+    ),
     this.listKey,
     this.footer,
   });
@@ -94,7 +100,7 @@ class PickerSheet extends StatelessWidget {
               fieldKey: s.fieldKey,
             ),
           ),
-          const SizedBox(height: 4),
+          const Gap(Space.xxs),
         ],
         if (listHeight == null)
           Flexible(child: scroll)
@@ -107,9 +113,9 @@ class PickerSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.fromLTRB(
               Layout.gutter,
-              10,
+              Space.md,
               Layout.gutter,
-              14,
+              Space.lg,
             ),
             decoration: BoxDecoration(
               border: Border(top: BorderSide(color: c.divider)),
@@ -121,29 +127,31 @@ class PickerSheet extends StatelessWidget {
   }
 }
 
-/// Shows [builder]'s picker: a bottom sheet on a phone (the list area is
-/// [mobileHeightFactor] of the screen when set), a centred panel elsewhere
+/// Shows [builder]'s picker: a bottom sheet on a compact screen (the list area
+/// is [sheetHeightFactor] of the screen when set), a centred panel elsewhere
 /// ([desktopWidth], [desktopHeight]; [shrink] fits the panel to its content).
 /// [desktopScroll] scrolls the content inside the panel. Completes with what
 /// the picker pops.
 Future<T?> showPickerSheet<T>(
   BuildContext context,
   WidgetBuilder builder, {
-  double desktopWidth = 480,
-  double desktopHeight = 640,
+  double desktopWidth = Widths.sheet,
+  double desktopHeight = Heights.dialog,
   bool shrink = true,
   bool desktopScroll = false,
-  double? mobileHeightFactor,
+  double? sheetHeightFactor,
 }) {
-  if (context.mobile) {
+  if (context.windowSizeClass.isCompact) {
     return showSheet<T>(
       context,
       (ctx) => SheetSurface(
         children: [
-          mobileHeightFactor == null
+          sheetHeightFactor == null
               ? builder(ctx)
               : SizedBox(
-                  height: MediaQuery.sizeOf(ctx).height * mobileHeightFactor,
+                  // A share of the screen the sheet rises from.
+                  // ignore: bb_lints/no_window_size
+                  height: MediaQuery.sizeOf(ctx).height * sheetHeightFactor,
                   child: builder(ctx),
                 ),
         ],

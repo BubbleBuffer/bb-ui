@@ -133,14 +133,19 @@ class _SearchPanelState extends State<SearchPanel> {
     final narrowed = widget.narrowedNote;
     final filters = widget.filters;
     Widget note(String s) => Padding(
-      padding: const EdgeInsets.all(16),
-      child: Text(s, style: ts(ty.ui, c.textTertiary, weight: 400)),
+      padding: const EdgeInsets.all(Space.lg),
+      child: Text(s, style: ts(ty.ui, c.textTertiary, weight: Weight.regular)),
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+          padding: const EdgeInsets.fromLTRB(
+            Space.md,
+            Space.md,
+            Space.md,
+            Space.sm,
+          ),
           child: SearchField(
             fieldKey: widget.fieldKey,
             controller: widget.controller,
@@ -151,7 +156,7 @@ class _SearchPanelState extends State<SearchPanel> {
         ),
         if (filters != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            padding: const EdgeInsets.fromLTRB(Space.md, 0, Space.md, Space.sm),
             child: filters,
           ),
         HLine(color: c.divider),
@@ -162,24 +167,34 @@ class _SearchPanelState extends State<SearchPanel> {
               ? note(widget.emptyNote)
               : SearchResultsList(
                   sections: sections,
-                  mobile: false,
+                  showActive: true,
                   active: _active.clamp(0, total - 1),
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(Space.xs),
                   onPick: widget.onPick,
                 ),
         ),
         if (narrowed != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            padding: const EdgeInsets.fromLTRB(
+              Space.lg,
+              Space.sm,
+              Space.lg,
+              Space.md,
+            ),
             child: Text(
               narrowed,
               key: const ValueKey('search-narrowed-hint'),
-              style: ts(ty.uiSmall, c.textTertiary, weight: 400),
+              style: ts(ty.uiSmall, c.textTertiary, weight: Weight.regular),
             ),
           ),
         if (correction != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            padding: const EdgeInsets.fromLTRB(
+              Space.lg,
+              Space.sm,
+              Space.lg,
+              Space.md,
+            ),
             child: Text.rich(
               TextSpan(
                 children: [
@@ -193,7 +208,7 @@ class _SearchPanelState extends State<SearchPanel> {
               key: const ValueKey('search-correction-hint'),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: ts(ty.uiSmall, c.textTertiary, weight: 400),
+              style: ts(ty.uiSmall, c.textTertiary, weight: Weight.regular),
             ),
           ),
       ],

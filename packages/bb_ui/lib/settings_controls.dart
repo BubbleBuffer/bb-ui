@@ -9,7 +9,8 @@ import 'package:flutter/widgets.dart';
 import 'bb_ui.dart';
 
 /// A section title ("Sync") with a hairline below. A [primary] heading
-/// names the whole section; on mobile the top bar shows that instead.
+/// names the whole section; on a compact screen the top bar shows that
+/// instead.
 class SettingsHeading extends StatelessWidget {
   const SettingsHeading(
     this.text, {
@@ -24,7 +25,9 @@ class SettingsHeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    if (primary && context.mobile) return const SizedBox(height: 4);
+    if (primary && context.windowSizeClass.isCompact) {
+      return const SizedBox(height: Space.xxs);
+    }
     return Padding(
       padding: EdgeInsets.only(top: top),
       child: Column(
@@ -33,12 +36,12 @@ class SettingsHeading extends StatelessWidget {
           Text(
             text,
             style: primary
-                ? tsDisplay(const TypeSpec(19, 24, 640), c.textPrimary)
-                : tsRaw(16, 24, 500, c.textPrimary),
+                ? tsDisplay(context.type.h3, c.textPrimary)
+                : ts(context.type.body, c.textPrimary, weight: Weight.medium),
           ),
-          const SizedBox(height: 12),
+          const Gap(Space.md),
           HLine(color: c.border),
-          const SizedBox(height: 16),
+          const Gap(Space.lg),
         ],
       ),
     );
@@ -63,50 +66,45 @@ class SettingsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final m = context.mobile;
+    final ty = context.type;
     final text = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          label,
-          style: m
-              ? tsRaw(16, 22, 400, c.textPrimary)
-              : tsRaw(14, 20, 400, c.textPrimary),
-        ),
+        Text(label, style: ts(ty.item, c.textPrimary, weight: Weight.regular)),
         if (description != null) ...[
-          const SizedBox(height: 2),
+          const Gap(Space.hair),
           Text(
             description!,
-            style: m
-                ? tsRaw(13, 18, 400, c.textSecondary)
-                : tsRaw(12, 16, 400, c.textSecondary),
+            style: ts(ty.uiSmall, c.textSecondary, weight: Weight.regular),
           ),
         ],
       ],
     );
     if (trailing == null) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: Space.sm),
         child: text,
       );
     }
     if (stack) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: Space.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [text, const SizedBox(height: 10), trailing!],
+          children: [text, const Gap(Space.md), trailing!],
         ),
       );
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: Space.sm),
       child: Row(
         children: [
           Expanded(child: text),
-          const SizedBox(width: 16),
-          trailing!,
+          const Gap(Space.lg),
+          // Shares the row with the label, so a long value or large text
+          // ellipsises instead of overflowing.
+          Flexible(child: trailing!),
         ],
       ),
     );
@@ -134,20 +132,20 @@ class Toggle extends StatelessWidget {
           onTap: onChanged == null ? null : () => onChanged!(!value),
           child: AnimatedContainer(
             duration: Motion.of(context).fast,
-            width: 30,
-            height: 18,
-            padding: const EdgeInsets.all(2),
+            width: Sizes.switchWidth,
+            height: Sizes.switchHeight,
+            padding: const EdgeInsets.all(Space.hair),
             decoration: BoxDecoration(
               color: value ? c.accent : off,
-              borderRadius: BorderRadius.circular(9),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: AnimatedAlign(
               duration: Motion.of(context).fast,
               curve: Motion.easing,
               alignment: value ? Alignment.centerRight : Alignment.centerLeft,
               child: Container(
-                width: 14,
-                height: 14,
+                width: Sizes.switchThumb,
+                height: Sizes.switchThumb,
                 decoration: BoxDecoration(
                   color: c.palette.knob,
                   shape: BoxShape.circle,
@@ -161,8 +159,8 @@ class Toggle extends StatelessWidget {
   }
 }
 
-/// A value with a chevron that opens a menu of [options] (a popover on
-/// desktop, a sheet on mobile).
+/// A value with a chevron that opens a menu of [options] (a popover, or a
+/// sheet on a compact screen).
 class SelectButton<T> extends StatelessWidget {
   const SelectButton({
     super.key,
@@ -180,7 +178,9 @@ class SelectButton<T> extends StatelessWidget {
 
   Future<void> _open(BuildContext context) async {
     T? picked;
-    if (context.mobile) {
+    // A sheet on a phone-sized window, even from inside a narrow pane or
+    // dialog; a popover elsewhere.
+    if (context.windowSizeClass.isCompact) {
       picked = await showSheet<T>(
         context,
         (ctx) => SheetSurface(
@@ -188,6 +188,7 @@ class SelectButton<T> extends StatelessWidget {
             if (title != null) SheetHeader(title!),
             for (final o in options)
               SheetItem(
+                key: ValueKey('option-${labelOf(o)}'),
                 label: labelOf(o),
                 selected: o == value,
                 onTap: () => Navigator.of(ctx).pop(o),
@@ -200,7 +201,7 @@ class SelectButton<T> extends StatelessWidget {
         context,
         globalRectOf(context),
         (ctx) => MenuList(
-          width: 220,
+          width: Widths.popover,
           children: [
             for (final o in options)
               MenuItem(
@@ -208,7 +209,11 @@ class SelectButton<T> extends StatelessWidget {
                 label: labelOf(o),
                 onTap: () => Navigator.of(ctx).pop(o),
                 trailing: o == value
-                    ? Icon20(Ico.check, size: 16, color: ctx.colors.iconPrimary)
+                    ? Icon20(
+                        Ico.check,
+                        size: IconSize.sm,
+                        color: ctx.colors.iconPrimary,
+                      )
                     : null,
               ),
           ],
@@ -229,25 +234,28 @@ class SelectButton<T> extends StatelessWidget {
           onTap: onChanged == null ? null : () => _open(b),
           hoverColor: onChanged == null ? kTransparent : null,
           radius: Radii.md,
-          padding: const EdgeInsets.fromLTRB(8, 0, 4, 0),
-          child: SizedBox(
-            height: 28,
+          padding: const EdgeInsets.fromLTRB(Space.sm, 0, Space.xxs, 0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: ControlSize.sm.height),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  labelOf(value),
-                  style: tsRaw(
-                    14,
-                    20,
-                    400,
-                    onChanged == null ? c.textDisabled : c.textSecondary,
+                Flexible(
+                  child: Text(
+                    labelOf(value),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: ts(
+                      context.type.ui,
+                      onChanged == null ? c.textDisabled : c.textSecondary,
+                      weight: Weight.regular,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 2),
+                const Gap(Space.hair),
                 Icon20(
                   Ico.chevronDown,
-                  size: 14,
+                  size: IconSize.xs,
                   color: onChanged == null ? c.textDisabled : c.iconTertiary,
                 ),
               ],
@@ -302,15 +310,15 @@ class _SettingsFieldState extends State<SettingsField> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final m = context.mobile;
+    final ty = context.type;
     final style = widget.mono
-        ? ts(TypeSpec(m ? 14 : 13, 20, 400), c.textPrimary, mono: true)
-        : tsRaw(m ? 16 : 14, 20, 400, c.textPrimary);
+        ? ts(ty.code, c.textPrimary, mono: true)
+        : ts(ty.item, c.textPrimary, weight: Weight.regular);
     return GestureDetector(
       onTap: _focus.requestFocus,
       child: FieldFrame(
-        height: m ? 40 : 32,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        height: context.metrics.field.height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.md),
         child: PlainField(
           key: widget.fieldKey,
           controller: widget.controller,
@@ -351,20 +359,22 @@ class OutlineButton extends StatelessWidget {
       onTap: onTap,
       radius: Radii.md,
       child: Container(
-        height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        height: ControlSize.md.height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.md),
         decoration: BoxDecoration(
           color: c.bgPrimary,
           borderRadius: Radii.ctl,
           border: Border.all(
-            color: danger ? c.inlineCodeText.withValues(alpha: 0.5) : c.thread,
+            color: danger
+                ? c.inlineCodeText.withValues(alpha: Alpha.muted)
+                : c.thread,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (icon != null) ...[icon!, const SizedBox(width: 6)],
-            Text(label, style: tsRaw(14, 20, 500, color)),
+            if (icon != null) ...[icon!, const Gap(Space.xs)],
+            Text(label, style: ts(context.type.ui, color)),
           ],
         ),
       ),
@@ -374,20 +384,21 @@ class OutlineButton extends StatelessWidget {
 
 /// Monospace text that can be copied, with a "Copy" button. An [inline] one
 /// has no box: the text with a small copy icon after it, for identifiers
-/// in running layouts. [size] is the text size in logical pixels.
+/// in running layouts. [type] is the text's role, `context.type.code` when
+/// null.
 class CopyableText extends StatefulWidget {
   const CopyableText(
     this.text, {
     super.key,
     this.textKey,
     this.inline = false,
-    this.size = 13,
+    this.type,
     this.color,
   });
   final String text;
   final Key? textKey;
   final bool inline;
-  final double size;
+  final TypeSpec? type;
   final Color? color;
 
   @override
@@ -401,7 +412,7 @@ class _CopyableTextState extends State<CopyableText> {
     await Clipboard.setData(ClipboardData(text: widget.text));
     if (!mounted) return;
     setState(() => _copied = true);
-    await Future<void>.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(Motion.confirm);
     if (mounted) setState(() => _copied = false);
   }
 
@@ -409,7 +420,7 @@ class _CopyableTextState extends State<CopyableText> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final style = ts(
-      TypeSpec(widget.size, widget.size * 1.5, 400),
+      widget.type ?? context.type.code,
       widget.color ?? c.textPrimary,
       mono: true,
     );
@@ -420,13 +431,18 @@ class _CopyableTextState extends State<CopyableText> {
           Flexible(
             child: Text(widget.text, key: widget.textKey, style: style),
           ),
-          const SizedBox(width: 4),
+          const Gap(Space.xxs),
           CopyButton(widget.text),
         ],
       );
     }
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
+      padding: const EdgeInsets.fromLTRB(
+        Space.md,
+        Space.xs,
+        Space.xxs,
+        Space.xs,
+      ),
       decoration: BoxDecoration(
         color: c.bgSecondary,
         borderRadius: Radii.field,
@@ -438,7 +454,7 @@ class _CopyableTextState extends State<CopyableText> {
           Expanded(
             child: Text(widget.text, key: widget.textKey, style: style),
           ),
-          const SizedBox(width: 8),
+          const Gap(Space.sm),
           TextBtn(
             _copied ? 'Copied' : 'Copy',
             onTap: _copy,
@@ -453,9 +469,15 @@ class _CopyableTextState extends State<CopyableText> {
 /// A small icon button that copies [text] to the clipboard and shows a check
 /// for two seconds.
 class CopyButton extends StatefulWidget {
-  const CopyButton(this.text, {super.key, this.size = 24, this.glyph = 16});
+  const CopyButton(
+    this.text, {
+    super.key,
+    this.size = ControlSize.xs,
+    this.glyph = IconSize.sm,
+  });
   final String text;
-  final double size, glyph;
+  final ControlSize size;
+  final IconSize glyph;
 
   @override
   State<CopyButton> createState() => _CopyButtonState();
@@ -468,7 +490,7 @@ class _CopyButtonState extends State<CopyButton> {
     await Clipboard.setData(ClipboardData(text: widget.text));
     if (!mounted) return;
     setState(() => _copied = true);
-    await Future<void>.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(Motion.confirm);
     if (mounted) setState(() => _copied = false);
   }
 

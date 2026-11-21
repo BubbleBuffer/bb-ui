@@ -6,6 +6,11 @@ import 'package:flutter/widgets.dart';
 import 'hover.dart';
 import 'icons.dart';
 import 'tokens.dart';
+import 'layout.dart';
+
+// Dragging a sheet: how far it follows the finger, and the distance or
+// downward speed (logical px per second) that dismisses it.
+const _maxDrag = 600.0, _dismissDrag = 120.0, _dismissVelocity = 700.0;
 
 class SheetRoute<T> extends PopupRoute<T> {
   SheetRoute({
@@ -78,14 +83,18 @@ class _SheetSurfaceState extends State<SheetSurface> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final mq = MediaQuery.of(context);
+    // A bottom sheet sizes against the screen it rises from.
+    // ignore: bb_lints/no_window_size
+    final screen = MediaQuery.sizeOf(context);
+    final safe = MediaQuery.paddingOf(context);
     return Transform.translate(
       offset: Offset(0, _drag),
       child: GestureDetector(
         onVerticalDragUpdate: (d) =>
-            setState(() => _drag = (_drag + d.delta.dy).clamp(0, 600)),
+            setState(() => _drag = (_drag + d.delta.dy).clamp(0, _maxDrag)),
         onVerticalDragEnd: (d) {
-          if (_drag > 120 || d.velocity.pixelsPerSecond.dy > 700) {
+          if (_drag > _dismissDrag ||
+              d.velocity.pixelsPerSecond.dy > _dismissVelocity) {
             Navigator.of(context).pop();
           } else {
             setState(() => _drag = 0);
@@ -93,29 +102,31 @@ class _SheetSurfaceState extends State<SheetSurface> {
         },
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(maxHeight: mq.size.height * 0.85),
+          constraints: BoxConstraints(
+            maxHeight: screen.height * Layout.sheetHeight,
+          ),
           decoration: BoxDecoration(
             color: c.bgElevated,
             borderRadius: Radii.panel,
             boxShadow: c.seamHover,
           ),
-          padding: EdgeInsets.only(bottom: mq.padding.bottom + 8),
+          padding: EdgeInsets.only(bottom: safe.bottom + Space.sm),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 8),
+              const Gap(Space.sm),
               Center(
                 child: Container(
-                  width: 36,
-                  height: 4,
+                  width: Sizes.grabWidth,
+                  height: Sizes.grabHeight,
                   decoration: BoxDecoration(
                     color: c.borderStrong,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(Radii.sm),
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const Gap(Space.md),
               Flexible(
                 child: SingleChildScrollView(
                   child: Column(
@@ -139,7 +150,12 @@ class SheetHeader extends StatelessWidget {
   final String text;
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(Layout.gutter, 4, Layout.gutter, 8),
+    padding: const EdgeInsets.fromLTRB(
+      Layout.gutter,
+      Space.xxs,
+      Layout.gutter,
+      Space.sm,
+    ),
     child: Text(
       text,
       style: ts(context.type.uiSmall, context.colors.textTertiary),
@@ -174,22 +190,27 @@ class SheetItem extends StatelessWidget {
       borderRadius: Radii.ctl,
       selected: selected,
       padding: const EdgeInsets.symmetric(horizontal: Layout.gutter),
-      child: SizedBox(
-        height: 48,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: ControlSize.xxl.height),
         child: Row(
           children: [
             leading ??
                 (icon == null
-                    ? const SizedBox(width: 22)
-                    : Icon20(icon!, size: 22, color: color ?? c.iconPrimary)),
-            const SizedBox(width: 14),
+                    ? SizedBox(width: IconSize.xl.px)
+                    : Icon20(
+                        icon!,
+                        size: IconSize.xl,
+                        color: color ?? c.iconPrimary,
+                      )),
+            const Gap(Space.lg),
             Expanded(
               child: Text(
                 label,
                 style: ts(context.type.body, color ?? c.textPrimary),
               ),
             ),
-            if (selected) Icon20(Ico.check, size: 18, color: c.accentText),
+            if (selected)
+              Icon20(Ico.check, size: IconSize.md, color: c.accentText),
           ],
         ),
       ),

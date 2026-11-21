@@ -7,12 +7,13 @@ import '../hover.dart';
 import '../icons.dart';
 import '../lines.dart';
 import '../tokens.dart';
+import '../layout.dart';
 
 /// The corners of the tab and the strip: square where they meet the edge,
 /// rounded where they hang free.
 const _hanging = BorderRadius.only(
-  bottomLeft: Radius.circular(12),
-  bottomRight: Radius.circular(12),
+  bottomLeft: Radius.circular(Radii.sheet),
+  bottomRight: Radius.circular(Radii.sheet),
 );
 
 BoxDecoration _surface(AppColors c) => BoxDecoration(
@@ -57,42 +58,42 @@ class EdgeTab extends StatelessWidget {
           onTap: onTap,
           borderRadius: _hanging,
           lift: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: Space.md),
           child: SizedBox(
-            height: 28,
+            height: ControlSize.sm.height,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (mark != null) ...[
                   Container(
-                    width: 8,
-                    height: 8,
+                    width: Sizes.dot,
+                    height: Sizes.dot,
                     decoration: BoxDecoration(
                       color: mark,
                       shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const Gap(Space.sm),
                 ],
                 Text(
                   label,
-                  style: ts(context.type.uiSmall, c.textSecondary, weight: 600),
+                  style: ts(
+                    context.type.uiSmall,
+                    c.textSecondary,
+                    weight: Weight.semibold,
+                  ),
                 ),
                 if (value != null) ...[
-                  const SizedBox(width: 8),
+                  const Gap(Space.sm),
                   Text(
                     value!,
-                    style: ts(
-                      const TypeSpec(11, 14, 400),
-                      c.textPrimary,
-                      mono: true,
-                    ),
+                    style: ts(context.type.caption, c.textPrimary, mono: true),
                   ),
                 ],
-                const SizedBox(width: 8),
+                const Gap(Space.sm),
                 Icon20(
                   opened ? Ico.chevronUp : Ico.chevronDown,
-                  size: 16,
+                  size: IconSize.sm,
                   color: c.iconSecondary,
                 ),
               ],
@@ -116,8 +117,8 @@ class EdgeStrip extends StatelessWidget {
     return Semantics(
       container: true,
       child: Container(
-        height: 42,
-        padding: const EdgeInsets.symmetric(horizontal: 6),
+        height: ControlSize.xl.height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.xs),
         decoration: _surface(c),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -125,8 +126,8 @@ class EdgeStrip extends StatelessWidget {
             for (var i = 0; i < groups.length; i++) ...[
               if (i > 0)
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: VLine(height: 22),
+                  padding: EdgeInsets.symmetric(horizontal: Space.xxs),
+                  child: VLine(height: Space.xl),
                 ),
               groups[i],
             ],
@@ -176,26 +177,31 @@ class EdgeStripButton extends StatelessWidget {
         selected: selected,
         selectedColor: c.bgPressed,
         radius: Radii.md,
-        padding: EdgeInsets.symmetric(horizontal: label == null ? 6 : 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: label == null ? Space.xs : Space.md,
+        ),
         child: SizedBox(
-          height: 32,
+          height: ControlSize.md.height,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon20(
                 icon,
-                size: 18,
+                size: IconSize.md,
                 color: signal ? c.accentText : c.iconSecondary,
               ),
               if (label != null) ...[
-                const SizedBox(width: 6),
-                Text(label!, style: ts(context.type.uiSmall, ink, weight: 600)),
+                const Gap(Space.xs),
+                Text(
+                  label!,
+                  style: ts(context.type.uiSmall, ink, weight: Weight.semibold),
+                ),
               ],
               if (menu) ...[
-                const SizedBox(width: 4),
+                const Gap(Space.xxs),
                 Icon20(
                   selected ? Ico.chevronUp : Ico.chevronDown,
-                  size: 14,
+                  size: IconSize.xs,
                   color: c.iconTertiary,
                 ),
               ],

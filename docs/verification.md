@@ -1,10 +1,13 @@
 # Verification and golden baselines
 
 All workflows use GitHub-hosted Linux runners with read-only repository
-permissions. Flutter is pinned to 3.47.5. CI checks format, strict analysis,
-package and gallery tests, committed golden comparison, generated-colour
-drift, raw colours and private strings. It also builds the web gallery and,
-on pushes, resolves the package through a Git dependency at the pushed commit.
+permissions. Flutter is pinned to 3.47.5. CI checks format, strict analysis
+with every bb_lints rule (tokens only, no raw colours or type, gaps, no
+window size in components, no magic numbers), the bb_lints package's own
+tests, package and gallery tests (including the width and text-scale matrix),
+committed golden comparison, generated-colour drift and private strings. It
+also builds the web gallery and, on pushes, resolves the package and loads
+the plugin through Git dependencies at the pushed commit.
 
 ## First baseline generation
 

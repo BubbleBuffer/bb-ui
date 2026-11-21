@@ -14,7 +14,7 @@ ValueNotifier<Widget>? _shown;
 Future<void> _pump(
   WidgetTester tester,
   Widget child, {
-  FormFactor formFactor = FormFactor.desktop,
+  Density density = Density.pointer,
   bool dark = false,
 }) async {
   final shown = _shown;
@@ -31,7 +31,7 @@ Future<void> _pump(
   await tester.pumpWidget(
     AppTheme(
       colors: dark ? AppColors.darkTheme : AppColors.light,
-      formFactor: formFactor,
+      density: density,
       child: WidgetsApp(
         color: const Color(0xFFFFFFFF),
         builder: (context, _) => Overlay(
@@ -157,7 +157,7 @@ void main() {
       await _pump(
         tester,
         SizedBox(
-          height: SearchResultRow.extent(false),
+          height: SearchResultRow.extent(Metrics.pointer),
           child: SearchResultRow(
             result: const SearchResult(
               id: 'r',
@@ -274,7 +274,6 @@ void main() {
         tester,
         SearchResultsList(
           sections: _sections(),
-          mobile: false,
           active: 1,
           onPick: (r) => picked.add(r.id),
         ),
@@ -291,12 +290,7 @@ void main() {
     testWidgets('marks only the active row on desktop', (tester) async {
       await _pump(
         tester,
-        SearchResultsList(
-          sections: _sections(),
-          mobile: false,
-          active: 2,
-          onPick: (_) {},
-        ),
+        SearchResultsList(sections: _sections(), active: 2, onPick: (_) {}),
       );
       final marked = tester
           .widgetList<DecoratedBox>(find.byType(DecoratedBox))

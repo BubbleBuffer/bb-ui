@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../tokens.dart';
+import '../layout.dart';
 
 /// One measurement: a [label] and its [value] in monospace.
 class Metric {
@@ -13,7 +14,12 @@ class Metric {
 /// A trend line through [values], scaled to fit its box. A single value or
 /// none draws nothing.
 class Sparkline extends StatelessWidget {
-  const Sparkline(this.values, {super.key, this.height = 24, this.color});
+  const Sparkline(
+    this.values, {
+    super.key,
+    this.height = Sizes.sparkline,
+    this.color,
+  });
   final List<double> values;
   final double height;
   final Color? color;
@@ -47,7 +53,11 @@ class _SparklinePainter extends CustomPainter {
     final path = Path();
     for (var i = 0; i < values.length; i++) {
       final x = size.width * i / (values.length - 1);
-      final y = size.height - 2 - (size.height - 4) * (values[i] - lo) / span;
+      // Half a stroke of room above and below keeps the line unclipped.
+      final y =
+          size.height -
+          Stroke.bold -
+          (size.height - 2 * Stroke.bold) * (values[i] - lo) / span;
       if (i == 0) {
         path.moveTo(x, y);
       } else {
@@ -59,7 +69,7 @@ class _SparklinePainter extends CustomPainter {
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5
+        ..strokeWidth = Stroke.regular
         ..strokeJoin = StrokeJoin.round,
     );
   }
@@ -82,7 +92,7 @@ class MetricsPanel extends StatelessWidget {
     this.trend = const [],
     this.trendCaption,
     this.trendValue,
-    this.width = 270,
+    this.width = Widths.panel,
   });
   final String title;
   final String? hint;
@@ -95,10 +105,15 @@ class MetricsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final mono = ts(const TypeSpec(11, 15, 400), c.textSecondary, mono: true);
+    final mono = ts(context.type.caption, c.textSecondary, mono: true);
     return Container(
       width: width,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.fromLTRB(
+        Space.lg,
+        Space.md,
+        Space.lg,
+        Space.md,
+      ),
       decoration: BoxDecoration(
         color: c.bgElevated,
         borderRadius: Radii.ctl,
@@ -114,7 +129,7 @@ class MetricsPanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: ts(ty.uiSmall, c.textPrimary, weight: 700),
+                  style: ts(ty.uiSmall, c.textPrimary, weight: Weight.bold),
                 ),
               ),
               if (hint != null)
@@ -122,10 +137,10 @@ class MetricsPanel extends StatelessWidget {
             ],
           ),
           if (trend.length > 1) ...[
-            const SizedBox(height: 8),
+            const Gap(Space.sm),
             Sparkline(trend),
             if (trendCaption != null || trendValue != null) ...[
-              const SizedBox(height: 4),
+              const Gap(Space.xxs),
               Row(
                 children: [
                   Expanded(
@@ -139,10 +154,10 @@ class MetricsPanel extends StatelessWidget {
               ),
             ],
           ],
-          const SizedBox(height: 8),
+          const Gap(Space.sm),
           for (final m in metrics)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 1.5),
+              padding: const EdgeInsets.symmetric(vertical: Space.hair),
               child: Row(
                 children: [
                   Expanded(

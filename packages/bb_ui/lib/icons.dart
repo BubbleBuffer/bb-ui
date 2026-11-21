@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'lucide.dart';
+import 'tokens.dart';
 
 enum Ico {
   plus,
@@ -403,12 +404,12 @@ class Icon20 extends StatelessWidget {
   const Icon20(
     this.icon, {
     super.key,
-    this.size = 20,
+    this.size = IconSize.lg,
     required this.color,
-    this.stroke = 1.5,
+    this.stroke = Stroke.regular,
   });
   final Ico icon;
-  final double size;
+  final IconSize size;
   final Color color;
 
   /// Line weight in px; picks the nearest Lucide weight.
@@ -416,8 +417,8 @@ class Icon20 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LucideIcon(
-    lucideWeight(icoGlyphs[icon]!, size, stroke),
-    size: size,
+    lucideWeight(icoGlyphs[icon]!, size.px, stroke),
+    size: size.px,
     color: color,
   );
 }
@@ -428,7 +429,7 @@ void paintIco(
   Ico icon,
   Rect rect,
   Color color, {
-  double stroke = 1.5,
+  double stroke = Stroke.regular,
 }) => paintLucide(
   canvas,
   lucideWeight(icoGlyphs[icon]!, rect.height, stroke),

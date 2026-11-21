@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import '../icons.dart';
 import '../tokens.dart';
 import 'search_result.dart';
+import '../layout.dart';
 
 /// A wrapped row of [chips]. Each is keyed `search-type-<id>`.
 class SearchTypeChips extends StatelessWidget {
@@ -14,8 +15,8 @@ class SearchTypeChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: 6,
-    runSpacing: 6,
+    spacing: Space.xs,
+    runSpacing: Space.xs,
     children: [
       for (final chip in chips)
         _TypeChip(
@@ -48,7 +49,7 @@ class _TypeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final m = context.mobile;
+    final m = context.touch;
     final ink = selected ? c.bgPrimary : c.textSecondary;
     return Semantics(
       button: true,
@@ -59,8 +60,8 @@ class _TypeChip extends StatelessWidget {
         // No alignment here: an aligned Container fills the Wrap's width, and
         // each chip would then take its own row.
         child: Container(
-          constraints: BoxConstraints(minHeight: m ? Layout.minTapTarget : 24),
-          padding: EdgeInsets.symmetric(horizontal: m ? 12 : 10),
+          constraints: BoxConstraints(minHeight: context.metrics.target.height),
+          padding: const EdgeInsets.symmetric(horizontal: Space.md),
           decoration: BoxDecoration(
             color: selected ? c.textPrimary : null,
             border: Border.all(color: selected ? c.textPrimary : c.border),
@@ -75,11 +76,11 @@ class _TypeChip extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: ts(m ? ty.ui : ty.uiSmall, ink, weight: 500),
+                  style: ts(m ? ty.ui : ty.uiSmall, ink, weight: Weight.medium),
                 ),
                 if (removable) ...[
-                  const SizedBox(width: 4),
-                  Icon20(Ico.close, size: 12, color: ink),
+                  const Gap(Space.xxs),
+                  Icon20(Ico.close, size: IconSize.xs, color: ink),
                 ],
               ],
             ),

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'buttons.dart';
 import 'icons.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// What a [NoticeBanner] says. The icon and the title repeat it, so colour is
 /// never the only signal.
@@ -41,26 +42,31 @@ class NoticeBanner extends StatelessWidget {
         Ico.circleCheck,
         c.okBg,
         p.constructiveInk,
-        p.constructiveInk.withValues(alpha: .35),
+        p.constructiveInk.withValues(alpha: Alpha.wash),
       ),
       NoticeKind.attention => (
         Ico.triangleAlert,
         c.attnBg,
         p.attentionInk,
-        p.attentionInk.withValues(alpha: .35),
+        p.attentionInk.withValues(alpha: Alpha.wash),
       ),
       NoticeKind.danger => (
         Ico.circleAlert,
         c.dangerBg,
         p.dangerInk,
-        p.dangerInk.withValues(alpha: .35),
+        p.dangerInk.withValues(alpha: Alpha.wash),
       ),
     };
     return Semantics(
       liveRegion: kind == NoticeKind.danger || kind == NoticeKind.attention,
       container: true,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+        padding: const EdgeInsets.fromLTRB(
+          Space.md,
+          Space.md,
+          Space.sm,
+          Space.md,
+        ),
         decoration: BoxDecoration(
           color: fill,
           borderRadius: Radii.field,
@@ -70,40 +76,46 @@ class NoticeBanner extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 1),
-              child: Icon20(icon, size: 20, color: ink),
+              padding: const EdgeInsets.only(top: Space.hair),
+              child: Icon20(icon, color: ink),
             ),
-            const SizedBox(width: 10),
+            const Gap(Space.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (title != null) ...[
-                    Text(title!, style: ts(ty.ui, c.textPrimary, weight: 700)),
-                    const SizedBox(height: 2),
+                    Text(
+                      title!,
+                      style: ts(ty.ui, c.textPrimary, weight: Weight.bold),
+                    ),
+                    const Gap(Space.hair),
                   ],
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    padding: const EdgeInsets.symmetric(vertical: Space.hair),
                     child: Text(
                       message,
-                      style: ts(ty.ui, c.textPrimary, weight: 400),
+                      style: ts(ty.ui, c.textPrimary, weight: Weight.regular),
                     ),
                   ),
                   if (actions.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Wrap(spacing: 8, runSpacing: 8, children: actions),
+                    const Gap(Space.sm),
+                    Wrap(
+                      spacing: Space.sm,
+                      runSpacing: Space.sm,
+                      children: actions,
+                    ),
                   ],
                 ],
               ),
             ),
             if (onDismiss != null)
               Padding(
-                padding: const EdgeInsets.only(left: 4),
+                padding: const EdgeInsets.only(left: Space.xxs),
                 child: IconBtn(
                   Ico.close,
-                  size: 28,
-                  glyph: 16,
+                  glyph: IconSize.sm,
                   semanticLabel: 'Dismiss',
                   onTap: onDismiss,
                 ),
@@ -137,38 +149,42 @@ class EmptyState extends StatelessWidget {
     final ty = context.type;
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 360),
+        constraints: const BoxConstraints(maxWidth: Widths.notice),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(Space.xl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: Sizes.emptyMark,
+                height: Sizes.emptyMark,
                 decoration: BoxDecoration(
                   color: c.bgHover,
                   borderRadius: Radii.panel,
                 ),
                 child: Center(
-                  child: Icon20(icon, size: 28, color: c.iconSecondary),
+                  child: Icon20(
+                    icon,
+                    size: IconSize.xxl,
+                    color: c.iconSecondary,
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const Gap(Space.lg),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: tsDisplay(ty.h3, c.textPrimary, weight: 700),
+                style: tsDisplay(ty.h3, c.textPrimary, weight: Weight.bold),
               ),
               if (message != null) ...[
-                const SizedBox(height: 8),
+                const Gap(Space.sm),
                 Text(
                   message!,
                   textAlign: TextAlign.center,
-                  style: ts(ty.ui, c.textSecondary, weight: 400),
+                  style: ts(ty.ui, c.textSecondary, weight: Weight.regular),
                 ),
               ],
-              if (action != null) ...[const SizedBox(height: 20), action!],
+              if (action != null) ...[const Gap(Space.xl), action!],
             ],
           ),
         ),
@@ -189,7 +205,7 @@ class ToastCard extends StatelessWidget {
     this.content,
     this.icon,
     this.progress,
-    this.width = 420,
+    this.width = Widths.form,
   });
   final String title;
   final String? message;
@@ -220,22 +236,27 @@ class ToastCard extends StatelessWidget {
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 16, 14),
+                padding: const EdgeInsets.fromLTRB(
+                  Space.md,
+                  Space.md,
+                  Space.lg,
+                  Space.lg,
+                ),
                 child: Row(
                   children: [
                     if (icon != null) ...[
                       Container(
-                        width: 36,
-                        height: 36,
+                        width: Sizes.tileSmall,
+                        height: Sizes.tileSmall,
                         decoration: BoxDecoration(
                           color: c.pawBg,
                           borderRadius: Radii.field,
                         ),
                         child: Center(
-                          child: Icon20(icon!, size: 20, color: c.accentText),
+                          child: Icon20(icon!, color: c.accentText),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const Gap(Space.md),
                     ],
                     Expanded(
                       child: Column(
@@ -244,17 +265,21 @@ class ToastCard extends StatelessWidget {
                         children: [
                           Text(
                             title,
-                            style: ts(ty.ui, c.textPrimary, weight: 700),
+                            style: ts(
+                              ty.ui,
+                              c.textPrimary,
+                              weight: Weight.bold,
+                            ),
                           ),
                           if (message != null) ...[
-                            const SizedBox(height: 2),
+                            const Gap(Space.hair),
                             Text(
                               message!,
                               style: ts(ty.uiSmall, c.textSecondary),
                             ),
                           ],
                           if (content != null) ...[
-                            const SizedBox(height: 6),
+                            const Gap(Space.xs),
                             content!,
                           ],
                         ],
@@ -268,14 +293,14 @@ class ToastCard extends StatelessWidget {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  height: 2,
+                  height: Stroke.bold,
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: FractionallySizedBox(
                       widthFactor: progress!.clamp(0.0, 1.0),
                       child: ColoredBox(
                         color: c.accent,
-                        child: const SizedBox(height: 2),
+                        child: const SizedBox(height: Stroke.bold),
                       ),
                     ),
                   ),
@@ -304,9 +329,9 @@ class ToastHandle {
 ToastHandle showToast(
   BuildContext context, {
   required Widget Function(BuildContext context, double? progress) builder,
-  Duration duration = const Duration(seconds: 4),
+  Duration duration = Motion.toast,
   Alignment alignment = Alignment.topCenter,
-  EdgeInsets margin = const EdgeInsets.only(top: 56),
+  EdgeInsets margin = const EdgeInsets.only(top: Space.xxxl),
   bool showProgress = true,
 }) {
   final overlay = Overlay.of(context, rootOverlay: true);
@@ -324,7 +349,7 @@ ToastHandle showToast(
   entry = OverlayEntry(
     builder: (context) => AppTheme(
       colors: theme.colors,
-      formFactor: theme.formFactor,
+      density: theme.density,
       child: _ToastHost(
         duration: duration,
         alignment: alignment,

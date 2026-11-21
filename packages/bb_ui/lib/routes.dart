@@ -5,11 +5,12 @@ import 'package:flutter/widgets.dart';
 
 import 'tokens.dart';
 
-/// Mobile pages slide in from the right. Desktop sheet routes stay transparent
-/// and animate their sheet inside the frame so the rail remains fixed.
+/// A [slide] page (a full-screen page on a phone) slides in from the right.
+/// Desktop sheet routes stay transparent and animate their sheet inside the
+/// frame so the rail remains fixed. Other pages appear at once.
 Route<T> pageRoute<T>(
   WidgetBuilder builder, {
-  required bool mobile,
+  required bool slide,
   required MotionDurations motion,
   RouteSettings? settings,
   bool desktopSheet = false,
@@ -17,22 +18,22 @@ Route<T> pageRoute<T>(
   settings: settings,
   opaque: !desktopSheet,
   maintainState: true,
-  transitionDuration: mobile || desktopSheet ? motion.sheet : Duration.zero,
-  reverseTransitionDuration: mobile
+  transitionDuration: slide || desktopSheet ? motion.sheet : Duration.zero,
+  reverseTransitionDuration: slide
       ? motion.standard
       : desktopSheet
       ? motion.sheet
       : Duration.zero,
   pageBuilder: (c, a, b) => builder(c),
   transitionsBuilder: (c, a, b, child) {
-    if ((!mobile && !desktopSheet) || MediaQuery.disableAnimationsOf(c)) {
+    if ((!slide && !desktopSheet) || MediaQuery.disableAnimationsOf(c)) {
       return child;
     }
-    if (!mobile) return child; // The desktop frame moves only the sheet, leaving the rail fixed.
+    if (!slide) return child; // The desktop frame moves only the sheet, leaving the rail fixed.
     final t = CurvedAnimation(parent: a, curve: Motion.easing);
     return SlideTransition(
       position: Tween(begin: const Offset(1, 0), end: Offset.zero).animate(t),
-      child: mobile
+      child: slide
           ? DecoratedBox(
               decoration: BoxDecoration(boxShadow: c.colors.stack),
               child: child,
@@ -67,7 +68,7 @@ class AppScrollBehavior extends ScrollBehavior {
     Widget child,
     ScrollableDetails details,
   ) {
-    if (context.mobile ||
+    if (context.touch ||
         details.direction == AxisDirection.left ||
         details.direction == AxisDirection.right) {
       return child;
@@ -76,9 +77,9 @@ class AppScrollBehavior extends ScrollBehavior {
     return RawScrollbar(
       controller: details.controller,
       thumbColor: c.palette.thumb,
-      thickness: 6,
-      radius: const Radius.circular(3),
-      crossAxisMargin: 2,
+      thickness: Stroke.seam,
+      radius: const Radius.circular(Radii.sm),
+      crossAxisMargin: Space.hair,
       child: child,
     );
   }

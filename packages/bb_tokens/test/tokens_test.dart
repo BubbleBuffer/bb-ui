@@ -31,9 +31,43 @@ void main() {
     expect(spaceColor('nope', Brightness.dark), isNull);
   });
 
-  test('the form factor follows the window width', () {
-    expect(FormFactor.forWidth(FormFactor.breakpoint - 1), FormFactor.mobile);
-    expect(FormFactor.forWidth(FormFactor.breakpoint), FormFactor.desktop);
+  test('the size class follows the width', () {
+    expect(SizeClass.forWidth(SizeClass.mediumWidth - 1), SizeClass.compact);
+    expect(SizeClass.forWidth(SizeClass.mediumWidth), SizeClass.medium);
+    expect(SizeClass.forWidth(SizeClass.expandedWidth), SizeClass.expanded);
+    expect(SizeClass.expanded.atLeast(SizeClass.medium), isTrue);
+    expect(SizeClass.compact.atLeast(SizeClass.medium), isFalse);
+  });
+
+  test('scales only grow', () {
+    void ascending(List<double> values) {
+      for (var i = 1; i < values.length; i++) {
+        expect(values[i], greaterThan(values[i - 1]));
+      }
+    }
+
+    ascending(Space.steps);
+    ascending([for (final s in ControlSize.values) s.height]);
+    ascending([for (final s in IconSize.values) s.px]);
+    ascending([for (final s in NumeralSize.values) s.spec.size]);
+  });
+
+  test('touch targets are large enough to tap', () {
+    expect(
+      Metrics.touch.target.height,
+      greaterThanOrEqualTo(Layout.minTapTarget),
+    );
+    expect(Metrics.touch.row.height, greaterThanOrEqualTo(Layout.minTapTarget));
+    expect(Density.forPlatform(TargetPlatform.iOS), Density.touch);
+    expect(Density.forPlatform(TargetPlatform.linux), Density.pointer);
+  });
+
+  test('every metric spacing is a step of the scale', () {
+    for (final m in [Metrics.pointer, Metrics.touch]) {
+      for (final v in [m.iconGap, m.padX, m.insetX]) {
+        expect(Space.steps, contains(v));
+      }
+    }
   });
 
   test('bundled font families keep Scratch names', () {
@@ -44,8 +78,6 @@ void main() {
 
   test('kit tokens match the Scratch-skin theme.css', () {
     const layout = KitLayout.standard;
-    expect(layout.sizeMedium, 600);
-    expect(layout.sizeExpanded, 1000);
     expect(layout.fitComposer, 460);
     expect(layout.paneMinWidth, 200);
     expect(layout.paneMinHeight, 120);
@@ -58,20 +90,26 @@ void main() {
   testWidgets('context reads the nearest AppTheme', (tester) async {
     late TypeScale type;
     late AppColors colors;
+    late String picked;
     await tester.pumpWidget(
       AppTheme(
         colors: AppColors.darkTheme,
-        formFactor: FormFactor.mobile,
-        child: Builder(
-          builder: (context) {
-            type = context.type;
-            colors = context.colors;
-            return const SizedBox();
-          },
+        density: Density.touch,
+        child: SizeClassScope(
+          sizeClass: SizeClass.medium,
+          child: Builder(
+            builder: (context) {
+              type = context.type;
+              colors = context.colors;
+              picked = context.adaptive(compact: 'c', expanded: 'e');
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );
     expect(colors, same(AppColors.darkTheme));
-    expect(type, same(TypeScale.mobile));
+    expect(type, same(TypeScale.touch));
+    expect(picked, 'c');
   });
 }

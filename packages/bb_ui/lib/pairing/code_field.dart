@@ -128,13 +128,13 @@ class _CodeFieldState extends State<CodeField> {
       behavior: HitTestBehavior.opaque,
       onTap: _focus.requestFocus,
       child: FieldFrame(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        height: ControlSize.xl.height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.md),
         child: PlainField(
           key: widget.fieldKey,
           controller: widget.controller,
           focusNode: _focus,
-          style: ts(const TypeSpec(15, 22, 400), c.textPrimary, mono: true),
+          style: ts(context.type.body, c.textPrimary, mono: true),
           placeholder: widget.placeholder,
           semanticLabel: widget.semanticLabel,
           onChanged: widget.onChanged,

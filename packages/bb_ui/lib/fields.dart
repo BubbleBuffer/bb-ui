@@ -7,6 +7,7 @@ import 'buttons.dart';
 import 'icons.dart';
 import 'selection.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
 /// A single-line text field with a placeholder, built on EditableText.
 class PlainField extends StatefulWidget {
@@ -109,7 +110,7 @@ class _PlainFieldState extends State<PlainField> {
             cursorColor: c.textPrimary,
             backgroundCursorColor: c.textTertiary,
             selectionColor: c.textSelection,
-            cursorWidth: 1.5,
+            cursorWidth: Stroke.regular,
             autofocus: widget.autofocus,
             onChanged: widget.onChanged,
             onSubmitted: widget.onSubmitted,
@@ -148,21 +149,23 @@ class SearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final ty = context.type;
-    final mobile = context.mobile;
+    final m = context.metrics;
     return FieldFrame(
-      height: mobile ? 40 : 32,
-      padding: EdgeInsets.symmetric(horizontal: mobile ? 12 : 8),
+      height: m.field.height,
+      padding: EdgeInsets.symmetric(horizontal: m.padX),
       child: Row(
         children: [
-          Icon20(Ico.search, size: mobile ? 20 : 16, color: c.iconTertiary),
-          SizedBox(width: mobile ? 8 : 6),
+          Icon20(Ico.search, size: m.iconSmall, color: c.iconTertiary),
+          Gap(m.iconGap),
           Expanded(
             child: PlainField(
               key: fieldKey,
               controller: controller,
               focusNode: focusNode,
-              style: ts(mobile ? ty.body : ty.ui, c.textPrimary, weight: 400),
-              placeholder: placeholder ?? (mobile ? 'Search' : 'Search pages…'),
+              style: ts(ty.item, c.textPrimary, weight: Weight.regular),
+              placeholder:
+                  placeholder ??
+                  (context.sizeClass.isCompact ? 'Search' : 'Search pages…'),
               onChanged: onChanged,
             ),
           ),
@@ -176,8 +179,8 @@ class SearchField extends StatelessWidget {
                       controller.clear();
                       onChanged('');
                     },
-                    size: 24,
-                    glyph: 14,
+                    size: ControlSize.xs,
+                    glyph: IconSize.xs,
                     color: c.iconTertiary,
                     semanticLabel: 'Clear search',
                   ),
@@ -194,7 +197,7 @@ class FieldFrame extends StatefulWidget {
     super.key,
     required this.child,
     this.height,
-    this.padding = const EdgeInsets.symmetric(horizontal: 8),
+    this.padding = const EdgeInsets.symmetric(horizontal: Space.sm),
   });
   final Widget child;
   final double? height;
@@ -241,13 +244,13 @@ class _FieldFocusRing extends CustomPainter {
   final Color color;
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = (Offset.zero & size).inflate(3);
+    final rect = (Offset.zero & size).inflate(Sizes.focusGap);
     canvas.drawRRect(
       Radii.field.toRRect(rect),
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+        ..strokeWidth = Stroke.bold,
     );
   }
 
@@ -324,8 +327,8 @@ class _ObscuredFieldState extends State<ObscuredField> {
       onTap: _focus.requestFocus,
       onFocus: _focus.requestFocus,
       child: FieldFrame(
-        height: context.mobile ? 44 : 36,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        height: context.metrics.listRow.height,
+        padding: const EdgeInsets.symmetric(horizontal: Space.md),
         child: Stack(
           alignment: Alignment.centerLeft,
           children: [
@@ -347,7 +350,7 @@ class _ObscuredFieldState extends State<ObscuredField> {
               cursorColor: c.textPrimary,
               backgroundCursorColor: c.textTertiary,
               selectionColor: c.textSelection,
-              cursorWidth: 1.5,
+              cursorWidth: Stroke.regular,
               autofocus: widget.autofocus,
               obscureText: true,
               autocorrect: false,

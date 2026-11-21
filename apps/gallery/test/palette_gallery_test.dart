@@ -79,7 +79,7 @@ void main() {
       tester.element(find.byType(CommandPalette).first),
     );
     expect(theme.colors.dark, isTrue);
-    expect(theme.formFactor, FormFactor.mobile);
+    expect(theme.density, Density.touch);
     expect(find.byKey(const ValueKey('palette-cancel')), findsWidgets);
     expect(tester.takeException(), isNull);
   });

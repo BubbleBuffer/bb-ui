@@ -146,11 +146,11 @@ class _FocusRing extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRRect(
-      radius.toRRect((Offset.zero & size).inflate(3)),
+      radius.toRRect((Offset.zero & size).inflate(Sizes.focusGap)),
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+        ..strokeWidth = Stroke.bold,
     );
   }
 

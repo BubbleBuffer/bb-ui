@@ -15,15 +15,16 @@ import 'icons.dart';
 import 'menu.dart';
 import 'routes.dart';
 import 'tokens.dart';
+import 'layout.dart';
 
-/// Shows [builder] in a centred panel, [width] x [height] at most (and 80 px
-/// smaller than the window). A [shrink] panel is as tall as its content.
+/// Shows [builder] in a centred panel, [width] x [height] at most (and a
+/// margin smaller than the window). A [shrink] panel is as tall as its content.
 /// Escape and a tap on the barrier close it.
 Future<T?> showModalPanel<T>(
   BuildContext context,
   WidgetBuilder builder, {
-  double width = 720,
-  double height = 640,
+  double width = Widths.content,
+  double height = Heights.dialog,
   bool shrink = false,
 }) => Navigator.of(context).push(
   ModalPanelRoute<T>(
@@ -66,9 +67,11 @@ class ModalPanelRoute<T> extends PopupRoute<T> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
+    // A dialog route sizes against the screen it covers.
+    // ignore: bb_lints/no_window_size
     final size = MediaQuery.sizeOf(context);
-    final w = (size.width - 80).clamp(280.0, width);
-    final h = (size.height - 80).clamp(200.0, height);
+    final w = (size.width - 2 * Space.xxxl).clamp(Widths.panel, width);
+    final h = (size.height - 2 * Space.xxxl).clamp(Heights.dialogMin, height);
     return Center(
       child: CallbackShortcuts(
         bindings: {
@@ -118,7 +121,7 @@ Future<bool> showConfirm(
       danger: danger,
       onDone: (v) => Navigator.of(ctx).pop(v),
     ),
-    width: 320,
+    width: Widths.dialog,
     shrink: true,
   );
   return r ?? false;
@@ -144,7 +147,12 @@ class ConfirmBox extends StatelessWidget {
     final c = context.colors;
     final ty = context.type;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      padding: const EdgeInsets.fromLTRB(
+        Space.xl,
+        Space.xl,
+        Space.xl,
+        Space.lg,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -152,17 +160,21 @@ class ConfirmBox extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: tsDisplay(const TypeSpec(19, 24, 640), c.textPrimary),
+            style: tsDisplay(
+              context.type.h3,
+              c.textPrimary,
+              weight: Weight.display,
+            ),
           ),
           if (message != null) ...[
-            const SizedBox(height: 6),
+            const Gap(Space.xs),
             Text(
               message!,
               textAlign: TextAlign.center,
-              style: ts(ty.uiSmall, c.textSecondary, weight: 400),
+              style: ts(ty.uiSmall, c.textSecondary, weight: Weight.regular),
             ),
           ],
-          const SizedBox(height: 16),
+          const Gap(Space.lg),
           DialogButton(
             key: const ValueKey('confirm-ok'),
             label: confirmLabel,
@@ -170,7 +182,7 @@ class ConfirmBox extends StatelessWidget {
             filled: true,
             onTap: () => onDone(true),
           ),
-          const SizedBox(height: 8),
+          const Gap(Space.sm),
           DialogButton(
             key: const ValueKey('confirm-cancel'),
             label: cancelLabel,
@@ -207,13 +219,17 @@ class DialogButton extends StatelessWidget {
       borderRadius: Radii.ctl,
       background: filled ? (enabled ? base : c.bgTertiary) : c.bgPrimary,
       hoverBackground: filled
-          ? (base == c.accent ? c.accentHover : base.withValues(alpha: .9))
+          ? (base == c.accent
+                ? c.accentHover
+                : base.withValues(alpha: Alpha.strong))
           : c.bgHover,
       pressedBackground: filled ? base : c.bgPressed,
       border: filled ? null : Border.all(color: c.thread),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: SizedBox(
-        height: height ?? (context.mobile ? 44 : 32),
+      padding: const EdgeInsets.symmetric(horizontal: Space.md),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: height ?? context.metrics.control.height,
+        ),
         child: Center(
           child: Text(
             label,
@@ -224,7 +240,7 @@ class DialogButton extends StatelessWidget {
                   : filled
                   ? (base == c.accent || c.dark ? c.onAccent : c.bgPrimary)
                   : c.textPrimary,
-              weight: filled ? 700 : 600,
+              weight: filled ? Weight.bold : Weight.semibold,
             ),
           ),
         ),
@@ -242,7 +258,7 @@ Future<T?> pushScreen<T>(
   pageRoute<T>(
     builder,
     motion: Motion.of(context),
-    mobile: true,
+    slide: true,
     settings: RouteSettings(name: name),
   ),
 );
@@ -274,17 +290,17 @@ class ScreenScaffold extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              height: Layout.topbarHeight,
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: Layout.topbarHeight),
               child: Row(
                 children: [
-                  const SizedBox(width: 4),
+                  const Gap(Space.xxs),
                   IconBtn(
                     Ico.chevronLeft,
                     key: const ValueKey('screen-back'),
                     onTap: () => Navigator.of(context).maybePop(),
-                    size: 44,
-                    glyph: 24,
+                    size: ControlSize.xl,
+                    glyph: IconSize.xl,
                     color: c.iconPrimary,
                     semanticLabel: 'Back',
                   ),
@@ -293,11 +309,15 @@ class ScreenScaffold extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: ts(context.type.ui, c.textPrimary, weight: 600),
+                      style: ts(
+                        context.type.ui,
+                        c.textPrimary,
+                        weight: Weight.semibold,
+                      ),
                     ),
                   ),
                   ...actions,
-                  const SizedBox(width: 8),
+                  const Gap(Space.sm),
                 ],
               ),
             ),
@@ -311,8 +331,8 @@ class ScreenScaffold extends StatelessWidget {
 
 /// A small rotating arc (work in progress).
 class Spinner extends StatefulWidget {
-  const Spinner({super.key, this.size = 16, this.color});
-  final double size;
+  const Spinner({super.key, this.size = IconSize.sm, this.color});
+  final IconSize size;
   final Color? color;
 
   @override
@@ -320,10 +340,8 @@ class Spinner extends StatefulWidget {
 }
 
 class _SpinnerState extends State<Spinner> with SingleTickerProviderStateMixin {
-  late final _ctl = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..repeat();
+  late final _ctl = AnimationController(vsync: this, duration: Motion.spin)
+    ..repeat();
 
   @override
   void dispose() {
@@ -333,8 +351,8 @@ class _SpinnerState extends State<Spinner> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: widget.size,
-    height: widget.size,
+    width: widget.size.px,
+    height: widget.size.px,
     child: AnimatedBuilder(
       animation: _ctl,
       builder: (context, _) => CustomPaint(
@@ -352,15 +370,18 @@ class _ArcPainter extends CustomPainter {
   final double t;
   final Color color;
 
+  /// The arc's sweep in half turns.
+  static const _sweep = 1.4;
+
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width / 8
+      ..strokeWidth = Stroke.bold
       ..strokeCap = StrokeCap.round;
-    final r = (Offset.zero & size).deflate(size.width / 8);
-    canvas.drawArc(r, t * 2 * math.pi, math.pi * 1.4, false, p);
+    final r = (Offset.zero & size).deflate(Stroke.bold);
+    canvas.drawArc(r, t * 2 * math.pi, math.pi * _sweep, false, p);
   }
 
   @override
@@ -376,7 +397,7 @@ class InputBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FieldFrame(
-      height: height ?? (context.mobile ? 40 : 32),
+      height: height ?? context.metrics.field.height,
       child: child,
     );
   }
@@ -404,8 +425,7 @@ class PanelRow extends StatelessWidget {
     selectedColor: context.colors.bgPressed,
     borderRadius: Radii.ctl,
     padding:
-        padding ??
-        EdgeInsets.symmetric(horizontal: context.mobile ? Layout.gutter : 8),
+        padding ?? EdgeInsets.symmetric(horizontal: context.metrics.insetX),
     child: child,
   );
 }

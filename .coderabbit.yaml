@@ -59,8 +59,7 @@ reviews:
         check-private-strings.sh must report sensitive hits as file:line only,
         still run public checks (secret formats, self-hosted runners, tool
         folders) without rules, and exit non-zero for --require-patterns with
-        no rules. check-raw-colours.sh must keep scanning untracked Dart under
-        packages/bb_ui and apps, excluding only tests and *.g.dart.
+        no rules. Raw colours are the bb_lints no_raw_colors rule's job.
 
     - path: "**/pubspec.yaml"
       instructions: >-

@@ -87,7 +87,7 @@ void main() {
     expect(find.text('Use light theme'), findsOneWidget);
     final theme = AppTheme.of(tester.element(find.byType(SearchPanel)));
     expect(theme.colors.dark, isTrue);
-    expect(theme.formFactor, FormFactor.mobile);
+    expect(theme.density, Density.touch);
     expect(find.text('DOCUMENT'), findsWidgets);
     expect(tester.takeException(), isNull);
   });

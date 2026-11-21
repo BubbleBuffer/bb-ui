@@ -247,52 +247,304 @@ AppColors _appColors(ProfileColors p, {required bool dark}) => AppColors(
   stack: p.shadowStack,
 );
 
-/// One entry of the type scale: size / line height in logical px, weight.
-class TypeSpec {
-  const TypeSpec(this.size, this.line, this.weight);
-  final double size, line;
-  final int weight;
+// ---------------------------------------------------------------------------
+// Scales. Widgets never write a number for spacing, size, type, stroke,
+// opacity or timing: they pick a step from one of these. The bb_lints
+// analyzer plugin enforces it (packages/bb_lints).
+// ---------------------------------------------------------------------------
+
+/// The spacing scale: every gap, padding, margin and inset is one step.
+///
+/// Gaps between siblings use `Row`/`Column` `spacing:` or bb_ui's `Gap`.
+abstract final class Space {
+  static const double hair = 2;
+  static const double xxs = 4;
+  static const double xs = 6;
+  static const double sm = 8;
+  static const double md = 12;
+  static const double lg = 16;
+  static const double xl = 24;
+  static const double xxl = 32;
+  static const double xxxl = 48;
+
+  /// Every step, smallest first.
+  static const steps = [hair, xxs, xs, sm, md, lg, xl, xxl, xxxl];
 }
 
+/// Heights of controls: buttons, fields, rows and chips.
+enum ControlSize {
+  xs(24),
+  sm(28),
+  md(32),
+  lg(36),
+  xl(44),
+  xxl(48);
+
+  const ControlSize(this.height);
+
+  /// The control's height in logical pixels.
+  final double height;
+}
+
+/// Icon sizes. Lucide picks a stroke weight per size, so line weight stays
+/// even across steps.
+enum IconSize {
+  xs(14),
+  sm(16),
+  md(18),
+  lg(20),
+  xl(24),
+
+  /// The mark of an empty state.
+  xxl(28);
+
+  const IconSize(this.px);
+
+  /// The glyph box in logical pixels.
+  final double px;
+}
+
+/// Line widths for borders, rules and painted strokes.
+abstract final class Stroke {
+  static const double hair = 1;
+  static const double regular = 1.5;
+  static const double bold = 2;
+  static const double seam = 3;
+}
+
+/// Opacity steps for a colour laid over another.
+abstract final class Alpha {
+  /// A faint wash, for example a hover tint over a patch.
+  static const double tint = .12;
+
+  /// A visible but quiet ring or fill.
+  static const double wash = .35;
+
+  /// Half strength, for example a disabled or danger border.
+  static const double muted = .5;
+
+  /// Nearly opaque, for example a pressed fill.
+  static const double strong = .9;
+}
+
+/// Widths of floating, side and centred surfaces.
+abstract final class Widths {
+  static const double popover = 220;
+  static const double menu = 260;
+  static const double tooltip = 280;
+  static const double panel = 280;
+  static const double dialog = 320;
+  static const double picker = 340;
+  static const double notice = 360;
+  static const double form = 420;
+  static const double sheet = 480;
+  static const double palette = 560;
+  static const double content = 720;
+}
+
+/// Heights of bounded surfaces.
+abstract final class Heights {
+  /// A scrolling list inside a sheet or popover.
+  static const double list = 360;
+
+  /// A centred dialog's largest height.
+  static const double dialog = 640;
+
+  /// The shortest a centred dialog gets on a small screen.
+  static const double dialogMin = 200;
+}
+
+/// Fixed sizes of small components: marks, tiles, handles and frames.
+abstract final class Sizes {
+  /// A status or legend dot.
+  static const double dot = 8;
+
+  /// A marker bullet in a list, and the bar-shaped marker beside it.
+  static const double bullet = 8, barWidth = 4, barHeight = 12;
+
+  /// A card's coloured leading edge.
+  static const double edge = 4;
+
+  /// The task checkbox.
+  static const double checkbox = 22;
+
+  /// A square icon tile at the start of a row.
+  static const double tile = 40;
+
+  /// A small icon tile, such as a notice's icon.
+  static const double tileSmall = 36;
+
+  /// The round mark above an empty state.
+  static const double emptyMark = 56;
+
+  /// A pill-shaped label's height.
+  static const double pill = 20;
+
+  /// The switch track and its thumb.
+  static const double switchWidth = 30, switchHeight = 18, switchThumb = 14;
+
+  /// The grab handle at the top of a bottom sheet.
+  static const double grabWidth = 36, grabHeight = 4;
+
+  /// The label column of a key/value row.
+  static const double labelColumn = 88;
+
+  /// The frame a QR code sits in, and the quiet margin a QR code needs
+  /// around its modules as a share of the frame.
+  static const double qr = 200, qrQuietZone = 1 / 12;
+
+  /// A sparkline's height.
+  static const double sparkline = 24;
+
+  /// A short vertical rule between toolbar items.
+  static const double rule = 20;
+
+  /// A text selection handle's radius.
+  static const double selectionHandle = 7;
+
+  /// How far a focus ring sits outside its control.
+  static const double focusGap = 3;
+
+  /// A display picker's preview of the screen arrangement.
+  static const double displayMap = 124;
+}
+
+/// A font weight from the type ramp.
+enum Weight {
+  regular(FontWeight.w400, 400),
+  medium(FontWeight.w500, 500),
+  semibold(FontWeight.w600, 600),
+
+  /// The display face's condensed title weight.
+  display(FontWeight.w600, 640),
+  bold(FontWeight.w700, 700);
+
+  const Weight(this.fontWeight, this.axis);
+
+  /// The nearest static weight, for faces without a weight axis.
+  final FontWeight fontWeight;
+
+  /// The value of a variable font's `wght` axis.
+  final double axis;
+}
+
+/// One entry of the type scale: size and line height in logical px, weight.
+/// Only [TypeScale] makes them; widgets pick a role from `context.type`.
+class TypeSpec {
+  const TypeSpec._(this.size, this.line, this.weight);
+  final double size, line;
+  final Weight weight;
+}
+
+/// The type ramp. [pointer] is for mouse and trackpad, [touch] for fingers;
+/// `AppTheme` picks one from its [Density].
 class TypeScale {
-  const TypeScale({
+  const TypeScale._({
     required this.pageTitle,
+    required this.display,
     required this.h1,
     required this.h2,
     required this.h3,
+    required this.title,
     required this.body,
+    required this.item,
     required this.ui,
     required this.uiSmall,
+    required this.caption,
+    required this.micro,
     required this.code,
+    required this.codeSmall,
   });
-  final TypeSpec pageTitle, h1, h2, h3, body, ui, uiSmall, code;
 
-  static const desktop = TypeScale(
-    pageTitle: TypeSpec(40, 48, 700),
-    h1: TypeSpec(30, 39, 600),
-    h2: TypeSpec(24, 31.2, 600),
-    h3: TypeSpec(20, 26, 600),
-    body: TypeSpec(16, 24, 400),
-    ui: TypeSpec(14, 20, 500),
-    uiSmall: TypeSpec(12, 16, 500),
-    code: TypeSpec(13.6, 20.4, 400),
+  /// The page's name above everything else.
+  final TypeSpec pageTitle;
+
+  /// A large name in the display face, such as a selected item's title.
+  final TypeSpec display;
+
+  /// Section headings, largest first.
+  final TypeSpec h1, h2, h3;
+
+  /// The name on a row or card.
+  final TypeSpec title;
+
+  /// Running text.
+  final TypeSpec body;
+
+  /// A row in a menu, list or setting: [ui] with a pointer, [body] by touch.
+  final TypeSpec item;
+
+  /// Labels on controls.
+  final TypeSpec ui;
+
+  /// Secondary labels and descriptions.
+  final TypeSpec uiSmall;
+
+  /// Fine print: metrics, counts and timestamps.
+  final TypeSpec caption;
+
+  /// Badges and eyebrows inside small marks.
+  final TypeSpec micro;
+
+  /// Monospace for code and identifiers.
+  final TypeSpec code, codeSmall;
+
+  static const pointer = TypeScale._(
+    pageTitle: TypeSpec._(40, 48, Weight.bold),
+    display: TypeSpec._(32, 34, Weight.bold),
+    h1: TypeSpec._(30, 39, Weight.semibold),
+    h2: TypeSpec._(24, 31.2, Weight.semibold),
+    h3: TypeSpec._(20, 26, Weight.semibold),
+    title: TypeSpec._(16, 20, Weight.display),
+    body: TypeSpec._(16, 24, Weight.regular),
+    item: TypeSpec._(14, 20, Weight.medium),
+    ui: TypeSpec._(14, 20, Weight.medium),
+    uiSmall: TypeSpec._(12, 16, Weight.medium),
+    caption: TypeSpec._(11, 15, Weight.regular),
+    micro: TypeSpec._(10, 12, Weight.semibold),
+    code: TypeSpec._(13.6, 20.4, Weight.regular),
+    codeSmall: TypeSpec._(12, 16, Weight.regular),
   );
 
-  static const mobile = TypeScale(
-    pageTitle: TypeSpec(28, 33.6, 700),
-    h1: TypeSpec(24, 31.2, 600),
-    h2: TypeSpec(20, 26, 600),
-    h3: TypeSpec(18, 23.4, 600),
-    body: TypeSpec(16, 22, 400),
-    ui: TypeSpec(15, 20, 500),
-    uiSmall: TypeSpec(13, 16, 500),
-    code: TypeSpec(13.6, 20.4, 400), // 85% of body, line 1.5
+  static const touch = TypeScale._(
+    pageTitle: TypeSpec._(28, 33.6, Weight.bold),
+    display: TypeSpec._(28, 32, Weight.bold),
+    h1: TypeSpec._(24, 31.2, Weight.semibold),
+    h2: TypeSpec._(20, 26, Weight.semibold),
+    h3: TypeSpec._(18, 23.4, Weight.semibold),
+    title: TypeSpec._(16, 20, Weight.display),
+    body: TypeSpec._(16, 22, Weight.regular),
+    item: TypeSpec._(16, 22, Weight.medium),
+    ui: TypeSpec._(15, 20, Weight.medium),
+    uiSmall: TypeSpec._(13, 16, Weight.medium),
+    caption: TypeSpec._(11, 15, Weight.regular),
+    micro: TypeSpec._(10, 12, Weight.semibold),
+    code: TypeSpec._(13.6, 20.4, Weight.regular),
+    codeSmall: TypeSpec._(12, 16, Weight.regular),
   );
 }
 
-FontWeight fw(int w) => FontWeight.values[(w ~/ 100 - 1).clamp(0, 8)];
+/// Large monospace numerals for codes people type in elsewhere ([md]) or
+/// compare at a glance ([lg]).
+enum NumeralSize {
+  md(TypeSpec._(22, 25.3, Weight.regular)),
+  lg(TypeSpec._(44, 50.6, Weight.regular));
 
-TextStyle ts(TypeSpec s, Color color, {int? weight, bool mono = false}) =>
+  const NumeralSize(this.spec);
+  final TypeSpec spec;
+}
+
+/// The monospace style for numerals of [size], slightly tracked out.
+TextStyle tsNumeral(NumeralSize size, Color color) => ts(
+  size.spec,
+  color,
+  mono: true,
+).copyWith(letterSpacing: _numeralTracking * size.spec.size);
+
+const _numeralTracking = .04;
+
+/// The body text style for [s] in [color]. [weight] overrides the role's.
+TextStyle ts(TypeSpec s, Color color, {Weight? weight, bool mono = false}) =>
     TextStyle(
       inherit: false,
       fontFamily: mono ? monoFamily : sansFamily,
@@ -301,49 +553,52 @@ TextStyle ts(TypeSpec s, Color color, {int? weight, bool mono = false}) =>
       fontSize: s.size,
       height: s.line / s.size,
       leadingDistribution: TextLeadingDistribution.even,
-      fontWeight: fw(weight ?? s.weight),
+      fontWeight: (weight ?? s.weight).fontWeight,
       color: color,
       decoration: TextDecoration.none,
     );
 
-TextStyle tsRaw(double size, double line, int weight, Color color) =>
-    ts(TypeSpec(size, line, weight), color);
-
-/// Display typography, including the prototype's condensed variable axes.
-TextStyle tsDisplay(TypeSpec s, Color color, {int? weight}) {
-  final w = weight ?? 640;
-  return ts(s, color, weight: w).copyWith(
+/// Display typography, with the condensed variable axes of the display face.
+TextStyle tsDisplay(TypeSpec s, Color color, {Weight weight = Weight.display}) {
+  return ts(s, color, weight: weight).copyWith(
     fontFamily: displayFamily,
     fontVariations: [
-      FontVariation('opsz', s.size.clamp(12.0, 96.0)),
-      const FontVariation('wdth', 90),
-      FontVariation('wght', w.toDouble()),
+      FontVariation('opsz', s.size.clamp(_opszMin, _opszMax)),
+      const FontVariation('wdth', _displayWidth),
+      FontVariation('wght', weight.axis),
     ],
-    letterSpacing: -.03 * s.size,
+    letterSpacing: _displayTracking * s.size,
   );
 }
 
+const _opszMin = 12.0, _opszMax = 96.0, _displayWidth = 90.0;
+const _displayTracking = -.03;
+
 class Layout {
-  // desktop
-  static const contentWidth = 720.0;
+  static const contentWidth = Widths.content;
   static const textWidth = 708.0;
-  static const blockPaddingX = 2.0;
-  static const blockRowGap = 2.0;
+  static const blockPaddingX = Space.hair;
+  static const blockRowGap = Space.hair;
   static const textBlockHeight = 28.0;
   static const topbarHeight = 44.0;
   static const sidebarWidth = 240.0;
   static const sidebarRowHeight = 30.0;
   static const handleOffset = -44.0;
-  // mobile
-  static const gutter = 18.0;
+
+  /// Side padding of a full-width page or list on a compact screen.
+  static const gutter = Space.lg;
   static const keyboardToolbarHeight = 44.0;
   static const minTapTarget = 44.0;
   static const listRowHeight = 44.0;
-  static const indent = 24.0;
+  static const indent = Space.xl;
+
+  /// Shares of the window a floating surface takes: the command palette's
+  /// distance from the top and its largest height, and a bottom sheet's
+  /// largest height.
+  static const paletteTop = .14, paletteHeight = .6, sheetHeight = .85;
 }
 
 class Radii {
-  // Legacy scalar values for specialised editor geometry.
   static const sm = 4.0, md = 6.0, lg = 10.0, sheet = 12.0;
   static const ctl = BorderRadius.only(
     topLeft: Radius.circular(7),
@@ -364,6 +619,9 @@ class Radii {
     bottomLeft: Radius.circular(16),
   );
   static const pill = BorderRadius.all(Radius.circular(999));
+
+  /// A uniform corner of [sm], [md], [lg] or [sheet].
+  static BorderRadius all(double r) => BorderRadius.all(Radius.circular(r));
 }
 
 class Motion {
@@ -371,6 +629,25 @@ class Motion {
   static const standard = Duration(milliseconds: 220);
   static const sheet = Duration(milliseconds: 250);
   static const wiggle = Duration(milliseconds: 200);
+
+  /// How long a pointer rests on a control before its tooltip shows.
+  static const hoverDelay = Duration(milliseconds: 500);
+
+  /// How long a tooltip stays after a long press ends.
+  static const linger = Duration(milliseconds: 1500);
+
+  /// How long a confirmation such as "Copied" replaces a label.
+  static const confirm = Duration(seconds: 2);
+
+  /// How long a toast stays before it dismisses itself.
+  static const toast = Duration(seconds: 4);
+
+  /// After a tooltip hides, how long the next one shows without the delay.
+  static const warm = Duration(milliseconds: 300);
+
+  /// One turn of a spinner.
+  static const spin = Duration(milliseconds: 900);
+
   static const ease = Cubic(.2, .8, .2, 1);
   static const settle = Cubic(.22, 1.25, .36, 1);
   static const easing = ease;
@@ -387,63 +664,207 @@ class MotionDurations {
   Duration get wiggle => reduced ? Duration.zero : Motion.wiggle;
 }
 
-/// Desktop: sidebar, top search, selection toolbar, popovers, drag handles.
-/// Mobile: stack navigation, bottom bar, keyboard toolbar, bottom sheets.
-enum FormFactor {
-  desktop,
-  mobile;
+// ---------------------------------------------------------------------------
+// Adapting. Two independent questions replace the old desktop/mobile switch:
+// how the user points (Density, set by the host) and how much room a widget
+// has (SizeClass, from the nearest SizeClassScope or else the window).
+// ---------------------------------------------------------------------------
 
-  /// The one switch between the two layouts: the window's logical width.
-  static const breakpoint = 768.0;
+/// How the user points. It sets control heights, icon sizes, row padding and
+/// the type ramp, not the layout.
+enum Density {
+  pointer,
+  touch;
 
-  static FormFactor forWidth(double width) =>
-      width < breakpoint ? mobile : desktop;
+  /// Touch on phones and tablets, pointer elsewhere.
+  static Density forPlatform(TargetPlatform platform) => switch (platform) {
+    TargetPlatform.android ||
+    TargetPlatform.iOS ||
+    TargetPlatform.fuchsia => touch,
+    TargetPlatform.linux ||
+    TargetPlatform.macOS ||
+    TargetPlatform.windows => pointer,
+  };
+
+  Metrics get metrics => this == touch ? Metrics.touch : Metrics.pointer;
+  TypeScale get type => this == touch ? TypeScale.touch : TypeScale.pointer;
+}
+
+/// Sizes that follow [Density]. Read them with `context.metrics`.
+class Metrics {
+  const Metrics._({
+    required this.row,
+    required this.listRow,
+    required this.tallRow,
+    required this.field,
+    required this.control,
+    required this.target,
+    required this.icon,
+    required this.iconSmall,
+    required this.iconGap,
+    required this.padX,
+    required this.insetX,
+  });
+
+  static const pointer = Metrics._(
+    row: ControlSize.sm,
+    listRow: ControlSize.lg,
+    tallRow: 64,
+    field: ControlSize.md,
+    control: ControlSize.md,
+    target: ControlSize.xs,
+    icon: IconSize.lg,
+    iconSmall: IconSize.sm,
+    iconGap: Space.sm,
+    padX: Space.sm,
+    insetX: Space.sm,
+  );
+
+  static const touch = Metrics._(
+    row: ControlSize.xl,
+    listRow: ControlSize.xl,
+    tallRow: 72,
+    field: ControlSize.xl,
+    control: ControlSize.xl,
+    target: ControlSize.xl,
+    icon: IconSize.xl,
+    iconSmall: IconSize.lg,
+    iconGap: Space.md,
+    padX: Space.md,
+    insetX: Space.lg,
+  );
+
+  /// A menu row.
+  final ControlSize row;
+
+  /// A row in a long list such as the command palette.
+  final ControlSize listRow;
+
+  /// A two-line row: a title over a detail line.
+  final double tallRow;
+
+  /// A text or search field.
+  final ControlSize field;
+
+  /// A button in a dialog or form.
+  final ControlSize control;
+
+  /// The smallest hit area of a tappable thing.
+  final ControlSize target;
+
+  /// A row's leading icon, and a smaller one for fields and chips.
+  final IconSize icon, iconSmall;
+
+  /// Between an icon and its label.
+  final double iconGap;
+
+  /// Inside a control, left and right.
+  final double padX;
+
+  /// A row's inset from the edge of its list.
+  final double insetX;
+}
+
+/// How much room there is: compact (phone, narrow pane), medium, expanded.
+enum SizeClass {
+  compact,
+  medium,
+  expanded;
+
+  /// The narrowest medium width.
+  static const mediumWidth = 600.0;
+
+  /// The narrowest expanded width.
+  static const expandedWidth = 1000.0;
+
+  static SizeClass forWidth(double width) => width < mediumWidth
+      ? compact
+      : width < expandedWidth
+      ? medium
+      : expanded;
+
+  bool get isCompact => this == compact;
+
+  /// Whether this class is [other] or wider.
+  bool atLeast(SizeClass other) => index >= other.index;
+}
+
+/// Sets the [SizeClass] below it. The app puts one at the root from the
+/// window; a pane can put its own from its constraints (bb_ui's
+/// `AdaptiveLayout` does).
+class SizeClassScope extends InheritedWidget {
+  const SizeClassScope({
+    super.key,
+    required this.sizeClass,
+    required super.child,
+  });
+
+  final SizeClass sizeClass;
+
+  /// The nearest scope's class, or the window's when there is none.
+  static SizeClass of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<SizeClassScope>()?.sizeClass ??
+      SizeClass.forWidth(MediaQuery.sizeOf(context).width);
+
+  @override
+  bool updateShouldNotify(SizeClassScope old) => old.sizeClass != sizeClass;
 }
 
 class AppTheme extends InheritedWidget {
   const AppTheme({
     super.key,
     required this.colors,
-    required this.formFactor,
+    required this.density,
     required super.child,
   });
   final AppColors colors;
-  final FormFactor formFactor;
+  final Density density;
 
-  bool get mobile => formFactor == FormFactor.mobile;
-  TypeScale get type => mobile ? TypeScale.mobile : TypeScale.desktop;
+  TypeScale get type => density.type;
+  Metrics get metrics => density.metrics;
 
   static AppTheme of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AppTheme>()!;
 
   @override
   bool updateShouldNotify(AppTheme old) =>
-      old.colors != colors || old.formFactor != formFactor;
+      old.colors != colors || old.density != density;
 }
 
 extension ThemeX on BuildContext {
   AppColors get colors => AppTheme.of(this).colors;
   TypeScale get type => AppTheme.of(this).type;
-  FormFactor get formFactor => AppTheme.of(this).formFactor;
-  bool get mobile => AppTheme.of(this).mobile;
+  Density get density => AppTheme.of(this).density;
+  Metrics get metrics => AppTheme.of(this).metrics;
+  bool get touch => density == Density.touch;
+  SizeClass get sizeClass => SizeClassScope.of(this);
+
+  /// The window's class, whatever pane this context is in. Overlays and app
+  /// chrome follow it: whether a menu opens as a sheet or a popover, whether
+  /// the command palette fills the screen. Content inside a pane follows
+  /// [sizeClass].
+  SizeClass get windowSizeClass =>
+      SizeClass.forWidth(MediaQuery.sizeOf(this).width);
+
+  /// The value for the current [SizeClass]; a missing class takes the next
+  /// narrower one that is given.
+  T adaptive<T>({required T compact, T? medium, T? expanded}) =>
+      switch (sizeClass) {
+        SizeClass.compact => compact,
+        SizeClass.medium => medium ?? compact,
+        SizeClass.expanded => expanded ?? medium ?? compact,
+      };
 }
 
 // ---------------------------------------------------------------------------
 // Agent kit tokens: the values of the approved Scratch-skin mockup's
-// `theme.css` that Scratch's own tokens do not have. Widgets read them through
-// the agent kit's `BbTheme`.
+// `theme.css` that the shared scales above do not have.
 // ---------------------------------------------------------------------------
 
-/// Layout thresholds and sizes of the agent kit (`--size-*`, `--fit-composer`,
-/// `--pane-min-*`, `--edge-tab`, `--ctl-h`, `--row` in `theme.css`).
-///
-/// The kit lays out by the width of its own container, never the window:
-/// compact is below [sizeMedium], medium from there to below [sizeExpanded],
-/// expanded from [sizeExpanded] up.
+/// Sizes of the agent kit (`--fit-composer`, `--pane-min-*`, `--edge-tab`,
+/// `--ctl-h`, `--row` in `theme.css`). Breakpoints are [SizeClass]'s.
 class KitLayout {
   const KitLayout({
-    this.sizeMedium = 600,
-    this.sizeExpanded = 1000,
     this.fitComposer = 460,
     this.contextSplit = 680,
     this.paneMinWidth = 200,
@@ -455,12 +876,6 @@ class KitLayout {
 
   /// The values of `theme.css`.
   static const standard = KitLayout();
-
-  /// Container width where compact ends.
-  final double sizeMedium;
-
-  /// Container width where medium ends.
-  final double sizeExpanded;
 
   /// Composer width below which Stop and Send drop their labels.
   final double fitComposer;
@@ -485,24 +900,7 @@ class KitLayout {
   final double rowHeight;
 }
 
-/// The kit's spacing scale. `theme.css` has no scale, so these are the steps
-/// `app.css` uses (2, 4, 6/8, 10/12, 16, 24 px).
-class KitSpacing {
-  const KitSpacing({
-    this.hair = 2,
-    this.xs = 4,
-    this.sm = 8,
-    this.md = 12,
-    this.lg = 16,
-    this.xl = 24,
-  });
-
-  static const standard = KitSpacing();
-
-  final double hair, xs, sm, md, lg, xl;
-}
-
-/// Motion that Scratch's [Motion] lacks.
+/// Motion beyond [Motion]'s.
 class KitMotion {
   const KitMotion({this.breathe = const Duration(milliseconds: 2400)});
 

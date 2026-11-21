@@ -1,11 +1,16 @@
 # bb_tokens
 
-BubbleBuffer design tokens for Flutter: colours, type scale, spacing, layout,
-radii and motion. Version 0.7.2 keeps the API extracted from agent-kit.
+BubbleBuffer design tokens for Flutter: colours, type scale, spacing, sizes,
+strokes, opacities, layout, radii, motion, density and size classes. Version
+0.8.0 is the only place in the kit that writes a design number; see the
+[migration guide](../../docs/migration-0.8.md) for the scales.
 
 Import `package:bb_tokens/bb_tokens.dart` or the compatibility `tokens.dart`
-entry point. `AppTheme`, `AppColors`, `TypeScale`, `Radii`, `Motion` and the
-layout/spacing helpers are shared with `bb_ui`. Hosts supply the font assets;
+entry point. `AppTheme`, `AppColors`, `TypeScale`, `Space`, `ControlSize`, `IconSize`,
+`Stroke`, `Alpha`, `Widths`, `Heights`, `Sizes`, `Radii`, `Motion`, `Density`,
+`Metrics` and `SizeClass` are shared with `bb_ui`. `TypeSpec`s are made only
+by the type scale: a new kind of text is a new role here, not a size at a call
+site. Hosts supply the font assets;
 the gallery includes a complete font registration example and OFL licences.
 
 ## Colour provenance
@@ -23,7 +28,8 @@ remains unchanged in this extraction.
 `lib/tokens.dart` contains the non-colour tokens and public API. `AppColors`
 and `KitInks` read the generated palette. `kTransparent` and `kMaskOpaque` are
 the only hand-written colour constants. `AppColors.palette` exposes the full
-resolved profile. CI checks raw colours in `packages/bb_ui` and `apps`.
+resolved profile. The bb_lints `no_raw_colors` rule keeps raw colours out of
+every other library.
 
 ## Change a colour
 
