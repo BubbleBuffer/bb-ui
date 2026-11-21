@@ -25,7 +25,7 @@ plugins:
   bb_lints:
     git:
       url: https://github.com/BubbleBuffer/bb-ui
-      ref: v0.9.0
+      ref: v0.9.1
       path: packages/bb_lints
     diagnostics:
       # Opt-in rules; the others are on by default.
@@ -100,6 +100,12 @@ It resolves every library under `lib/` and rewrites what is mechanical:
 - integer weights to `Weight`, `fw(n)` to `Weight.x.fontWeight`;
 - `context.mobile` to `context.touch`, `TypeScale.desktop` / `.mobile` to
   `.pointer` / `.touch`.
+- From 0.8 to 0.9 (run it while the package still resolves against 0.8,
+  then bump the pins): `Weight.medium` / `semibold` / `bold` to
+  `Weight.strong` (`displayStrong` for bold in `tsDisplay`), `onAccent` to
+  `accentInk`, and the palette's old `accentInk` (accent-coloured text) to
+  `accentText`. The last two swap names, so a plain find-and-replace would
+  swap colours.
 
 It adds `import 'package:bb_ui/bb_ui.dart';` where a rewritten library needs
 it (`--import <uri>` or `--no-import` to change that), then formats the files

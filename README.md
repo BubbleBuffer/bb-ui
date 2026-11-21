@@ -1,7 +1,7 @@
 # bb-ui
 
 Shared BubbleBuffer Flutter primitives and design tokens, without Material or
-an agent backend. The packages are version **0.9.0**; moving from 0.7 is in
+an agent backend. The packages are version **0.9.1**; moving from 0.7 is in
 the [migration guide](docs/migration-0.8.md).
 
 | Package | Purpose |
@@ -27,7 +27,7 @@ dependencies:
   bb_ui:
     git:
       url: https://github.com/BubbleBuffer/bb-ui
-      ref: v0.9.0
+      ref: v0.9.1
       path: packages/bb_ui
 ```
 
@@ -48,7 +48,7 @@ plugins:
   bb_lints:
     git:
       url: https://github.com/BubbleBuffer/bb-ui
-      ref: v0.9.0
+      ref: v0.9.1
       path: packages/bb_lints
 ```
 
