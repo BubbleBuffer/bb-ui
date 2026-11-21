@@ -80,7 +80,7 @@ class EdgeTab extends StatelessWidget {
                   style: ts(
                     context.type.uiSmall,
                     c.textSecondary,
-                    weight: Weight.semibold,
+                    weight: Weight.strong,
                   ),
                 ),
                 if (value != null) ...[
@@ -194,7 +194,7 @@ class EdgeStripButton extends StatelessWidget {
                 const Gap(Space.xs),
                 Text(
                   label!,
-                  style: ts(context.type.uiSmall, ink, weight: Weight.semibold),
+                  style: ts(context.type.uiSmall, ink, weight: Weight.strong),
                 ),
               ],
               if (menu) ...[

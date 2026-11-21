@@ -85,7 +85,7 @@ class DetailPanel extends StatelessWidget {
             style: ts(
               context.type.uiSmall,
               c.textTertiary,
-              weight: Weight.semibold,
+              weight: Weight.strong,
             ),
           ),
           const Gap(Space.xs),

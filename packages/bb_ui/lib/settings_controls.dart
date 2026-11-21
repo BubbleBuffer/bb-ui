@@ -37,7 +37,7 @@ class SettingsHeading extends StatelessWidget {
             text,
             style: primary
                 ? tsDisplay(context.type.h3, c.textPrimary)
-                : ts(context.type.body, c.textPrimary, weight: Weight.medium),
+                : ts(context.type.body, c.textPrimary, weight: Weight.strong),
           ),
           const Gap(Space.md),
           HLine(color: c.border),

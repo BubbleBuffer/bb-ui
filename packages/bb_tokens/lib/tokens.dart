@@ -1,13 +1,14 @@
-// Approved Stacks tokens plus the app-wide type scale and bundled fonts.
-// Every colour comes from `src/colors.g.dart`, generated from the agent-kit
-// profile of the BubbleBuffer design repository (packages/bb_tokens/README.md).
+// The kit's tokens: the unified BubbleBuffer language plus the app-wide type
+// scale and bundled fonts. Every colour, radius, height, spacing step, weight,
+// duration, curve and shadow comes from `src/bb_tokens.g.dart`, generated from
+// the BubbleBufferDesign repository (packages/bb_tokens/README.md).
 // No Material anywhere: this is the only theme the widgets read.
 
 import 'package:flutter/widgets.dart';
 
-import 'src/colors.g.dart';
+import 'src/bb_tokens.g.dart';
 
-export 'src/colors.g.dart';
+export 'src/bb_tokens.g.dart';
 
 /// Bundled fonts used identically on every platform and in golden tests.
 String sansFamily = 'Atkinson Hyperlegible Next';
@@ -122,7 +123,7 @@ class AppColors {
     required this.overlay,
     required this.desk,
     required this.accentText,
-    required this.onAccent,
+    required this.accentInk,
     required this.focus,
     required this.thread,
     required this.threadStrong,
@@ -172,8 +173,12 @@ class AppColors {
   final Color inlineCodeText;
   final Color overlay;
   final Color desk;
+
+  /// Accent-coloured text on a surface.
   final Color accentText;
-  final Color onAccent;
+
+  /// Ink on an accent fill.
+  final Color accentInk;
   final Color focus;
   final Color thread;
   final Color threadStrong;
@@ -227,8 +232,8 @@ AppColors _appColors(ProfileColors p, {required bool dark}) => AppColors(
   inlineCodeText: p.codeInk,
   overlay: p.scrim,
   desk: p.desk,
-  accentText: p.accentInk,
-  onAccent: p.onAccent,
+  accentText: p.accentText,
+  accentInk: p.accentInk,
   focus: p.focus,
   thread: p.thread,
   threadStrong: p.threadStrong,
@@ -258,14 +263,14 @@ AppColors _appColors(ProfileColors p, {required bool dark}) => AppColors(
 /// Gaps between siblings use `Row`/`Column` `spacing:` or bb_ui's `Gap`.
 abstract final class Space {
   static const double hair = 2;
-  static const double xxs = 4;
+  static const double xxs = Contract.spacing1;
   static const double xs = 6;
-  static const double sm = 8;
-  static const double md = 12;
-  static const double lg = 16;
-  static const double xl = 24;
-  static const double xxl = 32;
-  static const double xxxl = 48;
+  static const double sm = Contract.spacing2;
+  static const double md = Contract.spacing3;
+  static const double lg = Contract.spacing4;
+  static const double xl = Contract.spacing6;
+  static const double xxl = Contract.spacing8;
+  static const double xxxl = Contract.spacing12;
 
   /// Every step, smallest first.
   static const steps = [hair, xxs, xs, sm, md, lg, xl, xxl, xxxl];
@@ -273,12 +278,21 @@ abstract final class Space {
 
 /// Heights of controls: buttons, fields, rows and chips.
 enum ControlSize {
-  xs(24),
+  /// The floor for dense tools.
+  xs(Contract.controlHeightFloor),
   sm(28),
   md(32),
+
+  /// The dense control of the unified language.
+  dense(Contract.controlHeightDense),
   lg(36),
   xl(44),
-  xxl(48);
+
+  /// The default control of the unified language.
+  standard(Contract.controlHeightDefault),
+
+  /// The mobile control of the unified language.
+  xxl(Contract.controlHeightMobile);
 
   const ControlSize(this.height);
 
@@ -409,15 +423,21 @@ abstract final class Sizes {
   static const double displayMap = 124;
 }
 
-/// A font weight from the type ramp.
+/// A font weight from the type ramp: the contract weights of tokens.json.
+///
+/// Atkinson Hyperlegible Next and Bricolage Grotesque ship as variable fonts,
+/// so [axis] is applied exactly through the `wght` axis (450, 720, 620, 760).
+/// [fontWeight] is the nearest static weight, used only for a face without a
+/// weight axis. Fragment Mono is static (Regular only): code text keeps 400.
 enum Weight {
-  regular(FontWeight.w400, 400),
-  medium(FontWeight.w500, 500),
-  semibold(FontWeight.w600, 600),
+  regular(FontWeight.w400, Contract.typographyUiWeightRegular),
+  strong(FontWeight.w700, Contract.typographyUiWeightStrong),
 
-  /// The display face's condensed title weight.
-  display(FontWeight.w600, 640),
-  bold(FontWeight.w700, 700);
+  /// The display face's title weight.
+  display(FontWeight.w600, Contract.typographyDisplayWeightRegular),
+
+  /// The display face's heading weight.
+  displayStrong(FontWeight.w800, Contract.typographyDisplayWeightStrong);
 
   const Weight(this.fontWeight, this.axis);
 
@@ -490,35 +510,35 @@ class TypeScale {
   final TypeSpec code, codeSmall;
 
   static const pointer = TypeScale._(
-    pageTitle: TypeSpec._(40, 48, Weight.bold),
-    display: TypeSpec._(32, 34, Weight.bold),
-    h1: TypeSpec._(30, 39, Weight.semibold),
-    h2: TypeSpec._(24, 31.2, Weight.semibold),
-    h3: TypeSpec._(20, 26, Weight.semibold),
+    pageTitle: TypeSpec._(40, 48, Weight.strong),
+    display: TypeSpec._(32, 34, Weight.strong),
+    h1: TypeSpec._(30, 39, Weight.strong),
+    h2: TypeSpec._(24, 31.2, Weight.strong),
+    h3: TypeSpec._(20, 26, Weight.strong),
     title: TypeSpec._(16, 20, Weight.display),
     body: TypeSpec._(16, 24, Weight.regular),
-    item: TypeSpec._(14, 20, Weight.medium),
-    ui: TypeSpec._(14, 20, Weight.medium),
-    uiSmall: TypeSpec._(12, 16, Weight.medium),
+    item: TypeSpec._(14, 20, Weight.strong),
+    ui: TypeSpec._(14, 20, Weight.strong),
+    uiSmall: TypeSpec._(12, 16, Weight.strong),
     caption: TypeSpec._(11, 15, Weight.regular),
-    micro: TypeSpec._(10, 12, Weight.semibold),
+    micro: TypeSpec._(10, 12, Weight.strong),
     code: TypeSpec._(13.6, 20.4, Weight.regular),
     codeSmall: TypeSpec._(12, 16, Weight.regular),
   );
 
   static const touch = TypeScale._(
-    pageTitle: TypeSpec._(28, 33.6, Weight.bold),
-    display: TypeSpec._(28, 32, Weight.bold),
-    h1: TypeSpec._(24, 31.2, Weight.semibold),
-    h2: TypeSpec._(20, 26, Weight.semibold),
-    h3: TypeSpec._(18, 23.4, Weight.semibold),
+    pageTitle: TypeSpec._(28, 33.6, Weight.strong),
+    display: TypeSpec._(28, 32, Weight.strong),
+    h1: TypeSpec._(24, 31.2, Weight.strong),
+    h2: TypeSpec._(20, 26, Weight.strong),
+    h3: TypeSpec._(18, 23.4, Weight.strong),
     title: TypeSpec._(16, 20, Weight.display),
     body: TypeSpec._(16, 22, Weight.regular),
-    item: TypeSpec._(16, 22, Weight.medium),
-    ui: TypeSpec._(15, 20, Weight.medium),
-    uiSmall: TypeSpec._(13, 16, Weight.medium),
+    item: TypeSpec._(16, 22, Weight.strong),
+    ui: TypeSpec._(15, 20, Weight.strong),
+    uiSmall: TypeSpec._(13, 16, Weight.strong),
     caption: TypeSpec._(11, 15, Weight.regular),
-    micro: TypeSpec._(10, 12, Weight.semibold),
+    micro: TypeSpec._(10, 12, Weight.strong),
     code: TypeSpec._(13.6, 20.4, Weight.regular),
     codeSmall: TypeSpec._(12, 16, Weight.regular),
   );
@@ -554,6 +574,9 @@ TextStyle ts(TypeSpec s, Color color, {Weight? weight, bool mono = false}) =>
       height: s.line / s.size,
       leadingDistribution: TextLeadingDistribution.even,
       fontWeight: (weight ?? s.weight).fontWeight,
+      fontVariations: mono
+          ? null
+          : [FontVariation('wght', (weight ?? s.weight).axis)],
       color: color,
       decoration: TextDecoration.none,
     );
@@ -600,24 +623,9 @@ class Layout {
 
 class Radii {
   static const sm = 4.0, md = 6.0, lg = 10.0, sheet = 12.0;
-  static const ctl = BorderRadius.only(
-    topLeft: Radius.circular(7),
-    topRight: Radius.circular(11),
-    bottomRight: Radius.circular(6),
-    bottomLeft: Radius.circular(9),
-  );
-  static const field = BorderRadius.only(
-    topLeft: Radius.circular(6),
-    topRight: Radius.circular(10),
-    bottomRight: Radius.circular(6),
-    bottomLeft: Radius.circular(8),
-  );
-  static const panel = BorderRadius.only(
-    topLeft: Radius.circular(12),
-    topRight: Radius.circular(18),
-    bottomRight: Radius.circular(10),
-    bottomLeft: Radius.circular(16),
-  );
+  static const ctl = Contract.radiusControl;
+  static const field = Contract.radiusField;
+  static const panel = Contract.radiusPanel;
   static const pill = BorderRadius.all(Radius.circular(999));
 
   /// A uniform corner of [sm], [md], [lg] or [sheet].
@@ -625,9 +633,9 @@ class Radii {
 }
 
 class Motion {
-  static const fast = Duration(milliseconds: 150);
-  static const standard = Duration(milliseconds: 220);
-  static const sheet = Duration(milliseconds: 250);
+  static const fast = Contract.motionFast;
+  static const standard = Contract.motionFunctional;
+  static const sheet = Contract.motionSheet;
   static const wiggle = Duration(milliseconds: 200);
 
   /// How long a pointer rests on a control before its tooltip shows.
@@ -648,7 +656,9 @@ class Motion {
   /// One turn of a spinner.
   static const spin = Duration(milliseconds: 900);
 
-  static const ease = Cubic(.2, .8, .2, 1);
+  static const ease = Contract.motionEasing;
+
+  /// The overshoot is kit-only: the contract has no settle curve.
   static const settle = Cubic(.22, 1.25, .36, 1);
   static const easing = ease;
   static MotionDurations of(BuildContext context) =>

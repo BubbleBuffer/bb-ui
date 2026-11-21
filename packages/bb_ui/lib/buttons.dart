@@ -90,7 +90,7 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final enabled = onTap != null;
-    final ink = enabled ? c.onAccent : c.textDisabled;
+    final ink = enabled ? c.accentInk : c.textDisabled;
     return Semantics(
       button: true,
       enabled: enabled,
@@ -116,7 +116,7 @@ class PrimaryButton extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: ts(context.type.ui, ink, weight: Weight.bold),
+                  style: ts(context.type.ui, ink, weight: Weight.strong),
                 ),
               ),
             ],
@@ -180,7 +180,7 @@ class SecondaryButton extends StatelessWidget {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: ts(context.type.ui, ink, weight: Weight.semibold),
+                    style: ts(context.type.ui, ink, weight: Weight.strong),
                   ),
                 ),
               ],
@@ -228,7 +228,7 @@ class StacksCheckbox extends StatelessWidget {
             ),
           ),
           child: checked
-              ? Icon20(Ico.check, size: IconSize.sm, color: ink ?? c.onAccent)
+              ? Icon20(Ico.check, size: IconSize.sm, color: ink ?? c.accentInk)
               : null,
         ),
       ),

@@ -238,9 +238,9 @@ class DialogButton extends StatelessWidget {
               !enabled
                   ? c.textDisabled
                   : filled
-                  ? (base == c.accent || c.dark ? c.onAccent : c.bgPrimary)
+                  ? (base == c.accent || c.dark ? c.accentInk : c.bgPrimary)
                   : c.textPrimary,
-              weight: filled ? Weight.bold : Weight.semibold,
+              weight: filled ? Weight.strong : Weight.strong,
             ),
           ),
         ),
@@ -312,7 +312,7 @@ class ScreenScaffold extends StatelessWidget {
                       style: ts(
                         context.type.ui,
                         c.textPrimary,
-                        weight: Weight.semibold,
+                        weight: Weight.strong,
                       ),
                     ),
                   ),

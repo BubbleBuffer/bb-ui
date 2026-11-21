@@ -279,7 +279,7 @@ class FooterAction extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: ts(context.type.uiSmall, main ? c.onAccent : c.textPrimary),
+        style: ts(context.type.uiSmall, main ? c.accentInk : c.textPrimary),
       ),
     );
   }

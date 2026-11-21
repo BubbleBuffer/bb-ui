@@ -26,7 +26,7 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed .
       - name: Save a format patch
         if: failure()
-        run: dart format . && git diff > format.patch
+        run: dart format . && git diff > format.patch && cat format.patch
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
@@ -74,30 +74,20 @@ jobs:
           dart analyze --fatal-infos
           dart test
 
-  colours:
-    name: colour drift and raw colours
+  generated-tokens:
+    name: generated tokens header
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
-      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
-        with:
-          channel: stable
-          flutter-version: 3.47.5
-          cache: true
-      - run: flutter pub get
-      - name: Regenerate colours
-        working-directory: packages/bb_tokens
-        run: dart tool/generate_colors.dart
-      - name: Fail on generated colour drift
-        run: git diff --exit-code -- packages/bb_tokens/lib/src/colors.g.dart
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        if: failure()
-        with:
-          name: regenerated-colours
-          path: packages/bb_tokens/lib/src/colors.g.dart
+      - name: The generated Dart names its design commit
+        run: |
+          head -n 1 packages/bb_tokens/lib/src/bb_tokens.g.dart \
+            | grep -Eq '^// Vendored from BubbleBuffer/BubbleBufferDesign@[0-9a-f]{40} '
+          sed -n 2p packages/bb_tokens/lib/src/bb_tokens.g.dart \
+            | grep -q '^// GENERATED CODE, DO NOT EDIT\.$'
 
   test:
     name: tests (${{ matrix.package }})
