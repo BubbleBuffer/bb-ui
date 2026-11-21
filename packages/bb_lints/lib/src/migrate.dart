@@ -165,6 +165,12 @@ bool _nearStep(double v) => [
   ..._controlSizes,
 ].any((s) => (s.$1 - v).abs() <= _snapTolerance);
 
+/// 0.8 weights that 0.9 folded into `strong` / `displayStrong`.
+const _weights08 = {'medium', 'semibold', 'bold'};
+
+/// Classes whose colour roles 0.9 renamed.
+const _paletteTypes = {'AppColors', 'ProfileColors'};
+
 const _iconWidgets = {'Icon20', 'Spinner'};
 const _iconButtons = {'IconBtn', 'CopyButton'};
 const _buttons = {'PrimaryButton', 'SecondaryButton', 'TextBtn'};
@@ -407,6 +413,33 @@ class _Collector extends RecursiveAstVisitor<void> {
     } else if (target is SimpleIdentifier && target.name == 'TypeScale') {
       if (property == 'desktop') _replace(node, 'TypeScale.pointer');
       if (property == 'mobile') _replace(node, 'TypeScale.touch');
+    } else if (target is SimpleIdentifier &&
+        target.name == 'Weight' &&
+        _weights08.contains(property)) {
+      // 0.9 weights, mapped as 0.9.0 mapped bb_ui itself: medium, semibold
+      // and bold are `strong`, except bold in the display face.
+      final call = node.thisOrAncestorOfType<MethodInvocation>();
+      final display = call?.methodName.name == 'tsDisplay';
+      _replace(
+        node,
+        property == 'bold' && display
+            ? 'Weight.displayStrong'
+            : 'Weight.strong',
+      );
+    } else if (type is InterfaceType && _paletteTypes.contains(targetName)) {
+      // 0.9 swapped two palette names. Only code still resolved against 0.8
+      // (no `accentText` on the palette yet) is renamed, so a second run on
+      // 0.9 code changes nothing.
+      final on08 =
+          targetName != 'ProfileColors' ||
+          type.element.getGetter('accentText') == null;
+      if (property == 'onAccent') {
+        _replace(node, '${target.toSource()}.accentInk');
+      } else if (property == 'accentInk' &&
+          targetName == 'ProfileColors' &&
+          on08) {
+        _replace(node, '${target.toSource()}.accentText');
+      }
     }
   }
 }
