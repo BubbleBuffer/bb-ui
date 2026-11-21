@@ -25,7 +25,7 @@ plugins:
   bb_lints:
     git:
       url: https://github.com/BubbleBuffer/bb-ui
-      ref: v0.8.0
+      ref: v0.8.1
       path: packages/bb_lints
     diagnostics:
       # Opt-in rules; the others are on by default.

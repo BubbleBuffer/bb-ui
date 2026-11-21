@@ -98,14 +98,14 @@ class SettingsRow extends StatelessWidget {
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: Space.sm),
-      child: Row(
-        children: [
-          Expanded(child: text),
-          const Gap(Space.lg),
-          // Shares the row with the label, so a long value or large text
-          // ellipsises instead of overflowing.
-          Flexible(child: trailing!),
-        ],
+      // The control keeps its own width at the right edge while the label
+      // still fits beside it; on a narrow row or with large text it moves
+      // under the label instead of squeezing it or overflowing.
+      child: InlineOrStacked(
+        main: text,
+        trailing: trailing!,
+        gap: Space.lg,
+        runGap: Space.md,
       ),
     );
   }

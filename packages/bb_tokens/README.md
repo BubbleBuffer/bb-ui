@@ -2,7 +2,7 @@
 
 BubbleBuffer design tokens for Flutter: colours, type scale, spacing, sizes,
 strokes, opacities, layout, radii, motion, density and size classes. Version
-0.8.0 is the only place in the kit that writes a design number; see the
+0.8 is the only place in the kit that writes a design number; see the
 [migration guide](../../docs/migration-0.8.md) for the scales.
 
 Import `package:bb_tokens/bb_tokens.dart` or the compatibility `tokens.dart`
