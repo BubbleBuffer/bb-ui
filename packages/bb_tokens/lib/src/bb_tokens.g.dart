@@ -1,4 +1,4 @@
-// Vendored from BubbleBuffer/BubbleBufferDesign@a16925a5b1ac383c73a1124b297666889899d190 with: node plugins/bubblebuffer-design/skills/bubblebuffer-design-system/scripts/generate-design-tokens.mjs --dart <this file>
+// Vendored from BubbleBuffer/BubbleBufferDesign@6ef16db0e7ebefb6c17a3d680ca875ecfd100667 with: node plugins/bubblebuffer-design/skills/bubblebuffer-design-system/scripts/generate-design-tokens.mjs --dart <this file>
 // GENERATED CODE, DO NOT EDIT.
 //
 // Source: plugins/bubblebuffer-design/assets/design-system/tokens.json and plugins/bubblebuffer-design/assets/design-system/product-profiles.json.
@@ -748,33 +748,6 @@ class ProductDialect {
     radiusPanel: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(12), bottomRight: Radius.circular(7), bottomLeft: Radius.circular(10)),
     borderWidth: 1,
     controlHeight: 36,
-  );
-
-  static const lilbub = ProductDialect(
-    dark: false,
-    canvas: Color(0xFFF3EFE7),
-    surface: Color(0xFFFFFAF1),
-    surfaceMuted: Color(0xFFDCD4C8),
-    ink: Color(0xFF282A2F),
-    muted: Color(0xFF625C55),
-    boundary: Color(0xFF282A2F),
-    accent: Color(0xFFDE945F),
-    accentInk: Color(0xFF282A2F),
-    accentText: Color(0xFF874016),
-    focus: Color(0xFF282A2F),
-    focusDark: Color(0xFF7AB7FF),
-    stage: Color(0xFF000000),
-    stageInk: Color(0xFFF3EFE7),
-    constructive: Color(0xFFD1ECC0),
-    information: Color(0xFFC4DFF1),
-    attention: Color(0xFFF8DF93),
-    danger: Color(0xFFFFC9C6),
-    stateInk: Color(0xFF282A2F),
-    radiusControl: BorderRadius.all(Radius.circular(4)),
-    radiusField: BorderRadius.all(Radius.circular(4)),
-    radiusPanel: BorderRadius.all(Radius.circular(12)),
-    borderWidth: 2,
-    controlHeight: 44,
   );
 
   static const needlebub = ProductDialect(

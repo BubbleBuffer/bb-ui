@@ -173,6 +173,7 @@ class AppColors {
   final Color inlineCodeText;
   final Color overlay;
   final Color desk;
+
   /// Accent-coloured text on a surface.
   final Color accentText;
 
