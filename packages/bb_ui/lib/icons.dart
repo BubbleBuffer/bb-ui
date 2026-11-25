@@ -80,6 +80,8 @@ enum Ico {
   square,
   circle,
   hand,
+  slash,
+  pentagon,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -436,6 +438,16 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.hand,
     LucideIcons.hand500,
   ), // hand
+  Ico.slash: (
+    LucideIcons.slash300,
+    LucideIcons.slash,
+    LucideIcons.slash500,
+  ), // slash
+  Ico.pentagon: (
+    LucideIcons.pentagon300,
+    LucideIcons.pentagon,
+    LucideIcons.pentagon500,
+  ), // pentagon
 };
 
 class Icon20 extends StatelessWidget {

@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.10.0 builds
+Flutter primitives without Material, using `bb_tokens`. Version 0.10.1 builds
 every component from token scales only, adapts by density and by its own
 width, and grows with the system text size. Moving from 0.7 is in the
 [migration guide](../../docs/migration-0.8.md).
@@ -187,4 +187,5 @@ gesture, `onChangeEnd` on commit, `onChangeCancel` on Escape):
 - `PropertyRow` and `PropertySection`: compact fixed-label inspector rows and
   collapsible sections.
 - Additional `Ico` glyphs: `minus`, `maximize`, `eye`, `eyeOff`, `square`,
-  `circle`, and `hand`.
+  `circle`, and `hand`; 0.10.1 adds `slash` (a line tool) and `pentagon`
+  (a polygon tool).

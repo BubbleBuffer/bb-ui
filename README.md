@@ -1,7 +1,7 @@
 # bb-ui
 
 Shared BubbleBuffer Flutter primitives and design tokens, without Material or
-an agent backend. `bb_ui` is version **0.10.0** (`bb_tokens` and `bb_lints` are
+an agent backend. `bb_ui` is version **0.10.1** (`bb_tokens` and `bb_lints` are
 **0.9.1**); moving from 0.7 is in
 the [migration guide](docs/migration-0.8.md).
 
