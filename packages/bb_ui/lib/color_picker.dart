@@ -1375,24 +1375,26 @@ class _ColorPickerPopoverState extends State<_ColorPickerPopover> {
           Navigator.of(context).pop(_current),
     },
     child: MenuSurface(
-      padding: const EdgeInsets.all(Space.md),
-      child: ColorPickerPanel(
-        color: _current,
-        allowNone: widget.allowNone,
-        showAlpha: widget.showAlpha,
-        swatches: widget.swatches,
-        onChanged: (c) {
-          setState(() => _current = c);
-          widget.onChanged?.call(c);
-        },
-        onChangeEnd: (c) {
-          setState(() => _current = c);
-          widget.onChangeEnd?.call(c);
-        },
-        onChangeCancel: (c) {
-          setState(() => _current = c);
-          widget.onChangeCancel?.call(c);
-        },
+      child: Padding(
+        padding: const EdgeInsets.all(Space.md),
+        child: ColorPickerPanel(
+          color: _current,
+          allowNone: widget.allowNone,
+          showAlpha: widget.showAlpha,
+          swatches: widget.swatches,
+          onChanged: (c) {
+            setState(() => _current = c);
+            widget.onChanged?.call(c);
+          },
+          onChangeEnd: (c) {
+            setState(() => _current = c);
+            widget.onChangeEnd?.call(c);
+          },
+          onChangeCancel: (c) {
+            setState(() => _current = c);
+            widget.onChangeCancel?.call(c);
+          },
+        ),
       ),
     ),
   );
