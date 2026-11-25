@@ -1,7 +1,8 @@
 // Building blocks of the settings screens:
 // section titles with a divider, rows with a label, a description and a
-// control on the right, a toggle, a select button, a bordered text field
-// and a secondary button. Built from the UI kit's tokens and parts.
+// control on the right, a toggle, a select button, a segmented control, a
+// bordered text field and a secondary button. Built from the UI kit's tokens
+// and parts.
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -261,6 +262,178 @@ class SelectButton<T> extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One option in a [Segmented] control. At least one of [label] or [icon]
+/// must be provided.
+class SegmentOption<T> {
+  const SegmentOption({
+    required this.value,
+    this.label,
+    this.icon,
+    this.tooltip,
+    this.semanticLabel,
+    this.key,
+  }) : assert(label != null || icon != null);
+
+  /// The value represented by this segment.
+  final T value;
+
+  /// Optional text label shown inside the segment.
+  final String? label;
+
+  /// Optional icon shown before [label], or alone for icon-only segments.
+  final Ico? icon;
+
+  /// Optional tooltip shown on hover, focus, or long-press.
+  final String? tooltip;
+
+  /// Accessible label for screen readers; defaults to [label], [tooltip], or
+  /// the icon name.
+  final String? semanticLabel;
+
+  /// Optional key placed on the segment's interactive surface.
+  final Key? key;
+}
+
+/// A row of mutually exclusive segments, lifted from Scratch's segmented
+/// control and styled with `bb_tokens`.
+class Segmented<T> extends StatelessWidget {
+  const Segmented({
+    super.key,
+    required this.value,
+    required this.options,
+    required this.onChanged,
+    this.expand = false,
+  });
+
+  /// Currently selected value.
+  final T value;
+
+  /// Ordered options rendered left to right.
+  final List<SegmentOption<T>> options;
+
+  /// Called when an unselected segment is activated; null disables all
+  /// segments.
+  final ValueChanged<T>? onChanged;
+
+  /// When true, segments share the available width equally.
+  final bool expand;
+
+  KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
+    if (onChanged == null || options.length < 2) {
+      return KeyEventResult.ignored;
+    }
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    if (key != LogicalKeyboardKey.arrowLeft &&
+        key != LogicalKeyboardKey.arrowRight) {
+      return KeyEventResult.ignored;
+    }
+    final index = options.indexWhere((o) => o.value == value);
+    if (index < 0) return KeyEventResult.ignored;
+    final next = key == LogicalKeyboardKey.arrowRight
+        ? (index + 1) % options.length
+        : (index - 1 + options.length) % options.length;
+    onChanged!(options[next].value);
+    return KeyEventResult.handled;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final enabled = onChanged != null;
+    final iconSize = context.touch ? IconSize.md : IconSize.sm;
+    final padY = context.touch ? Space.sm : Space.xs;
+
+    Widget buildOption(SegmentOption<T> option) {
+      final selected = option.value == value;
+      final fg = !enabled
+          ? c.textDisabled
+          : selected
+          ? c.textPrimary
+          : c.textSecondary;
+      final tip = option.tooltip;
+      final label =
+          option.semanticLabel ?? option.label ?? tip ?? option.icon?.name;
+      final textWidget = option.label == null
+          ? null
+          : Text(
+              option.label!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: ts(
+                context.type.uiSmall,
+                fg,
+                weight: selected ? Weight.strong : Weight.regular,
+              ),
+            );
+
+      Widget segment = Semantics(
+        button: true,
+        selected: selected,
+        enabled: enabled,
+        label: label,
+        excludeSemantics: true,
+        onTap: enabled && !selected ? () => onChanged!(option.value) : null,
+        child: Hover(
+          key: option.key,
+          onTap: enabled && !selected ? () => onChanged!(option.value) : null,
+          borderRadius: Radii.ctl,
+          lift: 0,
+          background: selected ? c.bgPrimary : null,
+          border: selected
+              ? Border(
+                  bottom: BorderSide(
+                    color: enabled ? c.accent : c.borderStrong,
+                    width: Stroke.bold,
+                  ),
+                )
+              : null,
+          padding: EdgeInsets.symmetric(
+            horizontal: option.label == null ? Space.sm : Space.md,
+            vertical: padY,
+          ),
+          child: Row(
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (option.icon != null)
+                Icon20(option.icon!, size: iconSize, color: fg),
+              if (option.icon != null && textWidget != null)
+                const Gap(Space.xs),
+              if (textWidget != null)
+                expand ? Flexible(child: textWidget) : textWidget,
+            ],
+          ),
+        ),
+      );
+
+      if (tip != null) {
+        segment = AppTooltip(label: tip, child: segment);
+      }
+      return expand ? Expanded(child: segment) : segment;
+    }
+
+    return Focus(
+      skipTraversal: true,
+      onKeyEvent: _handleKey,
+      child: Container(
+        padding: const EdgeInsets.all(Space.hair),
+        decoration: BoxDecoration(
+          color: c.bgSecondary,
+          borderRadius: Radii.ctl,
+          border: Border.all(color: enabled ? c.borderStrong : c.border),
+        ),
+        child: Row(
+          mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+          children: [for (final option in options) buildOption(option)],
         ),
       ),
     );
