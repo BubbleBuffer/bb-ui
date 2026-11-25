@@ -47,4 +47,7 @@ abstract final class Specimen {
 
   /// A toast's progress in the still specimen.
   static const toastProgress = .6;
+
+  /// Widths for numeric fields and sliders in the editor specimen.
+  static const double numberField = 128, sliderWidth = 220;
 }

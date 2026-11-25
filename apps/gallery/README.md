@@ -26,7 +26,9 @@ disabled command, no match, and a button that opens it over the page): use
 `--dart-define=SCENE=palette`. A fourth page (`SCENE=devices`) shows device rows,
 the detail panel, code entry and display, notices, the empty state and the
 confirm dialog; a fifth (`SCENE=session`) shows the session edge tab and strip,
-the display picker, the metrics panel and toasts.
+the display picker, the metrics panel and toasts; and a sixth (`SCENE=editor`)
+shows the editor controls (tool rail, number fields, slider, segmented control,
+colour swatches and picker, tree rows, zoom control and property sections).
 
 Golden tests render four new `primitives_*.png` specimens at 1000 and 390 logical
 pixels, four `search_*.png` specimens of the search page and four `palette_*.png`
