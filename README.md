@@ -1,13 +1,14 @@
 # bb-ui
 
 Shared BubbleBuffer Flutter primitives and design tokens, without Material or
-an agent backend. The packages are version **0.9.1**; moving from 0.7 is in
+an agent backend. `bb_ui` is version **0.10.0** (`bb_tokens` and `bb_lints` are
+**0.9.1**); moving from 0.7 is in
 the [migration guide](docs/migration-0.8.md).
 
 | Package | Purpose |
 | --- | --- |
 | `packages/bb_tokens` | Colours, typography, spacing, radii, motion and themes |
-| `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection, stacks, device lists, pairing and session chrome |
+| `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection, stacks, device lists, pairing, session chrome, and editor controls |
 | `packages/bb_lints` | Analyzer plugin that keeps UI code on the tokens, and the 0.8 migrate tool |
 | `apps/gallery` | Interactive neutral specimens and Linux golden tests |
 

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import 'gallery_tokens.dart';
 import 'devices_gallery.dart';
+import 'editor_gallery.dart';
 import 'palette_gallery.dart';
 import 'search_gallery.dart';
 import 'session_gallery.dart';
@@ -13,7 +14,7 @@ import 'session_gallery.dart';
 const _maxTextScale = 2.0;
 
 /// Which specimen page the gallery shows.
-enum GalleryScene { primitives, search, palette, devices, session }
+enum GalleryScene { primitives, search, palette, devices, session, editor }
 
 class GalleryApp extends StatefulWidget {
   const GalleryApp({
@@ -68,6 +69,7 @@ class _GalleryAppState extends State<GalleryApp> {
       GalleryScene.palette => PaletteGallery(onThemeChanged: _toggleTheme),
       GalleryScene.devices => DevicesGallery(onThemeChanged: _toggleTheme),
       GalleryScene.session => SessionGallery(onThemeChanged: _toggleTheme),
+      GalleryScene.editor => EditorGallery(onThemeChanged: _toggleTheme),
     },
   );
 

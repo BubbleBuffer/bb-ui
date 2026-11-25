@@ -4,7 +4,8 @@ import 'gallery.dart';
 
 /// `flutter run --dart-define=SCENE=search` opens the search specimen,
 /// `SCENE=palette` the command palette's, `SCENE=devices` the device and
-/// pairing components and `SCENE=session` the session chrome.
+/// pairing components, `SCENE=session` the session chrome and `SCENE=editor`
+/// the editor controls.
 const _scene = String.fromEnvironment('SCENE');
 
 void main() => runApp(
@@ -14,6 +15,7 @@ void main() => runApp(
       'palette' => GalleryScene.palette,
       'devices' => GalleryScene.devices,
       'session' => GalleryScene.session,
+      'editor' => GalleryScene.editor,
       _ => GalleryScene.primitives,
     },
   ),

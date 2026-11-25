@@ -73,6 +73,13 @@ enum Ico {
   lock,
   userCheck,
   keyboard,
+  minus,
+  maximize,
+  eye,
+  eyeOff,
+  square,
+  circle,
+  hand,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -398,6 +405,37 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.keyboard,
     LucideIcons.keyboard500,
   ), // keyboard
+  Ico.minus: (
+    LucideIcons.minus300,
+    LucideIcons.minus,
+    LucideIcons.minus500,
+  ), // minus
+  Ico.maximize: (
+    LucideIcons.maximize2300,
+    LucideIcons.maximize2,
+    LucideIcons.maximize2500,
+  ), // maximize-2
+  Ico.eye: (LucideIcons.eye300, LucideIcons.eye, LucideIcons.eye500), // eye
+  Ico.eyeOff: (
+    LucideIcons.eyeOff300,
+    LucideIcons.eyeOff,
+    LucideIcons.eyeOff500,
+  ), // eye-off
+  Ico.square: (
+    LucideIcons.square300,
+    LucideIcons.square,
+    LucideIcons.square500,
+  ), // square
+  Ico.circle: (
+    LucideIcons.circle300,
+    LucideIcons.circle,
+    LucideIcons.circle500,
+  ), // circle
+  Ico.hand: (
+    LucideIcons.hand300,
+    LucideIcons.hand,
+    LucideIcons.hand500,
+  ), // hand
 };
 
 class Icon20 extends StatelessWidget {
