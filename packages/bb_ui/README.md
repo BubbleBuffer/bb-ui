@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.9.0 builds
+Flutter primitives without Material, using `bb_tokens`. Version 0.10.0 builds
 every component from token scales only, adapts by density and by its own
 width, and grows with the system text size. Moving from 0.7 is in the
 [migration guide](../../docs/migration-0.8.md).
@@ -50,9 +50,9 @@ medium: ..., expanded: ...)`.
 
 The public library exports buttons, fields, hover/focus surfaces, icons, ruled
 lines, marked lists, menus, modals, pickers, reference chips, routing, search,
-selection, settings controls, search, the command palette, sheets, foldable
+selection, settings controls, the command palette, sheets, foldable
 stacks, tooltips, device lists, pairing and code entry, notices and toasts,
-and session chrome. See the
+session chrome, and editor controls. See the
 [gallery](../../apps/gallery/README.md) for a small executable specimen set;
 it is not a complete state or accessibility audit of every export.
 
@@ -159,3 +159,32 @@ Icons come from `Ico`, which maps to Lucide. This version adds `monitor`,
 `circleCheck`, `circleAlert`, `triangleAlert`, `pointer`, `pointerClick`,
 `activity`, `gauge`, `volume`, `logOut`, `gamepad`, `qrCode`, `globe`,
 `radio`, `arrowRight`, `lock`, `userCheck`, `keyboard` and `chevronUp`.
+
+## Editor controls (0.10.0)
+
+Neutral editor chrome primitives built from `bb_tokens` with full semantics,
+keyboard navigation, and two-phase continuous gestures (`onChanged` during a
+gesture, `onChangeEnd` on commit, `onChangeCancel` on Escape):
+
+- `ToolRail`, `ToolButton`, `ToolRailSeparator`: vertical or horizontal tool
+  strips with active state, tooltips and optional shortcut hints.
+- `NumberField` (`parseNumberInput`, `formatNumberValue`): compact numeric field
+  with horizontal label scrubbing (Shift x10, Alt x0.1), arrow stepping,
+  `.`/`,` decimal parsing, min/max clamping, and Escape cancel.
+- `BbSlider`: horizontal continuous or discrete slider with keyboard stepping,
+  slider semantics, and `onChanged`/`onChangeEnd`/`onChangeCancel`.
+- `Segmented` and `SegmentOption`: mutually exclusive segment strip with
+  text and/or icon options.
+- `SwatchButton`, `SwatchGrid`, `ColorPickerPanel`, `showColorPicker`
+  (`parseHexColor`, `formatHexColor`): HSVA + hex colour picker with
+  checkerboard alpha, "none" state, and popover helper.
+- `TreeRow`, `TreeRowPress`, `TreeRowState`: indented tree item with
+  expand/collapse chevron, selection seam, hover-revealed trailing actions,
+  Shift/Ctrl-aware `onPressed`, `onSecondaryTap(Offset)` for context menus
+  and inline rename (`onRename`; double-click, F2 or `startRename()`).
+- `ZoomControl`: zoom-out, percentage label button, zoom-in, and optional fit
+  button with limit disabling.
+- `PropertyRow` and `PropertySection`: compact fixed-label inspector rows and
+  collapsible sections.
+- Additional `Ico` glyphs: `minus`, `maximize`, `eye`, `eyeOff`, `square`,
+  `circle`, and `hand`.
