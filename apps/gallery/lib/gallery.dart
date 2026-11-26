@@ -21,10 +21,14 @@ class GalleryApp extends StatefulWidget {
     super.key,
     this.initialBrightness = Brightness.light,
     this.scene = GalleryScene.primitives,
+    this.profile,
   });
 
   final Brightness initialBrightness;
   final GalleryScene scene;
+
+  /// The product profile the specimens are drawn in; standard when null.
+  final ThemeProfile? profile;
 
   @override
   State<GalleryApp> createState() => _GalleryAppState();
@@ -52,10 +56,9 @@ class _GalleryAppState extends State<GalleryApp> {
           maxScaleFactor: _maxTextScale,
           child: SizeClassScope(
             sizeClass: sizeClass,
-            child: AppTheme(
-              colors: _brightness == Brightness.dark
-                  ? AppColors.darkTheme
-                  : AppColors.light,
+            child: AppTheme.profile(
+              profile: widget.profile ?? ThemeProfile.standard,
+              dark: _brightness == Brightness.dark,
               density: sizeClass.isCompact ? Density.touch : Density.pointer,
               child: child!,
             ),

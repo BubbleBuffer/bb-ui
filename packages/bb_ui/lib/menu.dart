@@ -35,13 +35,13 @@ class MenuSurface extends StatelessWidget {
       decoration: BoxDecoration(
         color: c.bgElevated,
         borderRadius: radius == null
-            ? Radii.panel
+            ? context.shape.panel
             : BorderRadius.circular(radius!),
         boxShadow: c.seamHover,
       ),
       child: ClipRRect(
         borderRadius: radius == null
-            ? Radii.panel
+            ? context.shape.panel
             : BorderRadius.circular(radius!),
         child: child,
       ),

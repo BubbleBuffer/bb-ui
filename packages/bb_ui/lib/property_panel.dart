@@ -155,7 +155,7 @@ class _PropertySectionState extends State<PropertySection> {
                 child: Hover(
                   onTap: _toggle,
                   lift: 0,
-                  borderRadius: Radii.ctl,
+                  borderRadius: context.shape.ctl,
                   padding: const EdgeInsets.symmetric(
                     horizontal: Space.xs,
                     vertical: Space.xs,

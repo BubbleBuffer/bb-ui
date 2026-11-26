@@ -96,7 +96,7 @@ class DisplayPicker extends StatelessWidget {
         padding: const EdgeInsets.all(Space.lg),
         decoration: BoxDecoration(
           color: c.bgElevated,
-          borderRadius: Radii.panel,
+          borderRadius: context.shape.panel,
           border: Border.all(color: c.border),
           boxShadow: c.seamHover,
         ),
@@ -174,7 +174,7 @@ class _Map extends StatelessWidget {
       height: _height,
       decoration: BoxDecoration(
         color: c.bgPrimary,
-        borderRadius: Radii.field,
+        borderRadius: context.shape.field,
         border: Border.all(color: c.borderSubtle),
       ),
       child: LayoutBuilder(
@@ -244,7 +244,7 @@ class _Tile extends StatelessWidget {
       excludeSemantics: true,
       child: Hover(
         onTap: onTap,
-        borderRadius: Radii.field,
+        borderRadius: context.shape.field,
         lift: 0,
         background: selected ? c.bgSelectedBlock : c.bgSecondary,
         border: Border.all(
@@ -305,7 +305,7 @@ class _Row extends StatelessWidget {
         onTap: onTap,
         selected: selected,
         selectedColor: c.bgHover,
-        borderRadius: Radii.field,
+        borderRadius: context.shape.field,
         lift: 0,
         padding: const EdgeInsets.symmetric(horizontal: Space.sm),
         child: ConstrainedBox(

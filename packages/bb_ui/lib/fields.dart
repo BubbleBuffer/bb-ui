@@ -219,7 +219,9 @@ class _FieldFrameState extends State<FieldFrame> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: CustomPaint(
-          foregroundPainter: _focus ? _FieldFocusRing(c.focus) : null,
+          foregroundPainter: _focus
+              ? _FieldFocusRing(c.focus, context.shape.field)
+              : null,
           child: AnimatedContainer(
             duration: Motion.of(context).fast,
             curve: Motion.ease,
@@ -228,7 +230,7 @@ class _FieldFrameState extends State<FieldFrame> {
             alignment: Alignment.centerLeft,
             decoration: BoxDecoration(
               color: c.bgSecondary,
-              borderRadius: Radii.field,
+              borderRadius: context.shape.field,
               border: Border.all(color: _hover ? c.threadStrong : c.border),
             ),
             child: widget.child,
@@ -240,13 +242,14 @@ class _FieldFrameState extends State<FieldFrame> {
 }
 
 class _FieldFocusRing extends CustomPainter {
-  const _FieldFocusRing(this.color);
+  const _FieldFocusRing(this.color, this.radius);
   final Color color;
+  final BorderRadius radius;
   @override
   void paint(Canvas canvas, Size size) {
     final rect = (Offset.zero & size).inflate(Sizes.focusGap);
     canvas.drawRRect(
-      Radii.field.toRRect(rect),
+      radius.toRRect(rect),
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
@@ -255,7 +258,8 @@ class _FieldFocusRing extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_FieldFocusRing old) => old.color != color;
+  bool shouldRepaint(_FieldFocusRing old) =>
+      old.color != color || old.radius != radius;
 }
 
 /// A framed single-line field that hides what is typed, for passphrases.

@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.10.1 builds
+Flutter primitives without Material, using `bb_tokens`. Version 0.11.0 builds
 every component from token scales only, adapts by density and by its own
 width, and grows with the system text size. Moving from 0.7 is in the
 [migration guide](../../docs/migration-0.8.md).
@@ -188,4 +188,22 @@ gesture, `onChangeEnd` on commit, `onChangeCancel` on Escape):
   collapsible sections.
 - Additional `Ico` glyphs: `minus`, `maximize`, `eye`, `eyeOff`, `square`,
   `circle`, and `hand`; 0.10.1 adds `slash` (a line tool) and `pentagon`
-  (a polygon tool).
+  (a polygon tool); 0.11.0 adds the editor chrome set: `redo`, `folderOpen`,
+  `save`, `filePlus`, `sun`, `moon`, `upload`, `download`, `fileCode`, `rotateCw`,
+  `rotateCcw`, `flipHorizontal`, `flipVertical`, `grid`, `group`, `ungroup`,
+  `magnet`, `crop`, `zoomIn`, `zoomOut`, `layers`, `panelRight`, `spline`,
+  `shapes`, `library`, `smartphone`, `timerReset`, `rectangleHorizontal` and
+  `gitCommit`.
+
+## Product profiles
+
+`AppTheme.profile(profile:, dark:, density:, child:)` builds a theme from a
+`ThemeProfile`: its palette, its corner shapes and its type scale.
+`ThemeProfile.standard` is the default look. `ThemeProfile.pawth` is the
+flat editor look: warm milk chrome, a darker `stage` colour behind artwork,
+tight 4px corners and a 13px interface size. Widgets read corners through
+`context.shape.ctl`, `context.shape.field` and `context.shape.panel`, so the
+same widget follows the profile; `Radii.ctl`, `Radii.field` and `Radii.panel`
+remain the standard values. `AppColors.stage` is the area behind a drawing
+(profiles without one use `desk`). Run the gallery with
+`--dart-define=PROFILE=pawth` to see every specimen in the `pawth` profile.

@@ -659,7 +659,7 @@ class _ColorPickerPanelState extends State<ColorPickerPanel> {
                     alignment: Alignment.centerLeft,
                     decoration: BoxDecoration(
                       color: _enabled ? c.bgSecondary : c.bgTertiary,
-                      borderRadius: Radii.field,
+                      borderRadius: context.shape.field,
                       border: Border.all(
                         color: _hexFocused ? c.focus : c.border,
                         width: _hexFocused ? Stroke.bold : Stroke.hair,
@@ -824,14 +824,14 @@ class _SvAreaState extends State<_SvArea> {
                 child: Container(
                   height: height,
                   decoration: BoxDecoration(
-                    borderRadius: Radii.field,
+                    borderRadius: context.shape.field,
                     border: Border.all(
                       color: _focused ? c.focus : c.borderStrong,
                       width: _focused ? Stroke.bold : Stroke.hair,
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: Radii.field,
+                    borderRadius: context.shape.field,
                     child: CustomPaint(
                       size: Size(width, height),
                       painter: _SvPainter(

@@ -131,4 +131,18 @@ void main() {
     expect(type, same(TypeScale.touch));
     expect(picked, 'c');
   });
+
+  test('the pawth profile has its own stage, corners and type scale', () {
+    final standard = ThemeProfile.standard;
+    final pawth = ThemeProfile.pawth;
+
+    expect(
+      pawth.colors(dark: false).stage,
+      isNot(pawth.colors(dark: false).desk),
+    );
+    expect(pawth.colors(dark: true).dark, isTrue);
+    expect(pawth.shape.ctl, isNot(standard.shape.ctl));
+    expect(standard.shape, same(Shapes.standard));
+    expect(pawth.type, same(TypeScale.pawth));
+  });
 }

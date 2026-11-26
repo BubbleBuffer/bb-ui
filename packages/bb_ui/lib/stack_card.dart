@@ -133,7 +133,7 @@ class _FoldableStackCardState extends State<FoldableStackCard> {
                 height: ControlSize.xs.height,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  borderRadius: Radii.ctl,
+                  borderRadius: context.shape.ctl,
                   border: Border.all(color: c.border),
                 ),
                 child: Icon20(

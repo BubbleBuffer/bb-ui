@@ -96,7 +96,7 @@ class PrimaryButton extends StatelessWidget {
       enabled: enabled,
       child: Hover(
         onTap: onTap,
-        borderRadius: Radii.ctl,
+        borderRadius: context.shape.ctl,
         background: enabled ? c.accent : c.bgTertiary,
         hoverBackground: c.accentHover,
         pressedBackground: c.accentHover,
@@ -163,7 +163,7 @@ class SecondaryButton extends StatelessWidget {
               ? c.inlineCodeText.withValues(alpha: Alpha.muted)
               : c.thread,
         ),
-        borderRadius: Radii.ctl,
+        borderRadius: context.shape.ctl,
         padding: const EdgeInsets.symmetric(horizontal: Space.md),
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: size.height),
@@ -213,7 +213,7 @@ class StacksCheckbox extends StatelessWidget {
       checked: checked,
       child: Hover(
         onTap: onChanged == null ? null : () => onChanged!(!checked),
-        borderRadius: Radii.ctl,
+        borderRadius: context.shape.ctl,
         child: AnimatedContainer(
           duration: Motion.of(context).fast,
           curve: Motion.settle,
@@ -221,7 +221,7 @@ class StacksCheckbox extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             color: checked ? (fill ?? c.accent) : null,
-            borderRadius: Radii.ctl,
+            borderRadius: context.shape.ctl,
             border: Border.all(
               color: checked ? (fill ?? c.accent) : c.threadStrong,
               width: Stroke.regular,

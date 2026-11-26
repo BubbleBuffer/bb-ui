@@ -216,7 +216,7 @@ class DialogButton extends StatelessWidget {
     final enabled = onTap != null;
     return Hover(
       onTap: onTap,
-      borderRadius: Radii.ctl,
+      borderRadius: context.shape.ctl,
       background: filled ? (enabled ? base : c.bgTertiary) : c.bgPrimary,
       hoverBackground: filled
           ? (base == c.accent
@@ -423,7 +423,7 @@ class PanelRow extends StatelessWidget {
     onTap: onTap,
     selected: selected,
     selectedColor: context.colors.bgPressed,
-    borderRadius: Radii.ctl,
+    borderRadius: context.shape.ctl,
     padding:
         padding ?? EdgeInsets.symmetric(horizontal: context.metrics.insetX),
     child: child,

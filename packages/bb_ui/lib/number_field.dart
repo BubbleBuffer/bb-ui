@@ -360,7 +360,9 @@ class _NumberFieldState extends State<NumberField> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: CustomPaint(
-          foregroundPainter: _focused ? _NumberFocusRing(c.focus) : null,
+          foregroundPainter: _focused
+              ? _NumberFocusRing(c.focus, context.shape.field)
+              : null,
           child: AnimatedContainer(
             duration: Motion.of(context).fast,
             curve: Motion.ease,
@@ -369,7 +371,7 @@ class _NumberFieldState extends State<NumberField> {
             ),
             decoration: BoxDecoration(
               color: enabled ? c.bgSecondary : c.bgTertiary,
-              borderRadius: Radii.field,
+              borderRadius: context.shape.field,
               border: Border.all(
                 color: !enabled
                     ? c.borderSubtle
@@ -467,15 +469,16 @@ class _NumberFieldState extends State<NumberField> {
 }
 
 class _NumberFocusRing extends CustomPainter {
-  const _NumberFocusRing(this.color);
+  const _NumberFocusRing(this.color, this.radius);
 
   final Color color;
+  final BorderRadius radius;
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = (Offset.zero & size).inflate(Sizes.focusGap);
     canvas.drawRRect(
-      Radii.field.toRRect(rect),
+      radius.toRRect(rect),
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
@@ -484,5 +487,6 @@ class _NumberFocusRing extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_NumberFocusRing old) => old.color != color;
+  bool shouldRepaint(_NumberFocusRing old) =>
+      old.color != color || old.radius != radius;
 }

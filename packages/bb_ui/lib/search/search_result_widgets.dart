@@ -252,7 +252,7 @@ class SearchResultsList extends StatelessWidget {
         return DecoratedBox(
           decoration: BoxDecoration(
             color: item.index == active ? c.bgHover : null,
-            borderRadius: Radii.ctl,
+            borderRadius: context.shape.ctl,
           ),
           child: row,
         );

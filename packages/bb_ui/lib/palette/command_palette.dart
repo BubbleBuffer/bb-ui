@@ -298,11 +298,11 @@ class _CommandPaletteState extends State<CommandPalette> {
       decoration: BoxDecoration(
         color: c.bgElevated,
         border: full ? null : Border.all(color: c.borderStrong),
-        borderRadius: full ? null : Radii.panel,
+        borderRadius: full ? null : context.shape.panel,
         boxShadow: full ? null : c.seamHover,
       ),
       child: ClipRRect(
-        borderRadius: full ? BorderRadius.zero : Radii.panel,
+        borderRadius: full ? BorderRadius.zero : context.shape.panel,
         child: Column(
           mainAxisSize: full ? MainAxisSize.max : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -472,7 +472,7 @@ class _PaletteRow extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: active ? c.bgHover : null,
-                borderRadius: Radii.ctl,
+                borderRadius: context.shape.ctl,
               ),
               child: Stack(
                 fit: StackFit.expand,

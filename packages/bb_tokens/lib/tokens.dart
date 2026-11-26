@@ -141,7 +141,9 @@ class AppColors {
     required this.seamHover,
     required this.stack,
     ProfileColors? palette,
-  }) : palette = palette ?? (dark ? ProfileColors.dark : ProfileColors.light);
+    Color? stage,
+  }) : palette = palette ?? (dark ? ProfileColors.dark : ProfileColors.light),
+       stage = stage ?? desk;
 
   /// Every role of the agent-kit profile, including the ones below that
   /// have no field of their own (status, diff, context and control colours).
@@ -174,6 +176,10 @@ class AppColors {
   final Color overlay;
   final Color desk;
 
+  /// The field behind a drawing: darker than the chrome so the artwork leads.
+  /// Profiles without a stage use [desk].
+  final Color stage;
+
   /// Accent-coloured text on a surface.
   final Color accentText;
 
@@ -200,6 +206,89 @@ class AppColors {
   static final light = _appColors(ProfileColors.light, dark: false);
 
   static final darkTheme = _appColors(ProfileColors.dark, dark: true);
+
+  /// The `pawth` product profile, light. Chrome is the family canvas colour
+  /// and the stage a darker field. Seams are the family boundary.
+  static final pawthLight = _pawthColors(
+    FamilyColors.light,
+    ProductDialect.pawth,
+    ProfileColors.light,
+    dark: false,
+  );
+
+  /// The `pawth` product profile, dark.
+  static final pawthDark = _pawthColors(
+    FamilyColors.dark,
+    ProductDialect.pawthDark,
+    ProfileColors.dark,
+    dark: true,
+  );
+}
+
+/// The `pawth` dialect over the generated palette: roles come from the family
+/// colours, not from the dialect's `boundary`, which holds the strong seam.
+/// The editor's own CSS (hover, selected, stage) is the reference for the
+/// blends.
+AppColors _pawthColors(
+  FamilyColors f,
+  ProductDialect d,
+  ProfileColors p, {
+  required bool dark,
+}) {
+  final hover = f.surfaceMuted.withValues(alpha: dark ? .7 : .55);
+  final selected = Color.alphaBlend(
+    f.accent.withValues(alpha: dark ? .22 : .24),
+    f.canvas,
+  );
+  return AppColors(
+    dark: dark,
+    palette: p,
+    stage: d.stage,
+    bgPrimary: f.canvas,
+    bgSecondary: f.surface,
+    bgTertiary: f.surfaceMuted,
+    bgElevated: f.surface,
+    bgHover: hover,
+    bgPressed: f.surfaceMuted,
+    bgSelectedBlock: selected,
+    textSelection: f.accent.withValues(alpha: .45),
+    textPrimary: f.ink,
+    textSecondary: f.muted,
+    textTertiary: f.muted.withValues(alpha: .7),
+    textDisabled: f.muted.withValues(alpha: .55),
+    iconPrimary: f.ink,
+    iconSecondary: f.muted,
+    iconTertiary: f.muted.withValues(alpha: .7),
+    border: f.boundary,
+    borderSubtle: f.boundary.withValues(alpha: .5),
+    borderStrong: f.boundaryStrong,
+    borderTranslucent: f.boundary,
+    divider: f.boundary,
+    accent: f.accent,
+    accentHover: Color.alphaBlend(f.ink.withValues(alpha: .14), f.accent),
+    inlineCodeBg: f.canvas,
+    inlineCodeText: f.accentText,
+    overlay: p.scrim,
+    desk: f.canvas,
+    accentText: f.accentText,
+    accentInk: f.accentInk,
+    focus: dark ? f.focus : f.accentText,
+    thread: f.boundary,
+    threadStrong: f.boundaryStrong,
+    okBg: d.constructive,
+    infoBg: d.information,
+    attnBg: d.attention,
+    dangerBg: d.danger,
+    pawBg: p.pawTint,
+    rail: p.scratchRail,
+    rail2: p.scratchRail2,
+    railInk: p.scratchRailInk,
+    railMuted: p.scratchRailMuted,
+    railLine: p.scratchRailLine,
+    seam: p.shadow,
+    seamHover: p.shadowHover,
+    stack: p.shadowStack,
+  );
 }
 
 /// Scratch's field names over the generated palette.
@@ -433,6 +522,10 @@ enum Weight {
   regular(FontWeight.w400, Contract.typographyUiWeightRegular),
   strong(FontWeight.w700, Contract.typographyUiWeightStrong),
 
+  /// Between regular and strong: the weight of a labelled control in the
+  /// `pawth` ramp.
+  semibold(FontWeight.w600, 600),
+
   /// The display face's title weight.
   display(FontWeight.w600, Contract.typographyDisplayWeightRegular),
 
@@ -524,6 +617,25 @@ class TypeScale {
     micro: TypeSpec._(10, 12, Weight.strong),
     code: TypeSpec._(13.6, 20.4, Weight.regular),
     codeSmall: TypeSpec._(12, 16, Weight.regular),
+  );
+
+  /// The `pawth` ramp: a 13 px body at 1.45, labels, 12 px notes and 11 px
+  /// mono, for a dense editor. [display] is the wordmark.
+  static const pawth = TypeScale._(
+    pageTitle: TypeSpec._(28, 30, Weight.strong),
+    display: TypeSpec._(19, 20, Weight.strong),
+    h1: TypeSpec._(20, 26, Weight.strong),
+    h2: TypeSpec._(15, 20, Weight.strong),
+    h3: TypeSpec._(13, 18.85, Weight.strong),
+    title: TypeSpec._(15, 20, Weight.strong),
+    body: TypeSpec._(13, 18.85, Weight.regular),
+    item: TypeSpec._(13, 18.85, Weight.regular),
+    ui: TypeSpec._(13, 18.85, Weight.semibold),
+    uiSmall: TypeSpec._(12, 16, Weight.regular),
+    caption: TypeSpec._(12, 16, Weight.regular),
+    micro: TypeSpec._(10, 12, Weight.regular),
+    code: TypeSpec._(11, 16, Weight.regular),
+    codeSmall: TypeSpec._(11, 16, Weight.regular),
   );
 
   static const touch = TypeScale._(
@@ -630,6 +742,71 @@ class Radii {
 
   /// A uniform corner of [sm], [md], [lg] or [sheet].
   static BorderRadius all(double r) => BorderRadius.all(Radius.circular(r));
+}
+
+/// The asymmetric corner radii of a look. Widgets read them from
+/// `context.shape`, so a profile changes every control at once.
+@immutable
+class Shapes {
+  const Shapes({required this.ctl, required this.field, required this.panel});
+
+  /// Buttons, tools and chips.
+  final BorderRadius ctl;
+
+  /// Inputs, rows and swatches.
+  final BorderRadius field;
+
+  /// Panels and cards.
+  final BorderRadius panel;
+
+  /// The unified language: [Radii.ctl], [Radii.field] and [Radii.panel].
+  static const standard = Shapes(
+    ctl: Contract.radiusControl,
+    field: Contract.radiusField,
+    panel: Contract.radiusPanel,
+  );
+
+  /// The `pawth` profile's tighter corners.
+  static final pawth = Shapes(
+    ctl: ProductDialect.pawth.radiusControl,
+    field: ProductDialect.pawth.radiusField,
+    panel: ProductDialect.pawth.radiusPanel,
+  );
+}
+
+/// A look the app picks once at its root: a palette per brightness, the
+/// corner radii and, when it differs, the type ramp.
+@immutable
+class ThemeProfile {
+  const ThemeProfile({
+    required this.light,
+    required this.dark,
+    this.shape = Shapes.standard,
+    this.type,
+  });
+
+  final AppColors light, dark;
+  final Shapes shape;
+
+  /// The pointer type ramp; null keeps the density's own.
+  final TypeScale? type;
+
+  /// The unified BubbleBuffer language.
+  static final standard = ThemeProfile(
+    light: AppColors.light,
+    dark: AppColors.darkTheme,
+  );
+
+  /// The `pawth` product profile: milk chrome, a darker stage, tight corners,
+  /// a 13 px type ramp.
+  static final pawth = ThemeProfile(
+    light: AppColors.pawthLight,
+    dark: AppColors.pawthDark,
+    shape: Shapes.pawth,
+    type: TypeScale.pawth,
+  );
+
+  AppColors colors({required bool dark}) => dark ? this.dark : light;
 }
 
 class Motion {
@@ -825,12 +1002,37 @@ class AppTheme extends InheritedWidget {
     super.key,
     required this.colors,
     required this.density,
+    this.shape = Shapes.standard,
+    this.typeScale,
     required super.child,
   });
+
+  /// The theme of [profile] in the given brightness.
+  factory AppTheme.profile({
+    Key? key,
+    required ThemeProfile profile,
+    required bool dark,
+    Density density = Density.pointer,
+    required Widget child,
+  }) => AppTheme(
+    key: key,
+    colors: profile.colors(dark: dark),
+    density: density,
+    shape: profile.shape,
+    typeScale: density == Density.pointer ? profile.type : null,
+    child: child,
+  );
+
   final AppColors colors;
   final Density density;
 
-  TypeScale get type => density.type;
+  /// Corner radii of controls, fields and panels.
+  final Shapes shape;
+
+  /// Overrides the density's type ramp.
+  final TypeScale? typeScale;
+
+  TypeScale get type => typeScale ?? density.type;
   Metrics get metrics => density.metrics;
 
   static AppTheme of(BuildContext context) =>
@@ -838,12 +1040,16 @@ class AppTheme extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AppTheme old) =>
-      old.colors != colors || old.density != density;
+      old.colors != colors ||
+      old.density != density ||
+      old.shape != shape ||
+      old.typeScale != typeScale;
 }
 
 extension ThemeX on BuildContext {
   AppColors get colors => AppTheme.of(this).colors;
   TypeScale get type => AppTheme.of(this).type;
+  Shapes get shape => AppTheme.of(this).shape;
   Density get density => AppTheme.of(this).density;
   Metrics get metrics => AppTheme.of(this).metrics;
   bool get touch => density == Density.touch;
