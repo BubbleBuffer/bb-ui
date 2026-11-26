@@ -783,6 +783,7 @@ class ThemeProfile {
     required this.dark,
     this.shape = Shapes.standard,
     this.type,
+    this.metrics,
   });
 
   final AppColors light, dark;
@@ -790,6 +791,9 @@ class ThemeProfile {
 
   /// The pointer type ramp; null keeps the density's own.
   final TypeScale? type;
+
+  /// The pointer sizes; null keeps the density's own.
+  final Metrics? metrics;
 
   /// The unified BubbleBuffer language.
   static final standard = ThemeProfile(
@@ -804,6 +808,7 @@ class ThemeProfile {
     dark: AppColors.pawthDark,
     shape: Shapes.pawth,
     type: TypeScale.pawth,
+    metrics: Metrics.dense,
   );
 
   AppColors colors({required bool dark}) => dark ? this.dark : light;
@@ -892,6 +897,21 @@ class Metrics {
     required this.padX,
     required this.insetX,
   });
+
+  /// The pointer sizes with 28 px fields and controls, for dense tools.
+  static const dense = Metrics._(
+    row: ControlSize.sm,
+    listRow: ControlSize.lg,
+    tallRow: 64,
+    field: ControlSize.sm,
+    control: ControlSize.sm,
+    target: ControlSize.xs,
+    icon: IconSize.lg,
+    iconSmall: IconSize.sm,
+    iconGap: Space.sm,
+    padX: Space.sm,
+    insetX: Space.sm,
+  );
 
   static const pointer = Metrics._(
     row: ControlSize.sm,
@@ -1004,6 +1024,7 @@ class AppTheme extends InheritedWidget {
     required this.density,
     this.shape = Shapes.standard,
     this.typeScale,
+    this.metricsOverride,
     required super.child,
   });
 
@@ -1020,6 +1041,7 @@ class AppTheme extends InheritedWidget {
     density: density,
     shape: profile.shape,
     typeScale: density == Density.pointer ? profile.type : null,
+    metricsOverride: density == Density.pointer ? profile.metrics : null,
     child: child,
   );
 
@@ -1032,8 +1054,11 @@ class AppTheme extends InheritedWidget {
   /// Overrides the density's type ramp.
   final TypeScale? typeScale;
 
+  /// Overrides the density's sizes.
+  final Metrics? metricsOverride;
+
   TypeScale get type => typeScale ?? density.type;
-  Metrics get metrics => density.metrics;
+  Metrics get metrics => metricsOverride ?? density.metrics;
 
   static AppTheme of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AppTheme>()!;
@@ -1043,7 +1068,8 @@ class AppTheme extends InheritedWidget {
       old.colors != colors ||
       old.density != density ||
       old.shape != shape ||
-      old.typeScale != typeScale;
+      old.typeScale != typeScale ||
+      old.metricsOverride != metricsOverride;
 }
 
 extension ThemeX on BuildContext {

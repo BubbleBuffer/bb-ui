@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.11.0 builds
+Flutter primitives without Material, using `bb_tokens`. Version 0.11.1 builds
 every component from token scales only, adapts by density and by its own
 width, and grows with the system text size. Moving from 0.7 is in the
 [migration guide](../../docs/migration-0.8.md).
@@ -198,7 +198,8 @@ gesture, `onChangeEnd` on commit, `onChangeCancel` on Escape):
 ## Product profiles
 
 `AppTheme.profile(profile:, dark:, density:, child:)` builds a theme from a
-`ThemeProfile`: its palette, its corner shapes and its type scale.
+`ThemeProfile`: its palette, its corner shapes, its type scale and, for dense
+tools, its control sizes (`Metrics.dense`, 28px fields and controls, pawth only).
 `ThemeProfile.standard` is the default look. `ThemeProfile.pawth` is the
 flat editor look: warm milk chrome, a darker `stage` colour behind artwork,
 tight 4px corners and a 13px interface size. Widgets read corners through
