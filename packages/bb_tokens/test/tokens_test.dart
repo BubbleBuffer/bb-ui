@@ -144,5 +144,7 @@ void main() {
     expect(pawth.shape.ctl, isNot(standard.shape.ctl));
     expect(standard.shape, same(Shapes.standard));
     expect(pawth.type, same(TypeScale.pawth));
+    expect(pawth.metrics, same(Metrics.dense));
+    expect(Metrics.dense.field, ControlSize.sm);
   });
 }
