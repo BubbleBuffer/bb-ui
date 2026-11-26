@@ -385,7 +385,7 @@ class Segmented<T> extends StatelessWidget {
         child: Hover(
           key: option.key,
           onTap: enabled && !selected ? () => onChanged!(option.value) : null,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           lift: 0,
           background: selected ? c.bgPrimary : null,
           border: selected
@@ -428,7 +428,7 @@ class Segmented<T> extends StatelessWidget {
         padding: const EdgeInsets.all(Space.hair),
         decoration: BoxDecoration(
           color: c.bgSecondary,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           border: Border.all(color: enabled ? c.borderStrong : c.border),
         ),
         child: Row(
@@ -536,7 +536,7 @@ class OutlineButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: Space.md),
         decoration: BoxDecoration(
           color: c.bgPrimary,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           border: Border.all(
             color: danger
                 ? c.inlineCodeText.withValues(alpha: Alpha.muted)
@@ -618,7 +618,7 @@ class _CopyableTextState extends State<CopyableText> {
       ),
       decoration: BoxDecoration(
         color: c.bgSecondary,
-        borderRadius: Radii.field,
+        borderRadius: context.shape.field,
         border: Border.all(color: c.borderSubtle),
       ),
       child: Row(

@@ -80,7 +80,7 @@ class OneTimeCode extends StatelessWidget {
       padding: const EdgeInsets.all(Space.lg),
       decoration: BoxDecoration(
         color: c.bgSecondary,
-        borderRadius: Radii.panel,
+        borderRadius: context.shape.panel,
         border: Border.all(color: c.border),
       ),
       child: Column(
@@ -151,7 +151,7 @@ class ComparisonNumber extends StatelessWidget {
       padding: const EdgeInsets.all(Space.xl),
       decoration: BoxDecoration(
         color: c.bgSecondary,
-        borderRadius: Radii.panel,
+        borderRadius: context.shape.panel,
         border: Border.all(color: c.border),
       ),
       child: Column(
@@ -220,7 +220,7 @@ class QrFrame extends StatelessWidget {
           padding: EdgeInsets.all(size * Sizes.qrQuietZone),
           decoration: BoxDecoration(
             color: paper,
-            borderRadius: Radii.field,
+            borderRadius: context.shape.field,
             border: Border.all(color: c.borderStrong),
           ),
           child: child,

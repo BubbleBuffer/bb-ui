@@ -69,7 +69,7 @@ class NoticeBanner extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: fill,
-          borderRadius: Radii.field,
+          borderRadius: context.shape.field,
           border: Border.all(color: line),
         ),
         child: Row(
@@ -160,7 +160,7 @@ class EmptyState extends StatelessWidget {
                 height: Sizes.emptyMark,
                 decoration: BoxDecoration(
                   color: c.bgHover,
-                  borderRadius: Radii.panel,
+                  borderRadius: context.shape.panel,
                 ),
                 child: Center(
                   child: Icon20(
@@ -231,12 +231,12 @@ class ToastCard extends StatelessWidget {
         width: width,
         decoration: BoxDecoration(
           color: c.bgElevated,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           border: Border.all(color: c.border),
           boxShadow: c.seamHover,
         ),
         child: ClipRRect(
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           child: Stack(
             children: [
               Padding(
@@ -254,7 +254,7 @@ class ToastCard extends StatelessWidget {
                         height: Sizes.tileSmall,
                         decoration: BoxDecoration(
                           color: c.pawBg,
-                          borderRadius: Radii.field,
+                          borderRadius: context.shape.field,
                         ),
                         child: Center(
                           child: Icon20(icon!, color: c.accentText),

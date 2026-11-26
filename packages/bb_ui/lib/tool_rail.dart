@@ -56,7 +56,7 @@ class ToolRail extends StatelessWidget {
         padding: padding,
         decoration: BoxDecoration(
           color: c.bgElevated,
-          borderRadius: Radii.panel,
+          borderRadius: context.shape.panel,
           border: Border.all(color: c.border),
         ),
         child: _ToolRailScope(
@@ -171,7 +171,7 @@ class ToolButton extends StatelessWidget {
         selectedColor: enabled ? c.bgSelectedBlock : c.bgHover,
         hoverColor: selected ? c.bgSelectedBlock : null,
         lift: 0,
-        borderRadius: Radii.ctl,
+        borderRadius: context.shape.ctl,
         border: selected
             ? Border.all(color: enabled ? c.accent : c.border)
             : null,

@@ -63,7 +63,7 @@ class ZoomControl extends StatelessWidget {
       padding: const EdgeInsets.all(Space.hair),
       decoration: BoxDecoration(
         color: c.bgElevated,
-        borderRadius: Radii.ctl,
+        borderRadius: context.shape.ctl,
         border: Border.all(color: c.border),
       ),
       child: Row(
@@ -87,7 +87,7 @@ class ZoomControl extends StatelessWidget {
               child: Hover(
                 onTap: onLabelPressed,
                 lift: 0,
-                borderRadius: Radii.ctl,
+                borderRadius: context.shape.ctl,
                 padding: const EdgeInsets.symmetric(horizontal: Space.xs),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
@@ -160,7 +160,7 @@ class _ZoomIconBtn extends StatelessWidget {
         child: Hover(
           onTap: onTap,
           lift: 0,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           child: SizedBox(
             width: size.height,
             height: size.height,

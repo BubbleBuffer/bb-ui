@@ -64,7 +64,7 @@ class _HoverState extends State<Hover> {
     final radius =
         widget.borderRadius ??
         (widget.radius == Radii.md
-            ? Radii.ctl
+            ? context.shape.ctl
             : BorderRadius.circular(widget.radius));
     final bg = _down
         ? (widget.pressedBackground ?? c.bgPressed)

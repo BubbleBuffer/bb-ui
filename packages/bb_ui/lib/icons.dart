@@ -82,6 +82,35 @@ enum Ico {
   hand,
   slash,
   pentagon,
+  redo,
+  folderOpen,
+  save,
+  sun,
+  moon,
+  upload,
+  download,
+  fileCode,
+  rotateCw,
+  rotateCcw,
+  flipHorizontal,
+  flipVertical,
+  grid,
+  group,
+  ungroup,
+  magnet,
+  crop,
+  zoomIn,
+  zoomOut,
+  gitCommit,
+  rectangleHorizontal,
+  layers,
+  panelRight,
+  timerReset,
+  shapes,
+  library,
+  smartphone,
+  spline,
+  filePlus,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -448,6 +477,147 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.pentagon,
     LucideIcons.pentagon500,
   ), // pentagon
+  Ico.redo: (
+    LucideIcons.redo2300,
+    LucideIcons.redo2,
+    LucideIcons.redo2500,
+  ), // redo-2
+  Ico.folderOpen: (
+    LucideIcons.folderOpen300,
+    LucideIcons.folderOpen,
+    LucideIcons.folderOpen500,
+  ), // folder-open
+  Ico.save: (
+    LucideIcons.save300,
+    LucideIcons.save,
+    LucideIcons.save500,
+  ), // save
+  Ico.sun: (LucideIcons.sun300, LucideIcons.sun, LucideIcons.sun500), // sun
+  Ico.moon: (
+    LucideIcons.moon300,
+    LucideIcons.moon,
+    LucideIcons.moon500,
+  ), // moon
+  Ico.upload: (
+    LucideIcons.upload300,
+    LucideIcons.upload,
+    LucideIcons.upload500,
+  ), // upload
+  Ico.download: (
+    LucideIcons.download300,
+    LucideIcons.download,
+    LucideIcons.download500,
+  ), // download
+  Ico.fileCode: (
+    LucideIcons.fileCode300,
+    LucideIcons.fileCode,
+    LucideIcons.fileCode500,
+  ), // file-code
+  Ico.rotateCw: (
+    LucideIcons.rotateCw300,
+    LucideIcons.rotateCw,
+    LucideIcons.rotateCw500,
+  ), // rotate-cw
+  Ico.rotateCcw: (
+    LucideIcons.rotateCcw300,
+    LucideIcons.rotateCcw,
+    LucideIcons.rotateCcw500,
+  ), // rotate-ccw
+  Ico.flipHorizontal: (
+    LucideIcons.flipHorizontal300,
+    LucideIcons.flipHorizontal,
+    LucideIcons.flipHorizontal500,
+  ), // flip-horizontal
+  Ico.flipVertical: (
+    LucideIcons.flipVertical300,
+    LucideIcons.flipVertical,
+    LucideIcons.flipVertical500,
+  ), // flip-vertical
+  Ico.grid: (
+    LucideIcons.grid3x3300,
+    LucideIcons.grid3x3,
+    LucideIcons.grid3x3500,
+  ), // grid-3x3
+  Ico.group: (
+    LucideIcons.group300,
+    LucideIcons.group,
+    LucideIcons.group500,
+  ), // group
+  Ico.ungroup: (
+    LucideIcons.ungroup300,
+    LucideIcons.ungroup,
+    LucideIcons.ungroup500,
+  ), // ungroup
+  Ico.magnet: (
+    LucideIcons.magnet300,
+    LucideIcons.magnet,
+    LucideIcons.magnet500,
+  ), // magnet
+  Ico.crop: (
+    LucideIcons.crop300,
+    LucideIcons.crop,
+    LucideIcons.crop500,
+  ), // crop
+  Ico.zoomIn: (
+    LucideIcons.zoomIn300,
+    LucideIcons.zoomIn,
+    LucideIcons.zoomIn500,
+  ), // zoom-in
+  Ico.zoomOut: (
+    LucideIcons.zoomOut300,
+    LucideIcons.zoomOut,
+    LucideIcons.zoomOut500,
+  ), // zoom-out
+  Ico.gitCommit: (
+    LucideIcons.gitCommit300,
+    LucideIcons.gitCommit,
+    LucideIcons.gitCommit500,
+  ), // git-commit-horizontal
+  Ico.rectangleHorizontal: (
+    LucideIcons.rectangleHorizontal300,
+    LucideIcons.rectangleHorizontal,
+    LucideIcons.rectangleHorizontal500,
+  ), // rectangle-horizontal
+  Ico.layers: (
+    LucideIcons.layers300,
+    LucideIcons.layers,
+    LucideIcons.layers500,
+  ), // layers
+  Ico.panelRight: (
+    LucideIcons.panelRight300,
+    LucideIcons.panelRight,
+    LucideIcons.panelRight500,
+  ), // panel-right
+  Ico.timerReset: (
+    LucideIcons.timerReset300,
+    LucideIcons.timerReset,
+    LucideIcons.timerReset500,
+  ), // timer-reset
+  Ico.shapes: (
+    LucideIcons.shapes300,
+    LucideIcons.shapes,
+    LucideIcons.shapes500,
+  ), // shapes
+  Ico.library: (
+    LucideIcons.library300,
+    LucideIcons.library,
+    LucideIcons.library500,
+  ), // library
+  Ico.smartphone: (
+    LucideIcons.smartphone300,
+    LucideIcons.smartphone,
+    LucideIcons.smartphone500,
+  ), // smartphone
+  Ico.filePlus: (
+    LucideIcons.filePlus300,
+    LucideIcons.filePlus,
+    LucideIcons.filePlus500,
+  ), // filePlus
+  Ico.spline: (
+    LucideIcons.spline300,
+    LucideIcons.spline,
+    LucideIcons.spline500,
+  ), // spline
 };
 
 class Icon20 extends StatelessWidget {

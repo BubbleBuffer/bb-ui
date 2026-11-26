@@ -45,7 +45,7 @@ class DeviceRow extends StatelessWidget {
       height: Sizes.tile,
       decoration: BoxDecoration(
         color: selected ? c.textPrimary : c.bgHover,
-        borderRadius: Radii.field,
+        borderRadius: context.shape.field,
       ),
       child: Center(
         child: Icon20(
@@ -101,7 +101,7 @@ class DeviceRow extends StatelessWidget {
           onTap: onTap,
           selected: selected,
           selectedColor: c.bgHover,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           padding: const EdgeInsets.fromLTRB(
             Space.lg,
             Space.md,

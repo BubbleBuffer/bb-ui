@@ -116,7 +116,7 @@ class MetricsPanel extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: c.bgElevated,
-        borderRadius: Radii.ctl,
+        borderRadius: context.shape.ctl,
         border: Border.all(color: c.border),
         boxShadow: c.seamHover,
       ),

@@ -107,7 +107,7 @@ class _SheetSurfaceState extends State<SheetSurface> {
           ),
           decoration: BoxDecoration(
             color: c.bgElevated,
-            borderRadius: Radii.panel,
+            borderRadius: context.shape.panel,
             boxShadow: c.seamHover,
           ),
           padding: EdgeInsets.only(bottom: safe.bottom + Space.sm),
@@ -187,7 +187,7 @@ class SheetItem extends StatelessWidget {
     final color = danger ? c.inlineCodeText : null;
     return Hover(
       onTap: onTap,
-      borderRadius: Radii.ctl,
+      borderRadius: context.shape.ctl,
       selected: selected,
       padding: const EdgeInsets.symmetric(horizontal: Layout.gutter),
       child: ConstrainedBox(

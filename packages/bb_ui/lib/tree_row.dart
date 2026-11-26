@@ -261,7 +261,7 @@ class TreeRowState extends State<TreeRow> {
           key: widget.chevronKey,
           onTap: widget.onToggleExpanded,
           lift: 0,
-          borderRadius: Radii.ctl,
+          borderRadius: context.shape.ctl,
           child: SizedBox(
             width: chevronDim,
             height: chevronDim,
@@ -331,7 +331,7 @@ class TreeRowState extends State<TreeRow> {
                   selected: widget.selected,
                   selectedColor: c.bgSelectedBlock,
                   lift: 0,
-                  borderRadius: Radii.ctl,
+                  borderRadius: context.shape.ctl,
                   padding: EdgeInsets.only(
                     left: Space.xs + widget.depth * Space.lg,
                     right: Space.xs,
