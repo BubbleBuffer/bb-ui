@@ -10,6 +10,7 @@ the [migration guide](docs/migration-0.8.md).
 | `packages/bb_tokens` | Colours, typography, spacing, radii, motion and themes |
 | `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection, stacks, device lists, pairing, session chrome, and editor controls |
 | `packages/bb_lints` | Analyzer plugin that keeps UI code on the tokens, and the 0.8 migrate tool |
+| `packages/bb_ui_testing` | Widget coverage checks and step-driven Flutter test journeys |
 | `apps/gallery` | Interactive neutral specimens and Linux golden tests |
 
 The packages retain their existing APIs and directory names after extraction
@@ -36,6 +37,9 @@ For a tokens-only consumer use the same Git dependency with
 `path: packages/bb_tokens`. See [bb_ui](packages/bb_ui/README.md) for theme setup
 and [bb_tokens](packages/bb_tokens/README.md) for the scales and colour
 generation.
+
+Add [bb_ui_testing](docs/testing.md) as a dev dependency to check widget
+coverage and track the actions users take to complete a journey.
 
 ### Style rules
 
@@ -64,14 +68,15 @@ dart analyze --fatal-infos   # with the bb_lints rules; flutter analyze skips pl
 (cd packages/bb_lints && dart pub get && dart analyze && dart test)
 (cd packages/bb_tokens && flutter test)
 (cd packages/bb_ui && flutter test)
+(cd packages/bb_ui_testing && flutter test)
 (cd apps/gallery && flutter test --exclude-tags golden)
 (cd apps/gallery && flutter test --tags golden)
 bash scripts/check-private-strings.sh --patterns /path/to/private-rules
 ```
 
 Run the [gallery](apps/gallery/README.md) with `flutter run -d chrome` from
-`apps/gallery`. See [verification](docs/verification.md) for CI, initial golden
-baseline generation, candidate review and private-string configuration.
+`apps/gallery`. See the [docs index](docs/README.md) for testing, CI,
+golden baselines and migration.
 
 ## Licence
 
