@@ -38,9 +38,9 @@ for a class extending `State<WidgetName>` and checks that class's `build`. If
 the scan finds the state class but cannot find its `build` body, any executed
 line in that state class body counts. The scan matches declared builds by source
 line, so use a report generated from the same source revision. The per-widget
-`hit` field records whether the scan
-found a positive line hit. LCOV mode uses executed lines alone, so tests can
-find widgets by key, text, or other properties.
+`hit` field records whether the scan found a positive line hit. LCOV mode uses
+executed lines alone, so tests can find widgets by key, text, or other
+properties.
 
 ### Source references
 
