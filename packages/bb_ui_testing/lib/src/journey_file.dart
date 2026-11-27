@@ -130,7 +130,9 @@ class _YamlSubset {
     return result;
   }
 
-  static final _entry = RegExp(r'^([A-Za-z_][A-Za-z0-9_-]*):(?:\s+(.*)|$)');
+  static final _entry = RegExp(
+    r'^(?<key>[A-Za-z_][A-Za-z0-9_-]*):(?:\s+(?<value>.*)|$)',
+  );
 
   Map<String, dynamic> _mapping(int indent) {
     final result = <String, dynamic>{};
@@ -138,9 +140,9 @@ class _YamlSubset {
       final line = _lines[_position];
       final match = _entry.firstMatch(line.text);
       if (match == null) _fail('Expected an identifier followed by a colon.');
-      final key = match.group(1)!;
+      final key = match.namedGroup('key')!;
       if (result.containsKey(key)) _fail('Duplicate key "$key".');
-      final rest = match.group(2) ?? '';
+      final rest = match.namedGroup('value') ?? '';
       _position++;
       result[key] = rest.isEmpty ? _child(indent) : _scalar(rest, line.number);
       if (_position < _lines.length && _lines[_position].indent > indent) {
