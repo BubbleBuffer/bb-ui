@@ -11,6 +11,7 @@ the [migration guide](docs/migration-0.8.md).
 | `packages/bb_ui` | Buttons, fields, menus, sheets, tooltips, selection, stacks, device lists, pairing, session chrome, and editor controls |
 | `packages/bb_lints` | Analyzer plugin that keeps UI code on the tokens, and the 0.8 migrate tool |
 | `packages/bb_ui_testing` | Widget coverage checks and step-driven Flutter test journeys |
+| `packages/bb_release` | Per-version history, consumer pin checks and agent-drafted release notes ([docs](docs/release.md)) |
 | `apps/gallery` | Interactive neutral specimens and Linux golden tests |
 
 The packages retain their existing APIs and directory names after extraction
@@ -69,6 +70,7 @@ dart analyze --fatal-infos   # with the bb_lints rules; flutter analyze skips pl
 (cd packages/bb_tokens && flutter test)
 (cd packages/bb_ui && flutter test)
 (cd packages/bb_ui_testing && flutter test)
+(cd packages/bb_release && dart pub get && dart analyze && dart test)
 (cd apps/gallery && flutter test --exclude-tags golden)
 (cd apps/gallery && flutter test --tags golden)
 bash scripts/check-private-strings.sh --patterns /path/to/private-rules
