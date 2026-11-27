@@ -106,10 +106,11 @@ any of them:
 | `--harness` | Runs | `--model` |
 | --- | --- | --- |
 | `claude` (default) | `claude -p --output-format json` without tools, MCP servers or a saved session. | Claude Code's id, default `haiku` |
+| `dsh` | The DeepSeek Harness headless CLI, one turn in a read-only sandbox with no approvals and an empty temporary directory as its workspace. The tool runs the executable named by `BB_RELEASE_DSH`, else `dsh` on the PATH, and reads the reply from the `final` run event. | None; pass `--harness-arg --patch --harness-arg <file>` to set its model |
 | `command` | Any `--command "<argv>"`. The prompt goes to stdin and the reply comes from stdout, with `{model}` substituted. | Optional |
 | `echo` | Nothing. It returns an empty reply, so you can check a run and its prompts for free. | — |
 
-`--harness-arg` adds an argument to the `claude` command line.
+`--harness-arg` adds an argument to the `claude` or `dsh` command line.
 `--timeout` limits each request (default 300 seconds). An adapter error or a
 reply without JSON marks that release as failed. Its draft lists the commit
 subjects, and the command exits 1.

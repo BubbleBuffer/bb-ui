@@ -30,11 +30,13 @@ consumers:
 notes:
   --since <version>   Only versions newer than this one.
   --unreleased        Also write notes for commits after the last bump.
-  --harness <name>    claude (default), command or echo.
+  --harness <name>    claude (default), dsh, command or echo.
   --model <id>        The harness's model id (claude default: haiku).
   --command "<argv>"  For --harness command: prompt on stdin, reply on
                       stdout; {model} is replaced.
-  --harness-arg <a>   Extra argument for claude; repeatable.
+  --harness-arg <a>   Extra argument for claude or dsh; repeatable.
+                      dsh is one read-only turn; set BB_RELEASE_DSH to its
+                      executable (default: dsh on PATH).
   --jobs <n>          Requests in flight at once (default 4).
   --max-diff <n>      Characters of diff per prompt (default 60000).
   --timeout <s>       Seconds per request (default 300).

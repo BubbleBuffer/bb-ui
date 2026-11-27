@@ -24,10 +24,10 @@ abstract class Harness {
 
   /// Builds an adapter from command-line settings.
   ///
-  /// [name] is `claude`, `command` or `echo`. [model] is the
+  /// [name] is `claude`, `dsh`, `command` or `echo`. [model] is the
   /// harness's own model id. [command] is the argv for `command`, where
   /// `{model}` is replaced and the prompt goes to stdin. [extra] is appended
-  /// to the argv of `claude`.
+  /// to the argv of `claude` and `dsh`.
   factory Harness.create(
     String name, {
     String? model,
@@ -42,6 +42,8 @@ abstract class Harness {
           extra: extra,
           timeout: timeout,
         );
+      case 'dsh':
+        return DshHarness(extra: extra, timeout: timeout);
       case 'command':
         if (command.isEmpty) {
           throw HarnessException('command needs --command "<argv>"');
@@ -50,7 +52,9 @@ abstract class Harness {
       case 'echo':
         return EchoHarness();
     }
-    throw HarnessException('unknown harness "$name" (claude, command, echo)');
+    throw HarnessException(
+      'unknown harness "$name" (claude, dsh, command, echo)',
+    );
   }
 }
 
@@ -84,7 +88,12 @@ Future<String> _run(
     },
   );
   if (code != 0) {
-    throw HarnessException('${argv.first} exited $code: ${(await err).trim()}');
+    var detail = (await err).trim();
+    if (detail.isEmpty) {
+      final text = (await out).trim();
+      detail = text.substring(text.length > 400 ? text.length - 400 : 0);
+    }
+    throw HarnessException('${argv.first} exited $code: $detail');
   }
   return out;
 }
@@ -135,6 +144,82 @@ class ClaudeHarness implements Harness {
         ? json['result'] as String
         : out;
   }
+}
+
+/// The DeepSeek Harness headless CLI for one turn: read-only sandbox, no
+/// approvals, an empty temporary directory as its workspace, and the task
+/// on stdin. The executable comes from `BB_RELEASE_DSH`, else `dsh` on the
+/// PATH. DSH has no model flag here; pass `--patch <file>` through [extra]
+/// to choose its model or reasoning effort.
+class DshHarness implements Harness {
+  DshHarness({this.extra = const [], required this.timeout});
+
+  final List<String> extra;
+  final Duration timeout;
+
+  @override
+  String get id => 'dsh';
+
+  List<String> get argv => [
+    Platform.environment['BB_RELEASE_DSH'] ?? 'dsh',
+    'headless',
+    // Global options such as `--patch` are only accepted before the
+    // headless ones.
+    ...extra,
+    '--permission-mode',
+    'read-only',
+    '--approval-policy',
+    'never',
+    '--json',
+    '-',
+  ];
+
+  @override
+  Future<String> complete(String prompt) async {
+    final work = await Directory.systemTemp.createTemp('bb_release_dsh_');
+    try {
+      final out = await _run(
+        argv,
+        stdin: prompt,
+        timeout: timeout,
+        workingDirectory: work.path,
+      );
+      return dshReply(out);
+    } finally {
+      await work.delete(recursive: true);
+    }
+  }
+}
+
+/// The reply text in the newline-delimited run events of `dsh --json`: the
+/// `final` event's text, else the `text` events joined. A `final` or
+/// `turn_end` event whose reason is not `completed` is an error.
+String dshReply(String events) {
+  final parts = StringBuffer();
+  String? finalText;
+  for (final line in const LineSplitter().convert(events)) {
+    final Object? event;
+    try {
+      event = jsonDecode(line);
+    } on FormatException {
+      continue;
+    }
+    if (event is! Map) continue;
+    final reason = event['reason'];
+    if ((event['type'] == 'final' || event['phase'] == 'turn_end') &&
+        reason is Map &&
+        reason['kind'] != 'completed') {
+      throw HarnessException('dsh: ${jsonEncode(reason)}');
+    }
+    if (event['type'] == 'text' && event['text'] is String) {
+      parts.write(event['text']);
+    } else if (event['type'] == 'final' && event['text'] is String) {
+      finalText = event['text'] as String;
+    }
+  }
+  final text = finalText ?? parts.toString();
+  if (text.trim().isEmpty) throw HarnessException('dsh: no reply in events');
+  return text;
 }
 
 /// Any command that reads the prompt on stdin and prints the reply.

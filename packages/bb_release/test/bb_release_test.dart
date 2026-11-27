@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bb_release/bb_release.dart';
@@ -246,6 +247,53 @@ dependencies:
       expect(r.package, isNull);
       expect(r.status, PinStatus.behind);
       expect(r.commitsBehind, 2);
+    });
+  });
+
+  group('dsh events', () {
+    String events(List<Map<String, Object?>> list) =>
+        list.map(jsonEncode).join('\n');
+    Map<String, Object?> status(String phase, [Object? reason]) => {
+      'type': 'status',
+      'phase': phase,
+      'reason': ?reason,
+    };
+    Map<String, Object?> text(String t) => {'type': 'text', 'text': t};
+    Map<String, Object?> fin(Object reason, [String? t]) => {
+      'type': 'final',
+      'reason': reason,
+      'text': ?t,
+    };
+
+    test('reply text and failures', () {
+      const done = {'kind': 'completed'};
+      // The final event carries the whole reply.
+      expect(
+        dshReply(
+          events([
+            status('turn_start'),
+            text('{"summary":"a"}'),
+            status('turn_end', done),
+            fin(done, '{"summary":"a"}'),
+          ]),
+        ),
+        '{"summary":"a"}',
+      );
+      // Without a final event the text events are joined.
+      expect(
+        dshReply(events([text('{"summary":'), text('"b"}')])),
+        '{"summary":"b"}',
+      );
+      // A run that did not complete is an error, and so is an empty one.
+      expect(
+        () => dshReply(
+          events([
+            status('turn_end', {'kind': 'timeout'}),
+          ]),
+        ),
+        throwsA(predicate((e) => '$e'.contains('timeout'))),
+      );
+      expect(() => dshReply(''), throwsA(isA<HarnessException>()));
     });
   });
 }
