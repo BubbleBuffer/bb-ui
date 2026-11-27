@@ -2,8 +2,9 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    # The plugin is analyzed on its own (packages/bb_lints).
+    # Pure Dart packages outside the workspace are analyzed on their own.
     - packages/bb_lints/**
+    - packages/bb_release/**
 
 plugins:
   bb_lints:
