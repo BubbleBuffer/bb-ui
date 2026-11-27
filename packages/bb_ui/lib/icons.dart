@@ -111,6 +111,10 @@ enum Ico {
   smartphone,
   spline,
   filePlus,
+  link2,
+  unlink2,
+  scissors,
+  squareDashed,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -618,6 +622,26 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.spline,
     LucideIcons.spline500,
   ), // spline
+  Ico.link2: (
+    LucideIcons.link2300,
+    LucideIcons.link2,
+    LucideIcons.link2500,
+  ), // link-2
+  Ico.unlink2: (
+    LucideIcons.unlink2300,
+    LucideIcons.unlink2,
+    LucideIcons.unlink2500,
+  ), // unlink-2
+  Ico.scissors: (
+    LucideIcons.scissors300,
+    LucideIcons.scissors,
+    LucideIcons.scissors500,
+  ), // scissors
+  Ico.squareDashed: (
+    LucideIcons.squareDashed300,
+    LucideIcons.squareDashed,
+    LucideIcons.squareDashed500,
+  ), // square-dashed
 };
 
 class Icon20 extends StatelessWidget {
