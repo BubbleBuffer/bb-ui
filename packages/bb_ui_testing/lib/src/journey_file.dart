@@ -116,9 +116,10 @@ class _YamlSubset {
       if (rest.isEmpty) {
         result.add(_child(indent));
       } else if (_entry.hasMatch(rest)) {
-        // A compact item such as "- tap:" begins a mapping two columns in.
-        _lines.insert(_position, _Line(indent + 2, rest, line.number));
-        result.add(_mapping(indent + 2));
+        // A compact item such as "- tap:" begins a mapping after the marker.
+        final mappingIndent = indent + line.text.length - rest.length;
+        _lines.insert(_position, _Line(mappingIndent, rest, line.number));
+        result.add(_mapping(mappingIndent));
       } else {
         result.add(_scalar(rest, line.number));
       }

@@ -83,7 +83,7 @@ steps:
       find:
         key: title
       text: Updated
-  - key: Escape
+  - key: Arrow Left
 '''),
       report: report,
     );
@@ -98,6 +98,13 @@ steps:
     expect(record.total, 4);
     expect(record.stepCount, 4);
     expect(record.failedStep, isNull);
+    expect(
+      tester
+          .widget<EditableText>(find.byKey(const ValueKey('title')))
+          .controller
+          .selection,
+      const TextSelection.collapsed(offset: 6),
+    );
     final saved = jsonDecode(File(report.path!).readAsStringSync()) as Map;
     expect(saved['goals'], [record.toJson()]);
     final images = Directory(report.screenshotDirectory!)
@@ -127,7 +134,7 @@ steps:
     await tester.pumpWidget(const _Fixture());
     final report = JourneyReport(path: '${temporary.path}/report.json');
     await expectLater(
-      runJourney(tester, {
+      () async => runJourney(tester, {
         'goal': 'Check title',
         'steps': [
           {
@@ -206,7 +213,7 @@ steps:
     );
     final report = JourneyReport();
     await expectLater(
-      runJourney(tester, {
+      () async => runJourney(tester, {
         'goal': 'Missing row',
         'steps': [
           {

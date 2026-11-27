@@ -3,6 +3,9 @@ import 'dart:io';
 
 const _tripleQuoteLength = 3;
 const _qualifiedParentOffset = 3;
+const _escapedCharacterLength = 2;
+const _blockCommentStart = '/*';
+const _blockCommentEnd = '*/';
 
 /// Widget declarations and matching test references found by a source scan.
 class WidgetCoverage {
@@ -291,16 +294,16 @@ String _withoutCommentsAndStrings(String source) {
       final end = source.indexOf('\n', i + 2);
       i = end < 0 ? source.length : end;
       output.write(' ');
-    } else if (source.startsWith('/*', i)) {
+    } else if (source.startsWith(_blockCommentStart, i)) {
       var depth = 1;
-      i += 2;
+      i += _blockCommentStart.length;
       while (i < source.length && depth > 0) {
-        if (source.startsWith('/*', i)) {
+        if (source.startsWith(_blockCommentStart, i)) {
           depth++;
-          i += 2;
-        } else if (source.startsWith('*/', i)) {
+          i += _blockCommentStart.length;
+        } else if (source.startsWith(_blockCommentEnd, i)) {
           depth--;
-          i += 2;
+          i += _blockCommentEnd.length;
         } else {
           i++;
         }
@@ -314,7 +317,7 @@ String _withoutCommentsAndStrings(String source) {
       i += delimiter.length;
       while (i < source.length) {
         if (!raw && source[i] == r'\') {
-          i += 2;
+          i += _escapedCharacterLength;
         } else if (source.startsWith(delimiter, i)) {
           i += delimiter.length;
           break;
