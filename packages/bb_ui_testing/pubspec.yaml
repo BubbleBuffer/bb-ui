@@ -1,0 +1,13 @@
+name: bb_ui_testing
+description: Widget coverage checks and step-driven journeys for Flutter tests.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter

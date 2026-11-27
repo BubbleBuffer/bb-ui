@@ -8,6 +8,7 @@ environment:
 workspace:
   - packages/bb_tokens
   - packages/bb_ui
+  - packages/bb_ui_testing
   - apps/gallery
 
 dev_dependencies:

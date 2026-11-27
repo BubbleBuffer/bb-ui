@@ -99,6 +99,7 @@ jobs:
         include:
           - {package: bb_tokens, dir: packages/bb_tokens}
           - {package: bb_ui, dir: packages/bb_ui}
+          - {package: bb_ui_testing, dir: packages/bb_ui_testing}
           - {package: gallery, dir: apps/gallery}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -113,6 +114,26 @@ jobs:
       - name: Run non-golden tests
         working-directory: ${{ matrix.dir }}
         run: flutter test --exclude-tags golden
+      - name: Check bb_ui widget coverage
+        if: matrix.package == 'bb_ui_testing'
+        working-directory: packages/bb_ui_testing
+        run: |
+          status=0
+          dart run bb_ui_testing:coverage \
+            --lib ../bb_ui/lib --test ../bb_ui/test \
+            --allow ../bb_ui/coverage-allowlist.txt \
+            --json "$RUNNER_TEMP/bb-ui-coverage.json" \
+            --md "$RUNNER_TEMP/bb-ui-coverage.md" || status=$?
+          if test -f "$RUNNER_TEMP/bb-ui-coverage.md"; then
+            cat "$RUNNER_TEMP/bb-ui-coverage.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$status"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ !cancelled() && matrix.package == 'bb_ui_testing' }}
+        with:
+          name: bb-ui-widget-coverage
+          path: ${{ runner.temp }}/bb-ui-coverage.*
+          if-no-files-found: ignore
 
   goldens:
     name: primitive goldens
@@ -216,6 +237,12 @@ jobs:
                 url: $URL
                 ref: $REF
                 path: packages/bb_ui
+          dev_dependencies:
+            bb_ui_testing:
+              git:
+                url: $URL
+                ref: $REF
+                path: packages/bb_ui_testing
           YAML
           printf "import 'package:bb_ui/bb_ui.dart';\n\nfinal colors = AppColors.light;\nconst hint = AppTooltip.hoverDelay;\n" > "$dir/lib/ui_use.dart"
           printf "import 'package:bb_ui/tokens.dart';\n\nconst radius = Radii.md;\n" > "$dir/lib/tokens_use.dart"
@@ -230,6 +257,7 @@ jobs:
           cd "$dir"
           flutter pub get
           dart analyze --fatal-infos
+          dart run bb_ui_testing:coverage
           # The plugin loads from Git and reports a raw value.
           printf "import 'package:flutter/widgets.dart';\n\nconst pad = EdgeInsets.all(10);\n" > lib/raw.dart
           if out=$(dart analyze 2>&1); then
