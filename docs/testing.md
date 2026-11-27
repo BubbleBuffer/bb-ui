@@ -29,14 +29,16 @@ dart run bb_ui_testing:coverage \
 
 The tool lists classes declared in Dart files under `lib/` that extend
 `StatelessWidget`, `StatefulWidget`, or another widget class discovered in the
-same scan. Use `--private` to include classes whose names start with `_`.
+same scan. Use `--lib` to scan another source directory and `--private` to include
+classes whose names start with `_`.
 
 With `--lcov`, the tool counts a widget as covered when the current test run
 hit an executable line in its `build` body. For a stateful widget, it looks
 for a class extending `State<WidgetName>` and checks that class's `build`. If
 the scan finds the state class but cannot find its `build` body, any executed
-line in that state class body counts. Use a report generated from the same
-source revision you scan. The per-widget `hit` field records whether the scan
+line in that state class body counts. The scan matches declared builds by source
+line, so use a report generated from the same source revision. The per-widget
+`hit` field records whether the scan
 found a positive line hit. LCOV mode uses executed lines alone, so tests can
 find widgets by key, text, or other properties.
 
