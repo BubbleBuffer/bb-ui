@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.11.2 builds
+Flutter primitives without Material, using `bb_tokens`. Version 0.11.3 builds
 every component from token scales only, adapts by density and by its own
 width, and grows with the system text size. Moving from 0.7 is in the
 [migration guide](../../docs/migration-0.8.md).
@@ -193,7 +193,7 @@ gesture, `onChangeEnd` on commit, `onChangeCancel` on Escape):
   `rotateCcw`, `flipHorizontal`, `flipVertical`, `grid`, `group`, `ungroup`,
   `magnet`, `crop`, `zoomIn`, `zoomOut`, `layers`, `panelRight`, `spline`,
   `shapes`, `library`, `smartphone`, `timerReset`, `rectangleHorizontal` and
-  `gitCommit`; 0.11.2 adds `link2`, `unlink2`, `scissors` and `squareDashed`.
+  `gitCommit`; 0.11.3 adds `link2`, `unlink2`, `scissors` and `squareDashed`.
 
 ## Product profiles
 
