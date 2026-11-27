@@ -1,6 +1,6 @@
 # bb_ui
 
-Flutter primitives without Material, using `bb_tokens`. Version 0.11.1 builds
+Flutter primitives without Material, using `bb_tokens`. Version 0.11.2 builds
 every component from token scales only, adapts by density and by its own
 width, and grows with the system text size. Moving from 0.7 is in the
 [migration guide](../../docs/migration-0.8.md).
