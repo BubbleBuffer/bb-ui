@@ -1,0 +1,14 @@
+name: bb_release
+description: Per-version change history, release notes and downstream pin checks for BubbleBuffer repositories.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.4
+
+executables:
+  bb_release:
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0
