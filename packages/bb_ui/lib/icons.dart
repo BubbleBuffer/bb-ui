@@ -117,6 +117,12 @@ enum Ico {
   squareDashed,
   play,
   pause,
+  arrowLeftRight,
+  pipette,
+  slidersHorizontal,
+  palette,
+  folderPlus,
+  sparkles,
 }
 
 /// The Lucide glyph behind each [Ico].
@@ -654,6 +660,36 @@ const icoGlyphs = <Ico, LucideGlyph>{
     LucideIcons.pause,
     LucideIcons.pause500,
   ), // pause
+  Ico.arrowLeftRight: (
+    LucideIcons.arrowLeftRight300,
+    LucideIcons.arrowLeftRight,
+    LucideIcons.arrowLeftRight500,
+  ), // arrow-left-right
+  Ico.pipette: (
+    LucideIcons.pipette300,
+    LucideIcons.pipette,
+    LucideIcons.pipette500,
+  ), // pipette
+  Ico.slidersHorizontal: (
+    LucideIcons.slidersHorizontal300,
+    LucideIcons.slidersHorizontal,
+    LucideIcons.slidersHorizontal500,
+  ), // sliders-horizontal
+  Ico.palette: (
+    LucideIcons.palette300,
+    LucideIcons.palette,
+    LucideIcons.palette500,
+  ), // palette
+  Ico.folderPlus: (
+    LucideIcons.folderPlus300,
+    LucideIcons.folderPlus,
+    LucideIcons.folderPlus500,
+  ), // folder-plus
+  Ico.sparkles: (
+    LucideIcons.sparkles300,
+    LucideIcons.sparkles,
+    LucideIcons.sparkles500,
+  ), // sparkles
 };
 
 class Icon20 extends StatelessWidget {
