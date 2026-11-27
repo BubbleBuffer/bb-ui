@@ -1,23 +1,15 @@
-# Widgets without a matching test reference at the initial coverage check.
+# Widgets without build hits in the bb_ui test LCOV baseline.
 AdaptiveLayout
-CodeDisplay
 DetailPanel
-DialogButton
 EmptyState
 FoldableStackCard
 FooterAction
-HLine
-Hover
 InputBox
 KeyValueRow
-Keycap
-LucideIcon
 MarkedList
 MarkedRow
 MenuHeader
-MenuItem
 MenuSeparator
-MenuSurface
 MetricsPanel
 OneTimeCode
 OutlineButton
@@ -27,15 +19,13 @@ PickerSheet
 QrFrame
 ReferenceChip
 ScreenScaffold
-SearchGroupHeader
 SectionHeader
 SectionLabel
 SettingsField
 SettingsHeading
 SheetHeader
-SheetItem
 Sparkline
 Spinner
 StacksCheckbox
 SwatchGrid
-VLine
+Toggle

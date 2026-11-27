@@ -1,11 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-const _tripleQuoteLength = 3;
-const _qualifiedParentOffset = 3;
-const _escapedCharacterLength = 2;
-const _blockCommentStart = '/*';
-const _blockCommentEnd = '*/';
+import 'lcov.dart';
+import 'widget_source.dart';
 
 /// Widget declarations and matching test references found by a source scan.
 class WidgetCoverage {
@@ -14,12 +11,14 @@ class WidgetCoverage {
     required this.staleAllowlist,
     required this.libPath,
     required this.testPath,
+    this.lcovPath,
   });
 
   final List<WidgetCoverageEntry> widgets;
   final List<String> staleAllowlist;
   final String libPath;
   final String testPath;
+  final String? lcovPath;
 
   int get covered => widgets.where((entry) => entry.covered).length;
   int get allowed => widgets.where((entry) => entry.allowed).length;
@@ -29,6 +28,7 @@ class WidgetCoverage {
   Map<String, Object?> toJson() => {
     'lib': libPath,
     'test': testPath,
+    if (lcovPath != null) 'lcov': lcovPath,
     'summary': {
       'total': widgets.length,
       'covered': covered,
@@ -47,11 +47,13 @@ class WidgetCoverage {
 
   String toMarkdown() {
     final buffer = StringBuffer('# Widget coverage\n\n$summary\n\n')
-      ..writeln('| Widget | Status | Source | Test references | Goldens |')
-      ..writeln('| --- | --- | --- | --- | --- |');
+      ..writeln(
+        '| Widget | Status | Hit | Source | Test references | Goldens |',
+      )
+      ..writeln('| --- | --- | --- | --- | --- | --- |');
     for (final entry in widgets) {
       buffer.writeln(
-        '| ${entry.name} | ${entry.status} | ${_cell(entry.source)} | '
+        '| ${entry.name} | ${entry.status} | ${entry.hit ?? ""} | ${_cell(entry.source)} | '
         '${_cell(entry.tests.join(', '))} | '
         '${_cell(entry.goldens.join(', '))} |',
       );
@@ -75,6 +77,7 @@ class WidgetCoverageEntry {
     required this.tests,
     required this.allowed,
     required this.goldens,
+    this.hit,
   });
 
   final String name;
@@ -82,7 +85,8 @@ class WidgetCoverageEntry {
   final List<String> tests;
   final bool allowed;
   final List<String> goldens;
-  bool get covered => tests.isNotEmpty || goldens.isNotEmpty;
+  final bool? hit;
+  bool get covered => hit ?? (tests.isNotEmpty || goldens.isNotEmpty);
   String get status =>
       covered ? 'covered' : (allowed ? 'allowed' : 'uncovered');
 
@@ -92,6 +96,7 @@ class WidgetCoverageEntry {
     'status': status,
     'tests': tests,
     'goldens': goldens,
+    'hit': hit,
   };
 }
 
@@ -103,16 +108,30 @@ WidgetCoverage scanWidgetCoverage({
   bool includePrivate = false,
   bool allowMissingTestDirectory = false,
   Map<String, List<String>> goldens = const {},
+  String? lcovPath,
 }) {
   final sources = _files(libPath).where((file) => file.path.endsWith('.dart'));
-  final tests = _files(testPath, allowMissing: allowMissingTestDirectory);
-  final declarations = <({String name, String parent, String source})>[];
+  final tests = lcovPath == null
+      ? _files(testPath, allowMissing: allowMissingTestDirectory)
+      : <File>[];
+  final declarations =
+      <
+        ({
+          String name,
+          String parent,
+          String source,
+          String path,
+          WidgetSourceClass parsed,
+        })
+      >[];
   for (final file in sources) {
-    for (final declaration in _classes(file.readAsStringSync())) {
+    for (final declaration in parseWidgetSource(file.readAsStringSync())) {
       declarations.add((
         name: declaration.name,
         parent: declaration.parent,
         source: _relative(file.path, libPath),
+        path: file.path,
+        parsed: declaration,
       ));
     }
   }
@@ -140,6 +159,46 @@ WidgetCoverage scanWidgetCoverage({
           return byName != 0 ? byName : a.source.compareTo(b.source);
         });
   final names = widgets.map((widget) => widget.name).toSet();
+  final statefulNames = <String>{'StatefulWidget'};
+  var addedStateful = true;
+  while (addedStateful) {
+    addedStateful = false;
+    for (final declaration in declarations) {
+      if (statefulNames.contains(declaration.parent) &&
+          statefulNames.add(declaration.name)) {
+        addedStateful = true;
+      }
+    }
+  }
+  final lcov = lcovPath == null ? null : LcovHits(lcovPath, libPath);
+  bool hasHit(WidgetSourceClass declaration, String path) {
+    final span = declaration.build ?? declaration.body;
+    return span != null && lcov!.forFile(path).any(span.contains);
+  }
+
+  final hits = <(String, String), bool>{};
+  for (final widget in widgets) {
+    if (lcov == null) {
+      continue;
+    }
+    final bool hit;
+    if (statefulNames.contains(widget.parent)) {
+      var states = declarations
+          .where((state) => state.parsed.stateWidget == widget.name)
+          .toList();
+      final local = states.where((state) => state.path == widget.path).toList();
+      if (local.isNotEmpty) {
+        states = local;
+      }
+      hit = states.any((state) => hasHit(state.parsed, state.path));
+    } else {
+      final span = widget.parsed.build;
+      hit = span != null && lcov.forFile(widget.path).any(span.contains);
+    }
+    hits[(widget.source, widget.name)] = hit;
+  }
+  bool declarationHit(String source, String name) =>
+      hits[(source, name)] ?? false;
   final references = <String, List<String>>{};
   final pngs = <String>[];
   final identifier = RegExp(r'[A-Za-z_$][A-Za-z0-9_$]*');
@@ -155,7 +214,9 @@ WidgetCoverage scanWidgetCoverage({
     } on FormatException {
       continue;
     }
-    if (contents.contains('\u0000')) continue;
+    if (contents.contains('\u0000')) {
+      continue;
+    }
     final tokens = identifier
         .allMatches(contents)
         .map((m) => m.group(0))
@@ -180,9 +241,12 @@ WidgetCoverage scanWidgetCoverage({
           if ((goldens[name] ?? []).contains(png.split('/').last)) png,
       ],
   };
-  bool isCovered(String name) =>
-      references.containsKey(name) ||
-      (goldenEvidence[name]?.isNotEmpty ?? false);
+  bool isCovered(String name) => lcov != null
+      ? widgets
+            .where((widget) => widget.name == name)
+            .every((widget) => declarationHit(widget.source, name))
+      : references.containsKey(name) ||
+            (goldenEvidence[name]?.isNotEmpty ?? false);
   final stale =
       allowlist
           .where((name) => !names.contains(name) || isCovered(name))
@@ -191,6 +255,7 @@ WidgetCoverage scanWidgetCoverage({
   return WidgetCoverage(
     libPath: libPath,
     testPath: testPath,
+    lcovPath: lcovPath,
     staleAllowlist: stale,
     widgets: [
       for (final declaration in widgets)
@@ -200,8 +265,13 @@ WidgetCoverage scanWidgetCoverage({
           tests: references[declaration.name] ?? [],
           allowed:
               allowlist.contains(declaration.name) &&
-              !isCovered(declaration.name),
+              !(lcov == null
+                  ? isCovered(declaration.name)
+                  : declarationHit(declaration.source, declaration.name)),
           goldens: goldenEvidence[declaration.name]!,
+          hit: lcov == null
+              ? null
+              : declarationHit(declaration.source, declaration.name),
         ),
     ],
   );
@@ -249,90 +319,4 @@ String _relative(String path, String root) {
   return absolutePath.substring(
     absoluteRoot.length + (absoluteRoot.endsWith('/') ? 0 : 1),
   );
-}
-
-Iterable<({String name, String parent})> _classes(String source) sync* {
-  final tokens = RegExp(r'[A-Za-z_$][A-Za-z0-9_$]*|[^\s]')
-      .allMatches(_withoutCommentsAndStrings(source))
-      .map((match) => match.group(0)!)
-      .toList();
-  for (var i = 0; i + 1 < tokens.length; i++) {
-    if (tokens[i] != 'class') {
-      continue;
-    }
-    final name = tokens[i + 1];
-    var depth = 0;
-    for (var j = i + 2; j < tokens.length; j++) {
-      final token = tokens[j];
-      if (token == '<') {
-        depth++;
-      }
-      if (token == '>') {
-        depth--;
-      }
-      if (depth == 0 && (token == '{' || token == ';')) {
-        break;
-      }
-      if (depth == 0 &&
-          (token == 'extends' || token == '=') &&
-          j + 1 < tokens.length) {
-        var parent = tokens[j + 1];
-        if (j + _qualifiedParentOffset < tokens.length &&
-            tokens[j + 2] == '.') {
-          parent = tokens[j + _qualifiedParentOffset];
-        }
-        yield (name: name, parent: parent);
-        break;
-      }
-    }
-  }
-}
-
-// Skip nested block comments and single/triple quoted strings. Interpolation
-// stays inside the skipped string because declarations cannot occur there.
-String _withoutCommentsAndStrings(String source) {
-  final output = StringBuffer();
-  var i = 0;
-  while (i < source.length) {
-    if (source.startsWith('//', i)) {
-      final end = source.indexOf('\n', i + 2);
-      i = end < 0 ? source.length : end;
-      output.write(' ');
-    } else if (source.startsWith(_blockCommentStart, i)) {
-      var depth = 1;
-      i += _blockCommentStart.length;
-      while (i < source.length && depth > 0) {
-        if (source.startsWith(_blockCommentStart, i)) {
-          depth++;
-          i += _blockCommentStart.length;
-        } else if (source.startsWith(_blockCommentEnd, i)) {
-          depth--;
-          i += _blockCommentEnd.length;
-        } else {
-          i++;
-        }
-      }
-      output.write(' ');
-    } else if (source[i] == '"' || source[i] == "'") {
-      final quote = source[i];
-      final raw = i > 0 && source[i - 1] == 'r';
-      final tripleQuote = quote * _tripleQuoteLength;
-      final delimiter = source.startsWith(tripleQuote, i) ? tripleQuote : quote;
-      i += delimiter.length;
-      while (i < source.length) {
-        if (!raw && source[i] == r'\') {
-          i += _escapedCharacterLength;
-        } else if (source.startsWith(delimiter, i)) {
-          i += delimiter.length;
-          break;
-        } else {
-          i++;
-        }
-      }
-      output.write(' ');
-    } else {
-      output.write(source[i++]);
-    }
-  }
-  return output.toString();
 }
