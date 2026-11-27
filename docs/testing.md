@@ -21,8 +21,9 @@ Run `flutter pub get` in the app before using either tool.
 ## Widget coverage
 
 ```sh
+flutter test --coverage
 dart run bb_ui_testing:coverage \
-  --lib lib --test test --allow coverage-allowlist.txt \
+  --lcov coverage/lcov.info --allow coverage-allowlist.txt \
   --json build/widget-coverage.json --md build/widget-coverage.md
 ```
 
@@ -30,11 +31,23 @@ The tool lists classes declared in Dart files under `lib/` that extend
 `StatelessWidget`, `StatefulWidget`, or another widget class discovered in the
 same scan. Use `--private` to include classes whose names start with `_`.
 
+With `--lcov`, the tool counts a widget as covered when the current test run
+hit an executable line in its `build` body. For a stateful widget, it looks
+for a class extending `State<WidgetName>` and checks that class's `build`. If
+the scan finds the state class but cannot find its `build` body, any executed
+line in that state class body counts. Use a report generated from the same
+source revision you scan. The per-widget `hit` field records whether the scan
+found a positive line hit. LCOV mode uses executed lines alone, so tests can
+find widgets by key, text, or other properties.
+
+### Source references
+
+Omit `--lcov` to scan `test/` for references, or set another path with `--test`.
 A widget is covered when its exact class name appears in a UTF-8 text file under
-`test/`. This is a source reference check. For example, a class name inside a
-test description counts. To count golden files, pass `--goldens FILE` with a
-JSON object that maps widget class names to PNG basenames. You can give one
-basename or a list. A listed PNG found anywhere under `test/` covers its widget.
+`test/`, including within a test description. To count golden files, pass
+`--goldens FILE` with a JSON object that maps widget class names to PNG
+basenames. You can give one basename or a list. A listed PNG found anywhere
+under `test/` covers its widget.
 
 ```json
 {
@@ -42,6 +55,8 @@ basename or a list. A listed PNG found anywhere under `test/` covers its widget.
   "DeviceRow": ["device_row_light.png", "device_row_dark.png"]
 }
 ```
+
+### Reports and allowlists
 
 The command prints a table and writes reports at the supplied `--json` and
 `--md` paths. With no arguments it scans `lib/` and `test/` and uses
@@ -51,8 +66,8 @@ Blank lines and comments starting with `#` are ignored. If the default
 
 Exit code 1 means an uncovered widget needs a test or the allowlist has a stale
 entry. Delete an entry when its widget gains coverage or leaves the scan. The
-bb-ui workflow checks that policy against `packages/bb_ui` and publishes the
-table and reports with the CI run.
+bb-ui test job collects LCOV for `packages/bb_ui`, checks its allowlist, and
+publishes the LCOV file and both reports with the CI run.
 
 ## Test journeys
 

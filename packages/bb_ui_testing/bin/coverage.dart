@@ -6,7 +6,7 @@ import 'package:bb_ui_testing/src/coverage.dart';
 const _usage =
     'Usage: dart run bb_ui_testing:coverage '
     '[--lib lib] [--test test] [--allow coverage-allowlist.txt] '
-    '[--json out.json] [--md out.md] [--private] [--goldens mapping.json]';
+    '[--json out.json] [--md out.md] [--private] [--goldens mapping.json] [--lcov path]';
 
 void main(List<String> arguments) {
   try {
@@ -29,6 +29,7 @@ void main(List<String> arguments) {
             '--json',
             '--md',
             '--goldens',
+            '--lcov',
           ].contains(argument) ||
           i + 1 == arguments.length ||
           arguments[i + 1].startsWith('--')) {
@@ -45,13 +46,16 @@ void main(List<String> arguments) {
           options['--allow'] ??
           (defaultAllow.existsSync() ? defaultAllow.path : null),
       includePrivate: includePrivate,
-      goldens: options['--goldens'] == null
+      lcovPath: options['--lcov'],
+      goldens: options['--goldens'] == null || options['--lcov'] != null
           ? const {}
           : readGoldenMapping(options['--goldens']!),
     );
-    stdout.writeln('Widget\tStatus\tSource');
+    stdout.writeln('Widget\tStatus\tHit\tSource');
     for (final entry in report.widgets) {
-      stdout.writeln('${entry.name}\t${entry.status}\t${entry.source}');
+      stdout.writeln(
+        '${entry.name}\t${entry.status}\t${entry.hit ?? ""}\t${entry.source}',
+      );
     }
     stdout.writeln(report.summary);
     for (final name in report.staleAllowlist) {

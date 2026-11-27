@@ -112,15 +112,23 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: Run non-golden tests
+        if: matrix.package != 'bb_ui'
         working-directory: ${{ matrix.dir }}
         run: flutter test --exclude-tags golden
+      - name: Run bb_ui non-golden tests with coverage
+        if: matrix.package == 'bb_ui'
+        working-directory: packages/bb_ui
+        run: |
+          flutter test --exclude-tags golden --coverage \
+            --coverage-path "$RUNNER_TEMP/bb-ui-coverage.lcov"
       - name: Check bb_ui widget coverage
-        if: matrix.package == 'bb_ui_testing'
+        if: matrix.package == 'bb_ui'
         working-directory: packages/bb_ui_testing
         run: |
           status=0
           dart run bb_ui_testing:coverage \
             --lib ../bb_ui/lib --test ../bb_ui/test \
+            --lcov "$RUNNER_TEMP/bb-ui-coverage.lcov" \
             --allow ../bb_ui/coverage-allowlist.txt \
             --json "$RUNNER_TEMP/bb-ui-coverage.json" \
             --md "$RUNNER_TEMP/bb-ui-coverage.md" || status=$?
@@ -129,7 +137,7 @@ jobs:
           fi
           exit "$status"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        if: ${{ !cancelled() && matrix.package == 'bb_ui_testing' }}
+        if: ${{ !cancelled() && matrix.package == 'bb_ui' }}
         with:
           name: bb-ui-widget-coverage
           path: ${{ runner.temp }}/bb-ui-coverage.*
