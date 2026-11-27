@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  lucide_icons_flutter: 3.1.25
+  lucide_icons_flutter: 4.0.1
   bb_tokens:
     path: ../bb_tokens
 
