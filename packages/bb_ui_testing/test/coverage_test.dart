@@ -31,6 +31,7 @@ class Middle<T extends Object>
     extends Base<T> {}
 abstract class Base<T> extends ui.StatelessWidget {}
 class Stateful extends StatefulWidget {}
+class Wrapped = Stateful with Wrapper;
 class _Private extends StatelessWidget {}
 class Plain {}
 // class CommentWidget extends StatelessWidget {}
@@ -40,16 +41,18 @@ final text = "class StringWidget extends StatelessWidget {}";
 // Leaf Middle
 const text = 'Base Stateful';
 ''');
+    write('$tests/journeys/open.yaml', 'goal: Open Wrapped');
     final report = scanWidgetCoverage(libPath: lib, testPath: tests);
     expect(report.widgets.map((entry) => entry.name), [
       'Base',
       'Leaf',
       'Middle',
       'Stateful',
+      'Wrapped',
     ]);
-    expect(report.covered, 4);
+    expect(report.covered, 5);
     expect(report.passed, isTrue);
-    expect(report.toJson()['summary'], containsPair('covered', 4));
+    expect(report.toJson()['summary'], containsPair('covered', 5));
     expect(report.toMarkdown(), contains('| Leaf | covered |'));
     final privateReport = scanWidgetCoverage(
       libPath: lib,
@@ -143,7 +146,7 @@ const text = 'Base Stateful';
 
   test('existing mapped golden covers widget and makes allowance stale', () {
     write('$lib/widget.dart', 'class Card extends StatelessWidget {}');
-    write('$tests/goldens/card.light.png', 'fixture');
+    write('$tests/goldens/card.light.png', 'Card');
     final mapping = '${fixture.path}/goldens.json';
     write(
       mapping,

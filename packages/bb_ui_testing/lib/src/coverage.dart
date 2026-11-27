@@ -104,12 +104,8 @@ WidgetCoverage scanWidgetCoverage({
   bool allowMissingTestDirectory = false,
   Map<String, List<String>> goldens = const {},
 }) {
-  final sources = _files(libPath, '.dart');
-  final tests = _files(
-    testPath,
-    '.dart',
-    allowMissing: allowMissingTestDirectory,
-  );
+  final sources = _files(libPath).where((file) => file.path.endsWith('.dart'));
+  final tests = _files(testPath, allowMissing: allowMissingTestDirectory);
   final declarations = <({String name, String parent, String source})>[];
   for (final file in sources) {
     for (final declaration in _classes(file.readAsStringSync())) {
@@ -145,15 +141,27 @@ WidgetCoverage scanWidgetCoverage({
         });
   final names = widgets.map((widget) => widget.name).toSet();
   final references = <String, List<String>>{};
+  final pngs = <String>[];
+  final identifier = RegExp(r'[A-Za-z_$][A-Za-z0-9_$]*');
   for (final file in tests) {
-    final tokens = RegExp(r'[A-Za-z_$][A-Za-z0-9_$]*')
-        .allMatches(file.readAsStringSync())
-        .map((match) => match.group(0)!)
+    final path = _relative(file.path, testPath);
+    if (path.endsWith('.png')) {
+      pngs.add(path);
+      continue;
+    }
+    final String contents;
+    try {
+      contents = utf8.decode(file.readAsBytesSync());
+    } on FormatException {
+      continue;
+    }
+    if (contents.contains('\u0000')) continue;
+    final tokens = identifier
+        .allMatches(contents)
+        .map((m) => m.group(0))
         .toSet();
     for (final name in names.where(tokens.contains)) {
-      references
-          .putIfAbsent(name, () => [])
-          .add(_relative(file.path, testPath));
+      references.putIfAbsent(name, () => []).add(path);
     }
   }
   final allowlist = <String>{};
@@ -165,11 +173,6 @@ WidgetCoverage scanWidgetCoverage({
       }
     }
   }
-  final pngs = _files(
-    testPath,
-    '.png',
-    allowMissing: allowMissingTestDirectory,
-  ).map((file) => _relative(file.path, testPath)).toList();
   final goldenEvidence = <String, List<String>>{
     for (final name in names)
       name: [
@@ -225,7 +228,7 @@ Map<String, List<String>> readGoldenMapping(String path) {
   });
 }
 
-List<File> _files(String path, String extension, {bool allowMissing = false}) {
+List<File> _files(String path, {bool allowMissing = false}) {
   final directory = Directory(path);
   if (!directory.existsSync()) {
     if (allowMissing) {
@@ -236,7 +239,6 @@ List<File> _files(String path, String extension, {bool allowMissing = false}) {
   return directory
       .listSync(recursive: true, followLinks: false)
       .whereType<File>()
-      .where((file) => file.path.endsWith(extension))
       .toList()
     ..sort((a, b) => a.path.compareTo(b.path));
 }
@@ -268,10 +270,12 @@ Iterable<({String name, String parent})> _classes(String source) sync* {
       if (token == '>') {
         depth--;
       }
-      if (depth == 0 && (token == '{' || token == ';' || token == '=')) {
+      if (depth == 0 && (token == '{' || token == ';')) {
         break;
       }
-      if (depth == 0 && token == 'extends' && j + 1 < tokens.length) {
+      if (depth == 0 &&
+          (token == 'extends' || token == '=') &&
+          j + 1 < tokens.length) {
         var parent = tokens[j + 1];
         if (j + _qualifiedParentOffset < tokens.length &&
             tokens[j + 2] == '.') {

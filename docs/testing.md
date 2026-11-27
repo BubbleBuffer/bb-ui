@@ -30,7 +30,7 @@ The tool lists classes declared in Dart files under `lib/` that extend
 `StatelessWidget`, `StatefulWidget`, or another widget class discovered in the
 same scan. Use `--private` to include classes whose names start with `_`.
 
-A widget is covered when its exact class name appears in a Dart file under
+A widget is covered when its exact class name appears in a UTF-8 text file under
 `test/`. This is a source reference check. For example, a class name inside a
 test description counts. To count golden files, pass `--goldens FILE` with a
 JSON object that maps widget class names to PNG basenames. You can give one
